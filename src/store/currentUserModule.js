@@ -21,7 +21,6 @@ export const currentUserModule = {
             state.isAuth = true;
         },
         setData(state, data) {
-            console.log(data);
             state.isAuth = true;
             state.id = data.id;
             state.username = data.username;

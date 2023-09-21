@@ -17,12 +17,29 @@ export async function login(username, pwd) {
     }
 }
 
+export async function refresh() {
+    try {
+        const response = await axios.post('/user_account/refresh', {},
+            { headers: { 'X-CSRF-TOKEN': $cookies.get('csrf_refresh_token') } }
+        );
+        return response.data;
+    }
+    catch (e) {
+        console.log(e);
+    }
+}
+
 export async function profileSettings() {
     try {
         const response = await axios.get('/user_account/profile_settings');
         return response.data;
     } catch (e) {
-        console.log(e);
+        if (e.response.status == 401 && "msg" in e.response.data && e.response.data.msg == "Token has expired") {
+            refresh();
+        }
+        else {
+            console.log(e);
+        }
     }
 }
 
@@ -48,6 +65,44 @@ export async function registration(userName, fullName, email, password, phone, c
                 "pwd": password
             }
         );
+        return response.data;
+    }
+    catch (e) {
+        try {
+            return e.response.data;
+        }
+        catch (ex) {
+            console.log(ex);
+        }
+
+    }
+}
+
+export async function get_locations() {
+    try {
+        const response = await axios.get('/user_account/locations')
+        return response.data;
+    }
+    catch (e) {
+        console.log(e);
+    }
+}
+
+export async function get_location(location_id) {
+    try {
+        const response = await axios.get('/user_account/location/' + location_id)
+        return response.data;
+    }
+    catch (e) {
+        console.log(e);
+    }
+}
+
+export async function edit_location(location_id, location_data) {
+    try {
+        const response = await axios.post('/user_account/location/' + location_id,
+            location_data,
+            { headers: { 'X-CSRF-TOKEN': $cookies.get('csrf_access_token') } });
         return response.data;
     }
     catch (e) {

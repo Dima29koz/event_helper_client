@@ -12,27 +12,32 @@
       </ul>
 
       <div class="col-md-3 text-end">
-        <template v-if="currentUser.isAuth">
-          <div class="nav-item dropdown">
-            <button class="d-flex ms-sm-auto nav-link active text-decoration-none " id="dropdownUser"
-              data-bs-toggle="dropdown" aria-expanded="false">
-              <img src="@/assets/default_avatar.jpg" alt="" width="32" height="32" class="rounded-circle me-2" />
-              <p class="my-0 dropdown-toggle">{{ currentUser.username }}</p>
-            </button>
-            <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser">
-              <li><router-link to="/profile_settings" class="dropdown-item">Настройки профиля</router-link></li>
-              <li>
-                <hr class="dropdown-divider ">
-              </li>
-              <a @click="logout" type="button" class="dropdown-item">Выйти</a>
-            </ul>
-          </div>
-        </template>
+        <div class="d-flex justify-content-end">
+          <template v-if="currentUser.isAuth">
+            <div class="nav-item dropdown">
+              <button class="d-flex ms-sm-auto nav-link active text-decoration-none " id="dropdownUser"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                <img src="@/assets/default_avatar.jpg" alt="" width="32" height="32" class="rounded-circle me-2" />
+                <p class="my-0 dropdown-toggle">{{ currentUser.username }}</p>
+              </button>
+              <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser">
+                <li><router-link to="/profile_settings" class="dropdown-item">Настройки профиля</router-link></li>
+                <li><router-link to="/locations" class="dropdown-item">Мои адреса</router-link></li>
+                <li>
+                  <hr class="dropdown-divider ">
+                </li>
+                <a @click="logout" type="button" class="dropdown-item">Выйти</a>
+              </ul>
+            </div>
+          </template>
 
-        <template v-else>
-          <button @click="$router.push('login')" type="button" class="btn btn-outline-primary me-2">Вход</button>
-          <button @click="$router.push('registration')" type="button" class="btn btn-primary">Регистрация</button>
-        </template>
+          <template v-else>
+            <button @click="$router.push('login')" type="button" class="btn btn-outline-primary me-2">Вход</button>
+            <button @click="$router.push('registration')" type="button" class="btn btn-primary">Регистрация</button>
+          </template>
+          <color-mode-toggler></color-mode-toggler>
+        </div>
+
 
       </div>
     </header>
@@ -41,12 +46,14 @@
   
 <script>
 import { mapGetters } from 'vuex'
-import 'bootstrap/js/dist/dropdown'
-import 'bootstrap/js/dist/collapse'
 
+import ColorModeToggler from "@/components/ColorModeToggler"
 import { logout } from "@/utils/api_user_account"
 
 export default {
+  components: {
+    ColorModeToggler,
+  },
   methods: {
     async logout() {
       let r = await logout();

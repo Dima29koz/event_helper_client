@@ -1,6 +1,8 @@
 <template>
     <div>
-        <RegistrationForm @register='createUser'></RegistrationForm>
+        <RegistrationForm @register='createUser'>
+            <div v-if="error">{{ error }}</div>
+        </RegistrationForm>
     </div>
 </template>
   
@@ -9,12 +11,17 @@ import RegistrationForm from "@/components/RegistrationForm";
 import { registration } from "@/utils/api_user_account"
 
 export default {
+    data() {
+        return {
+            error: null,
+        }
+    },
     components: {
         RegistrationForm,
     },
     methods: {
         async createUser(new_user) {
-            registration(
+            const res = await registration(
                 new_user.username,
                 new_user.full_name,
                 new_user.email,
@@ -22,6 +29,13 @@ export default {
                 new_user.phone,
                 new_user.contacts
             );
+            if ("msg" in res && res.msg == 'username is not allowed') {
+                this.error = 'Пользователь с таким именем уже существует';
+            }
+            else {
+                this.$router.push('login');
+            }
+
         },
     },
 }

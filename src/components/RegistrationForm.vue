@@ -7,7 +7,9 @@
       <div class="form-floating">
         <Field v-focus v-model="new_user.username" name="username" type="text" class="form-control" placeholder="Логин" />
         <label for="username">Логин</label>
-        <ErrorMessage as="div" name="username" class="alert alert-danger p-1" />
+        <slot>
+          <ErrorMessage as="div" name="username" class="alert alert-danger p-1" />
+        </slot>
       </div>
       <div class="form-floating">
         <Field v-model="new_user.full_name" name="name" id="name" type="text" class="form-control" placeholder="ФИО" />
@@ -56,8 +58,7 @@ const schema = yup.object({
   username: yup.string().required(),
   email: yup.string().required().email(),
   password: yup.string().required(),
-  passwordRepeat: yup.string()
-    .oneOf([yup.ref('password'), null], 'Passwords must match')
+  passwordRepeat: yup.string().oneOf([yup.ref('password'), null], 'Passwords must match')
 });
 </script>
 
@@ -92,7 +93,6 @@ export default {
       }
       else {
         this.$emit('register', this.new_user);
-        this.$router.push('login');
       }
 
     },
