@@ -7,7 +7,7 @@
 </template>
   
 <script>
-import RegistrationForm from "@/components/RegistrationForm";
+import RegistrationForm from "@/components/Forms/RegistrationForm";
 import { registration } from "@/utils/api_user_account"
 
 export default {

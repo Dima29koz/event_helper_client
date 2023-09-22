@@ -5,7 +5,7 @@
 </template>
   
 <script>
-import LoginForm from "@/components/LoginForm";
+import LoginForm from "@/components/Forms/LoginForm";
 import { login, profileSettings} from "@/utils/api_user_account"
 
 export default {
