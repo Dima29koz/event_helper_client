@@ -1,40 +1,43 @@
 <template>
-    <template v-if="show">
-        <div class="dialog" @click.stop="hideDialog">
-        <div @click.stop class="dialog__content">
-            <slot></slot>
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="" aria-hidden="true" ref="modalEle">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">{{ title }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <slot name="body" />
+                </div>
+                <div class="modal-footer">
+                    <slot name="footer"></slot>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
-    </template>
-    
 </template>
-  
-<script>
-import toggleMixin from "@/mixins/toggleMixin";
+    
+<script setup>
+import { onMounted, ref } from "vue";
+import Modal from 'bootstrap/js/dist/modal'
+defineProps({
+    title: {
+        type: String,
+        default: "<<Title goes here>>",
+    },
+});
+let modalEle = ref(null);
+let thisModalObj = null;
 
-export default {
-    name: 'modal',
-    mixins: [toggleMixin],
+onMounted(() => {
+    thisModalObj = new Modal(modalEle.value);
+});
+function _show() {
+    thisModalObj.show();
 }
+defineExpose({ show: _show });
 </script>
-
-<style scoped>
-.dialog {
-    top: 0;
-    bottom: 0;
-    right: 0;
-    left: 0;
-    background: rgba(0, 0, 0, 0.5);
-    position: fixed;
-    display: flex;
-}
-
-.dialog__content {
-    margin: auto;
-    background: white;
-    border-radius: 12px;
-    min-height: 50px;
-    min-width: 300px;
-    padding: 20px;
-}
-</style>
+  

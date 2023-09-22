@@ -109,3 +109,31 @@ export async function edit_location(location_id, location_data) {
         console.log(e);
     }
 }
+
+export async function delete_location(location_id) {
+    try {
+        const response = await axios.delete('/user_account/location/' + location_id, { headers: { 'X-CSRF-TOKEN': $cookies.get('csrf_access_token') } })
+        return response.data;
+    }
+    catch (e) {
+        console.log(e);
+    }
+}
+
+export async function create_location(location_data) {
+    try {
+        const response = await axios.post('/user_account/create_location',
+            {
+                "name": location_data.name,
+                "address": location_data.address,
+                "geo": location_data.geo,
+                "maps_link": location_data.maps_link,
+                "description": location_data.description,
+            },
+            { headers: { 'X-CSRF-TOKEN': $cookies.get('csrf_access_token') } });
+        return response.data.data;
+    }
+    catch (e) {
+        console.log(e);
+    }
+}
