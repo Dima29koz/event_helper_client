@@ -1,7 +1,7 @@
 <template>
   <div>
-    <navbar></navbar>
-    <router-view></router-view>
+    <Navbar></Navbar>
+    <RouterView />
   </div>
 </template>
 
@@ -11,25 +11,27 @@ import 'bootstrap/js/dist/dropdown'
 import 'bootstrap/js/dist/collapse'
 import 'bootstrap/js/dist/modal'
 
-import Navbar from "@/components/Navbar";
-import { profileSettings } from "@/utils/api_user_account"
+import Navbar from './components/NavbarHeader.vue'
+import { profileSettings } from '@/utils/api_user_account'
+import { useCurrentUserStore } from './stores/currentUserStore'
 
 export default {
   components: {
     Navbar
   },
-  
+
   mounted() {
-    if (this.$cookies.keys().includes("csrf_access_token")) {
-      this.getUserData();
+    if (this.$cookies.keys().includes('csrf_access_token')) {
+      this.getUserData()
     }
   },
 
   methods: {
     async getUserData() {
-      let user_data = await profileSettings();
-      this.$store.commit('current_user/setData', user_data);
-    },
+      let user_data = await profileSettings()
+      const currentUserStore = useCurrentUserStore()
+      currentUserStore.setData(user_data)
+    }
   }
 }
 </script>

@@ -1,5 +1,3 @@
-import Modal from "@/components/UI/Modal";
+import Modal from '@/components/UI/BModal.vue'
 
-export default [
-    Modal
-];
+export default [Modal]

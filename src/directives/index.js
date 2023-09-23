@@ -1,5 +1,3 @@
-import VFocus from "@/directives/VFocus";
+import VFocus from '@/directives/VFocus'
 
-export default [
-    VFocus,
-]
+export default [VFocus]

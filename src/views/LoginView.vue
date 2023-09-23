@@ -1,32 +1,36 @@
 <template>
-    <div>
-        <LoginForm @login='loginUser'></LoginForm>
-    </div>
+  <div>
+    <LoginForm @login="loginUser"></LoginForm>
+  </div>
 </template>
-  
+
 <script>
-import LoginForm from "@/components/Forms/LoginForm";
-import { login, profileSettings} from "@/utils/api_user_account"
+import LoginForm from '../components/Forms/LoginForm.vue'
+import { login, profileSettings } from '@/utils/api_user_account'
+
+import { useCurrentUserStore } from '../stores/currentUserStore'
 
 export default {
-    components: {
-        LoginForm,
-    },
-    methods: {
-        async loginUser(user) {
-            await login(user.username, user.password);
-            this.$store.commit('current_user/authenticate');
-            this.getUserData();
-        },
-        async getUserData() {
-            let user_data = await profileSettings();
-            this.$store.commit('current_user/setData', user_data);
-        },
+  setup() {
+    const currentUserStore = useCurrentUserStore()
+    return { currentUserStore }
+  },
+  components: {
+    LoginForm
+  },
+  methods: {
+    async loginUser(user) {
+      await login(user.username, user.password)
 
+      this.currentUserStore.authenticate()
+      this.getUserData()
     },
+    async getUserData() {
+      let user_data = await profileSettings()
+      this.currentUserStore.setData(user_data)
+    }
+  }
 }
 </script>
-  
-<style scoped>
 
-</style>
+<style scoped></style>
