@@ -91,7 +91,6 @@ export async function get_location(location_id) {
 
 export async function edit_location(location_id, location_data) {
   try {
-    console.log($cookies.get('csrf_access_token'))
     const response = await axios.post('/api/user_account/location/' + location_id, location_data, {
       headers: { 'X-CSRF-TOKEN': $cookies.get('csrf_access_token') }
     })

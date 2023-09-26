@@ -3,7 +3,7 @@
     <div class="form-floating">
       <input
         v-focus
-        v-model="name"
+        v-model="local_location.name"
         ref="name"
         type="text"
         class="form-control"
@@ -13,7 +13,7 @@
     </div>
     <div class="form-floating">
       <input
-        v-model="description"
+        v-model="local_location.description"
         ref="description"
         type="text"
         class="form-control"
@@ -23,7 +23,7 @@
     </div>
     <div class="form-floating">
       <textarea
-        v-model="address"
+        v-model="local_location.address"
         ref="address"
         rows="4"
         class="form-control"
@@ -33,12 +33,18 @@
       <label>Адрес</label>
     </div>
     <div class="form-floating">
-      <input v-model="geo" ref="geo" type="text" class="form-control" placeholder="Геолокация" />
+      <input
+        v-model="local_location.geo"
+        ref="geo"
+        type="text"
+        class="form-control"
+        placeholder="Геолокация"
+      />
       <label>Координаты</label>
     </div>
     <div class="form-floating">
       <input
-        v-model="maps_link"
+        v-model="local_location.maps_link"
         ref="maps_link"
         type="text"
         class="form-control"
@@ -54,11 +60,15 @@ export default {
   name: 'location-form',
   data() {
     return {
-      name: '',
-      description: '',
-      address: '',
-      geo: '',
-      maps_link: ''
+      local_location: this.location
+        ? { ...this.location }
+        : {
+            name: '',
+            description: '',
+            address: '',
+            geo: '',
+            maps_link: ''
+          }
     }
   },
 
@@ -71,7 +81,8 @@ export default {
           description: '',
           address: '',
           geo: '',
-          maps_link: ''
+          maps_link: '',
+          id: ''
         }
       }
     },
@@ -85,17 +96,9 @@ export default {
   watch: {
     isSubmited(newValue) {
       if (newValue) {
-        this.onSubmit(this)
+        this.onSubmit(this.local_location)
       }
     }
-  },
-
-  mounted() {
-    this.name = this.location.name
-    this.description = this.location.description
-    this.address = this.location.address
-    this.geo = this.location.geo
-    this.maps_link = this.location.maps_link
   }
 }
 </script>
