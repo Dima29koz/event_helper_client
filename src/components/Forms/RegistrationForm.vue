@@ -96,7 +96,7 @@
 </template>
 
 <script setup>
-import yup from 'yup'
+import * as yup from 'yup'
 
 const schema = yup.object({
   username: yup.string().required(),

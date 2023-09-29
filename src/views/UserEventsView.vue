@@ -5,8 +5,14 @@
         <div class="d-flex justify-content-between">
           <h1>События</h1>
           <div>
-            <button type="button" class="btn btn-primary me-2" disabled>Присоединиться</button>
-            <button type="button" class="btn btn-success" disabled>Создать</button>
+            <button
+              type="button"
+              class="btn btn-primary me-2"
+              @click="$router.push({ name: 'event', params: { key: '123' } })"
+            >
+              Присоединиться
+            </button>
+            <button type="button" class="btn btn-success" @click="onCreateEvent">Создать</button>
           </div>
         </div>
       </caption>
@@ -21,7 +27,7 @@
         <tr
           v-for="(event, index) in [...events_creator, ...events_member]"
           :key="index"
-          @click="eventInfo(event, index, $event)"
+          @click="eventInfo(event)"
         >
           <th scope="row">{{ index + 1 }}</th>
           <td>{{ event.title }}</td>
@@ -30,14 +36,25 @@
       </tbody>
     </table>
 
-    <!-- <LocationModal v-if="dialogVisible" v-model:modalVisible="dialogVisible" :location="eventByIdx()"
-            @close="dialogVisible = false" @newLocation="addEvent"></LocationModal> -->
+    <b-modal
+      v-if="dialogVisible"
+      :title="'Создание события'"
+      @close="dialogVisible = false"
+      ref="modalElem"
+    >
+      <template #body>
+        <event-form id="eventForm" :onSubmit="addEvent"></event-form>
+      </template>
+      <template #footer>
+        <button type="submit" class="btn btn-primary" form="eventForm">Создать</button>
+      </template>
+    </b-modal>
   </div>
 </template>
 
 <script>
-// import LocationModal from "@/components/LocationModal"
-import { get_events } from '@/utils/api_event_management'
+import EventForm from '../components/Forms/EventForm.vue'
+import { get_events, create_event } from '@/utils/api_event_management'
 
 export default {
   data() {
@@ -50,29 +67,32 @@ export default {
   },
 
   components: {
-    // LocationModal
+    EventForm
   },
 
   methods: {
     eventByIdx() {
-      if (isNaN(this.selectedLocationIdx)) {
+      if (isNaN(this.selectedEventIdx)) {
         return {}
       }
-      return this.events[this.selectedLocationIdx]
+      return this.events[this.selectedEventIdx]
     },
 
-    createEvent() {
+    onCreateEvent() {
       this.selectedEventIdx = NaN
       this.dialogVisible = true
     },
 
-    addEvent(new_event) {
-      this.events.push(new_event)
+    async addEvent(new_event) {
+      console.log(new_event)
+      this.$refs.modalElem.modal.hide()
+      let key = await create_event(new_event)
+      console.log(key)
+      // this.events.push(new_event)
     },
 
-    async eventInfo(event, index, e) {
-      console.log(event)
-      console.log(index)
+    async eventInfo(event) {
+      this.$router.push({ name: 'event', params: { key: event.key } })
       // let event_data = await get_location(event.id);
       // this.selectedEventIdx = index;
       // this.events[index] = event_data;
@@ -85,6 +105,7 @@ export default {
       this.events_member = data.member_on
     }
   },
+
   mounted() {
     this.getEvents()
   }
