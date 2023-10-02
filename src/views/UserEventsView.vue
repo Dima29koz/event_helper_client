@@ -98,7 +98,7 @@ export default {
       this.$router.push({ name: 'event', params: { key: key } })
     },
 
-    async eventInfo(event) {
+    eventInfo(event) {
       this.$router.push({ name: 'event', params: { key: event.key } })
       // let event_data = await get_location(event.id);
       // this.selectedEventIdx = index;

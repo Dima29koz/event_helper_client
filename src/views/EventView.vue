@@ -39,7 +39,14 @@
       </li>
     </ul>
 
-    <component :is="currentTabComponent" :data="currentTabData" class="tab"></component>
+    <component
+      :is="currentTabComponent"
+      :data="currentTabData"
+      class="tab"
+      @delEvent="del_event"
+      @editEvent="edit_event"
+      @editLocation="edit_location"
+    ></component>
   </div>
 </template>
 
@@ -81,6 +88,31 @@ export default {
       this.socket.emit('get_data', {
         entity: 'members'
       })
+    },
+    del_event() {
+      this.socket.emit('delete_event', {
+        auth: {
+          csrf_access_token: $cookies.get('csrf_access_token')
+        }
+      })
+    },
+    edit_event(event_data) {
+      this.socket.emit('update_data', {
+        auth: {
+          csrf_access_token: $cookies.get('csrf_access_token')
+        },
+        entity: 'event',
+        data: event_data
+      })
+    },
+    edit_location(location_data) {
+      this.socket.emit('update_data', {
+        auth: {
+          csrf_access_token: $cookies.get('csrf_access_token')
+        },
+        entity: 'location',
+        data: location_data
+      })
     }
   },
   computed: {
@@ -112,31 +144,37 @@ export default {
     })
 
     this.socket.on('get_event', (event_data) => {
-      console.log(event_data)
       this.event_data = event_data
+      this.event_data.date_start = new Date(event_data.date_start)
+      this.event_data.date_end = new Date(event_data.date_end)
     })
 
     this.socket.on('get_event_location', (location_data) => {
-      console.log(location_data)
       this.event_data.location = location_data
     })
 
     this.socket.on('get_event_members', (event_members) => {
-      console.log(event_members)
       this.event_members = event_members
     })
 
     this.socket.on('update_event', (event_data) => {
-      console.log(event_data)
+      Object.keys(event_data).forEach((key) => {
+        this.event_data[key] = event_data[key]
+      })
+      this.event_data.date_start = new Date(event_data.date_start)
+      this.event_data.date_end = new Date(event_data.date_end)
     })
+
     this.socket.on('update_event_location', (event_location) => {
-      console.log(event_location)
+      this.event_data.location = event_location
     })
+
     this.socket.on('update_event_member', (member_data) => {
       console.log(member_data)
     })
     this.socket.on('delete_event', (event_data) => {
       console.log(event_data)
+      this.$router.push({ name: 'events' })
     })
     this.socket.on('add_member', (member_data) => {
       console.log(member_data)

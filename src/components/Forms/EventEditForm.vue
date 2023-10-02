@@ -1,5 +1,5 @@
 <template>
-  <VForm @submit="this.onSubmit(this.event)" :validation-schema="schema" ref="eventForm">
+  <VForm @submit="isLocationSubmited = true" :validation-schema="schema" ref="eventEditForm">
     <div class="form-floating">
       <Field
         v-focus
@@ -54,7 +54,12 @@
       <ErrorMessage as="div" name="cost_reduction_factor" class="alert alert-danger p-1" />
     </div>
     <div class="form-floating">
-      <location-card :location="event_data.location"></location-card>
+      <h5>Изменение адреса</h5>
+      <location-form
+        :location="event_data.location"
+        :onSubmit="submitForms"
+        v-model:isSubmited="isLocationSubmited"
+      ></location-form>
     </div>
   </VForm>
 </template>
@@ -64,7 +69,6 @@ import * as yup from 'yup'
 
 const schema = yup.object({
   title: yup.string().required('Название не указано'),
-  location_id: yup.number().required('Адрес не указан').typeError('Адрес не указан'),
   date_start: yup.string().required('Дата не выбрана'),
   date_end: yup.string().required('Дата не выбрана'),
   cost_reduction_factor: yup.number().required().typeError('Зачение не указано')
@@ -76,30 +80,28 @@ import { Form as VForm, Field, ErrorMessage } from 'vee-validate'
 import DatePicker from '@/components/UI/DatePicker.vue'
 
 import LocationForm from '@/components/Forms/LocationForm.vue'
-import LocationCard from '@/components/Cards/LocationCard.vue'
 
 export default {
-  name: 'event-info-form',
+  name: 'event-edit-form',
   data() {
     return {
-      event: { ...this.event_data }
+      event: { ...this.event_data },
+      isLocationSubmited: false
     }
   },
 
-  components: { DatePicker, LocationForm, LocationCard },
+  components: { DatePicker, LocationForm },
   props: {
-    event_data: {
-      title: '',
-      description: '',
-      date_start: null,
-      date_end: null,
-      timezone: '+0300',
-      cost_reduction_factor: 25,
-      location: {}
-    },
+    event_data: {},
     onSubmit: {
       type: Function,
       default: null
+    }
+  },
+  methods: {
+    submitForms(location_data) {
+      this.event.location = location_data
+      this.onSubmit(this.event)
     }
   }
 }
