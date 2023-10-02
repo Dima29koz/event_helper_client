@@ -28,33 +28,21 @@
       <label>Адрес</label>
       <ErrorMessage as="div" name="location_id" class="alert alert-danger p-1" />
     </div>
-
     <div class="row">
       <div class="col">
-        <div class="form-floating">
-          <Field
-            v-model="event.date_start"
-            name="date_start"
-            type="datetime-local"
-            class="form-control"
-            placeholder="Дата начала"
-          />
-          <label>Дата начала</label>
-          <ErrorMessage as="div" name="date_start" class="alert alert-danger p-1" />
-        </div>
+        <date-picker
+          v-model:model="event.date_start"
+          :label="'Дата начала'"
+          :name="'date_start'"
+        ></date-picker>
       </div>
+
       <div class="col">
-        <div class="form-floating">
-          <Field
-            v-model="event.date_end"
-            name="date_end"
-            type="datetime-local"
-            class="form-control"
-            placeholder="Дата окончания"
-          />
-          <label>Дата окончания</label>
-          <ErrorMessage as="div" name="date_end" class="alert alert-danger p-1" />
-        </div>
+        <date-picker
+          v-model:model="event.date_end"
+          :label="'Дата окончания'"
+          :name="'date_end'"
+        ></date-picker>
       </div>
     </div>
     <div class="form-floating">
@@ -90,26 +78,26 @@ import * as yup from 'yup'
 const schema = yup.object({
   title: yup.string().required('Название не указано'),
   location_id: yup.number().required('Адрес не указан').typeError('Адрес не указан'),
-  date_start: yup.date().required().typeError('Дата не выбрана'),
-  date_end: yup.date().required().typeError('Дата не выбрана'),
+  date_start: yup.string().required('Дата не выбрана'),
+  date_end: yup.string().required('Дата не выбрана'),
   cost_reduction_factor: yup.number().required().typeError('Зачение не указано')
 })
 </script>
 
 <script>
 import { Form as VForm, Field, ErrorMessage } from 'vee-validate'
-
+import DatePicker from '@/components/UI/DatePicker.vue'
 import { get_locations } from '@/utils/api_user_account'
 
 export default {
-  name: 'event-form',
+  name: 'event-creation-form',
   data() {
     return {
       event: {
         title: '',
         description: '',
-        date_start: '',
-        date_end: '',
+        date_start: null,
+        date_end: null,
         timezone: '+0300',
         cost_reduction_factor: 25,
         location_id: ''
@@ -118,6 +106,7 @@ export default {
     }
   },
 
+  components: { DatePicker },
   props: {
     onSubmit: {
       type: Function,
@@ -127,7 +116,6 @@ export default {
 
   methods: {
     async getLocations() {
-      console.log(typeof this.onSubmit)
       this.locations = await get_locations()
     }
   },

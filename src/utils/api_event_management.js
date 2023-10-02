@@ -16,15 +16,15 @@ export async function create_event(event) {
       {
         title: event.title,
         description: event.description,
-        date_start: event.date_start,
-        date_end: event.date_end,
+        date_start: event.date_start.toISOString(),
+        date_end: event.date_end.toISOString(),
         timezone: event.timezone,
         cost_reduction_factor: event.cost_reduction_factor,
         location_id: event.location_id
       },
       { headers: { 'X-CSRF-TOKEN': $cookies.get('csrf_access_token') } }
     )
-    return response.data
+    return response.data.key
   } catch (e) {
     console.log(e)
   }
