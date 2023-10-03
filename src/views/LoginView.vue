@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import LoginForm from '../components/Forms/LoginForm.vue'
+import LoginForm from '@/components/Forms/LoginForm.vue'
 import { login, profileSettings } from '@/utils/api_user_account'
 
 import { useCurrentUserStore } from '../stores/currentUserStore'
@@ -24,6 +24,7 @@ export default {
 
       this.currentUserStore.authenticate()
       this.getUserData()
+      this.$router.push({ name: 'events' })
     },
     async getUserData() {
       let user_data = await profileSettings()

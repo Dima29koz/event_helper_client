@@ -22,12 +22,14 @@ const router = createRouter({
     {
       path: '/profile_settings',
       name: 'profile_settings',
-      component: () => import('../views/UserProfileView.vue')
+      component: () => import('../views/UserProfileView.vue'),
+      meta: { requiresAuth: true }
     },
     {
       path: '/events',
       name: 'events',
-      component: () => import('../views/UserEventsView.vue')
+      component: () => import('../views/UserEventsView.vue'),
+      meta: { requiresAuth: true }
     },
     {
       path: '/event/:key',
@@ -37,7 +39,8 @@ const router = createRouter({
     {
       path: '/locations',
       name: 'locations',
-      component: () => import('../views/UserLocationsView.vue')
+      component: () => import('../views/UserLocationsView.vue'),
+      meta: { requiresAuth: true }
     },
     {
       path: '/about',

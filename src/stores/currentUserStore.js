@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { profileSettings } from '@/utils/api_user_account'
 
 export const useCurrentUserStore = defineStore('currentUser', {
   state: () => ({
@@ -32,6 +33,13 @@ export const useCurrentUserStore = defineStore('currentUser', {
     },
     logout() {
       this.$reset()
+    },
+    async fetch_user() {
+      if (!this.id) {
+        await profileSettings().then((user_data) => {
+          this.setData(user_data)
+        })
+      }
     }
   }
 })

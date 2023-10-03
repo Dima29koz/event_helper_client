@@ -35,7 +35,7 @@ export async function profileSettings() {
       'msg' in e.response.data &&
       e.response.data.msg == 'Token has expired'
     ) {
-      refresh()
+      await refresh()
     } else {
       console.log(e)
     }

@@ -1,6 +1,6 @@
 <template>
   <div class="modal fade" tabindex="-1" aria-labelledby="" aria-hidden="true" ref="modalEle">
-    <div class="modal-dialog">
+    <div class="modal-dialog" :class="size">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="ModalLabel">{{ title }}</h5>
@@ -38,7 +38,8 @@ export default {
     title: {
       type: String,
       default: '<<Title goes here>>'
-    }
+    },
+    size: null
   },
 
   mounted() {

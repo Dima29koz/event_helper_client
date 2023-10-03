@@ -49,13 +49,17 @@
 
           <template v-else>
             <button
-              @click="$router.push('login')"
+              @click="$router.push({ name: 'login' })"
               type="button"
               class="btn btn-outline-primary me-2"
             >
               Вход
             </button>
-            <button @click="$router.push('registration')" type="button" class="btn btn-primary">
+            <button
+              @click="$router.push({ name: 'registration' })"
+              type="button"
+              class="btn btn-primary"
+            >
               Регистрация
             </button>
           </template>
@@ -84,7 +88,7 @@ export default {
       let r = await logout()
       console.log(r)
       this.currentUserStore.logout()
-      this.$router.push('login')
+      this.$router.push({ name: 'login' })
     }
   },
   computed: {

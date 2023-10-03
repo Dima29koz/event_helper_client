@@ -46,6 +46,9 @@
       @delEvent="del_event"
       @editEvent="edit_event"
       @editLocation="edit_location"
+      @addMember="add_member"
+      @editMember="edit_member"
+      @delMember="del_member"
     ></component>
   </div>
 </template>
@@ -92,14 +95,14 @@ export default {
     del_event() {
       this.socket.emit('delete_event', {
         auth: {
-          csrf_access_token: $cookies.get('csrf_access_token')
+          csrf_access_token: this.$cookies.get('csrf_access_token')
         }
       })
     },
     edit_event(event_data) {
       this.socket.emit('update_data', {
         auth: {
-          csrf_access_token: $cookies.get('csrf_access_token')
+          csrf_access_token: this.$cookies.get('csrf_access_token')
         },
         entity: 'event',
         data: event_data
@@ -108,10 +111,35 @@ export default {
     edit_location(location_data) {
       this.socket.emit('update_data', {
         auth: {
-          csrf_access_token: $cookies.get('csrf_access_token')
+          csrf_access_token: this.$cookies.get('csrf_access_token')
         },
         entity: 'location',
         data: location_data
+      })
+    },
+    add_member(member_data) {
+      this.socket.emit('add_member', {
+        auth: {
+          csrf_access_token: this.$cookies.get('csrf_access_token')
+        },
+        member: member_data
+      })
+    },
+    edit_member(member_data) {
+      this.socket.emit('update_data', {
+        auth: {
+          csrf_access_token: this.$cookies.get('csrf_access_token')
+        },
+        entity: 'member',
+        data: member_data
+      })
+    },
+    del_member(member) {
+      this.socket.emit('delete_member', {
+        auth: {
+          csrf_access_token: this.$cookies.get('csrf_access_token')
+        },
+        member_id: member.id
       })
     }
   },
@@ -154,6 +182,14 @@ export default {
     })
 
     this.socket.on('get_event_members', (event_members) => {
+      event_members.forEach((member) => {
+        if (member.date_from) {
+          member.date_from = new Date(member.date_from)
+        }
+        if (member.date_to) {
+          member.date_to = new Date(member.date_to)
+        }
+      })
       this.event_members = event_members
     })
 
@@ -170,17 +206,30 @@ export default {
     })
 
     this.socket.on('update_event_member', (member_data) => {
-      console.log(member_data)
+      let member_idx = this.event_members.findIndex((element) => element.id == member_data.id)
+      if (member_data.date_from) {
+        member_data.date_from = new Date(member_data.date_from)
+      }
+      if (member_data.date_to) {
+        member_data.date_to = new Date(member_data.date_to)
+      }
+      this.event_members[member_idx] = member_data
     })
     this.socket.on('delete_event', (event_data) => {
       console.log(event_data)
       this.$router.push({ name: 'events' })
     })
     this.socket.on('add_member', (member_data) => {
-      console.log(member_data)
+      if (member_data.date_from) {
+        member_data.date_from = new Date(member_data.date_from)
+      }
+      if (member_data.date_to) {
+        member_data.date_to = new Date(member_data.date_to)
+      }
+      this.event_members.push(member_data)
     })
-    this.socket.on('delete_member', (member_id) => {
-      console.log(member_id)
+    this.socket.on('delete_member', (response) => {
+      this.event_members = this.event_members.filter((member) => member.id !== response.member_id)
     })
   }
 }

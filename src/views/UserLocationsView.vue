@@ -115,7 +115,7 @@ export default {
     updateLocation(location_data) {
       this.isSubmited = false
       edit_location(location_data.id, location_data)
-      let location_idx = this.locations.findIndex((element) => (element.id = location_data.id))
+      let location_idx = this.locations.findIndex((element) => element.id == location_data.id)
       this.locations[location_idx] = location_data
     },
 

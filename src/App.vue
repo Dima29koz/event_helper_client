@@ -12,7 +12,6 @@ import 'bootstrap/js/dist/collapse'
 import 'bootstrap/js/dist/modal'
 
 import Navbar from './components/NavbarHeader.vue'
-import { profileSettings } from '@/utils/api_user_account'
 import { useCurrentUserStore } from './stores/currentUserStore'
 
 export default {
@@ -21,17 +20,24 @@ export default {
   },
 
   mounted() {
-    if (this.$cookies.keys().includes('csrf_access_token')) {
-      this.getUserData()
-    }
-  },
-
-  methods: {
-    async getUserData() {
-      let user_data = await profileSettings()
-      const currentUserStore = useCurrentUserStore()
-      currentUserStore.setData(user_data)
-    }
+    const currentUserStore = useCurrentUserStore()
+    this.$router.beforeEach(async (to, from, next) => {
+      if (this.$cookies.keys().includes('csrf_access_token')) {
+        await currentUserStore.fetch_user()
+      }
+      if (to.matched.some((record) => record.meta.requiresAuth)) {
+        if (!currentUserStore.isAuth) {
+          next({
+            path: '/login',
+            query: { redirect: to.fullPath }
+          })
+        } else {
+          next()
+        }
+      } else {
+        next()
+      }
+    })
   }
 }
 </script>
