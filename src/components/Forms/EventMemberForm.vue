@@ -72,7 +72,7 @@
         <label class="form-check-label"> Приеду </label>
         <ErrorMessage as="div" name="is_involved" class="alert alert-danger p-1" />
       </div>
-      <div v-if="mode != 'join'" class="form-floating">
+      <div v-if="eventMemberStore.hasOneOfRoles(['organizer', 'creator'])" class="form-floating">
         <Field
           as="select"
           v-model="member.role"
@@ -92,22 +92,24 @@
   </VForm>
 </template>
 
-<script setup>
-import * as yup from 'yup'
-
-const schema = yup.object({
-  nickname: yup.string().required('Поле не заполнено'),
-  date_from: yup.string().required('Дата не выбрана'),
-  date_to: yup.string().required('Дата не выбрана')
-})
-</script>
-
 <script>
+import * as yup from 'yup'
 import { Form as VForm, Field, ErrorMessage } from 'vee-validate'
 import DatePicker from '@/components/UI/DatePicker.vue'
+import { useEventMemberStore } from '@/stores/eventMemberStore'
 
 export default {
   name: 'event-member-form',
+  components: { VForm, Field, ErrorMessage, DatePicker },
+  setup() {
+    const schema = yup.object({
+      nickname: yup.string().required('Поле не заполнено'),
+      date_from: yup.string().required('Дата не выбрана'),
+      date_to: yup.string().required('Дата не выбрана')
+    })
+    const eventMemberStore = useEventMemberStore()
+    return { schema, eventMemberStore }
+  },
   data() {
     return {
       member: this.member_data
@@ -128,7 +130,6 @@ export default {
 
   props: {
     member_data: {},
-    mode: undefined,
     is_editable: {
       type: Boolean,
       default: false

@@ -6,13 +6,30 @@
           <h1>Участники:</h1>
           <div>
             <button
-              v-if="!data.some((e) => e.user === currentUserStore.username)"
+              v-if="isNaN(meMemberIdx)"
               type="button"
               class="btn btn-primary me-2"
               @click="(sellectedMemberIdx = NaN), (dialogMode = 'join'), (dialogVisible = true)"
             >
               Присоединиться
             </button>
+            <template v-else>
+              <button
+                type="button"
+                class="btn btn-primary me-2"
+                @click="
+                  (sellectedMemberIdx = meMemberIdx),
+                    (dialogMode = 'editMe'),
+                    (dialogVisible = true)
+                "
+              >
+                Изменить себя
+              </button>
+              <button type="button" class="btn btn-danger me-2" @click="this.$emit('delMe')">
+                Покинуть событие
+              </button>
+            </template>
+
             <button
               v-if="eventMemberStore.hasOneOfRoles(['organizer', 'creator'])"
               type="button"
@@ -63,8 +80,9 @@
         <event-member-form
           id="memberForm"
           :member_data="sellectedMember()"
-          v-model:mode="dialogMode"
-          :is_editable="eventMemberStore.hasOneOfRoles(['organizer', 'creator'])"
+          :is_editable="
+            eventMemberStore.hasOneOfRoles(['organizer', 'creator']) || dialogMode === 'editMe'
+          "
           :onSubmit="dialogOnSubmit"
         ></event-member-form>
       </template>
@@ -115,7 +133,7 @@ export default {
         return
       }
       this.sellectedMemberIdx = index
-      this.dialogMode = undefined
+      this.dialogMode = 'editMember'
       this.dialogVisible = true
     },
 
@@ -130,20 +148,44 @@ export default {
     onEditMember(member_data) {
       this.$refs.modalElem.modal.hide()
       this.$emit('editMember', member_data)
+    },
+    onEditMe(member_data) {
+      this.$refs.modalElem.modal.hide()
+      this.$emit('editMe', member_data)
     }
   },
   computed: {
     dialogTitle() {
-      if (this.sellectedMember() === null) {
-        return this.dialogMode == 'add' ? 'Добавление участника' : 'Присоединиться'
+      switch (this.dialogMode) {
+        case 'add':
+          return 'Добавление участника'
+        case 'join':
+          return 'Присоединиться'
+        case 'editMember':
+          return 'Изменение участника'
+        case 'editMe':
+          return 'Изменение себя'
+        default:
+          return ''
       }
-      return 'Изменение участника'
     },
     dialogOnSubmit() {
-      if (this.sellectedMember() === null) {
-        return this.dialogMode == 'add' ? this.onAddMember : this.onJoinEvent
+      switch (this.dialogMode) {
+        case 'add':
+          return this.onAddMember
+        case 'join':
+          return this.onJoinEvent
+        case 'editMember':
+          return this.onEditMember
+        case 'editMe':
+          return this.onEditMe
+        default:
+          return () => {}
       }
-      return this.onEditMember
+    },
+    meMemberIdx() {
+      const idx = this.data.findIndex((e) => e.user === this.currentUserStore.username)
+      return idx > -1 ? idx : NaN
     }
   }
 }

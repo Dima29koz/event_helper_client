@@ -49,6 +49,8 @@
       @addMember="add_member"
       @joinEvent="join_event"
       @editMember="edit_member"
+      @editMe="edit_me"
+      @delMe="del_me"
       @delMember="del_member"
     ></component>
   </div>
@@ -60,12 +62,14 @@ import TabAbout from '@/components/EventTabs/TabAbout.vue'
 import TabMembers from '@/components/EventTabs/TabMembers.vue'
 import TabProducts from '@/components/EventTabs/TabProducts.vue'
 import TabResults from '@/components/EventTabs/TabResults.vue'
+import { useCurrentUserStore } from '@/stores/currentUserStore'
 import { useEventMemberStore } from '@/stores/eventMemberStore'
 
 export default {
   setup() {
+    const currentUserStore = useCurrentUserStore()
     const eventMemberStore = useEventMemberStore()
-    return { eventMemberStore }
+    return { eventMemberStore, currentUserStore }
   },
   data() {
     return {
@@ -148,6 +152,21 @@ export default {
         data: member_data
       })
     },
+    edit_me(member_data) {
+      this.socket.emit('update_me', {
+        auth: {
+          csrf_access_token: this.$cookies.get('csrf_access_token')
+        },
+        data: member_data
+      })
+    },
+    del_me() {
+      this.socket.emit('delete_me', {
+        auth: {
+          csrf_access_token: this.$cookies.get('csrf_access_token')
+        }
+      })
+    },
     del_member(member) {
       this.socket.emit('delete_member', {
         auth: {
@@ -223,6 +242,11 @@ export default {
 
     this.socket.on('update_event_member', (member_data) => {
       let member_idx = this.event_members.findIndex((element) => element.id == member_data.id)
+      const me_idx = this.event_members.findIndex((e) => e.user === this.currentUserStore.username)
+      if (member_idx == me_idx && me_idx > -1) {
+        this.eventMemberStore.fetchMemberInfo(event_key)
+      }
+
       if (member_data.date_from) {
         member_data.date_from = new Date(member_data.date_from)
       }
