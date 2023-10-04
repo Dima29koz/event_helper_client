@@ -29,3 +29,16 @@ export async function create_event(event) {
     console.log(e)
   }
 }
+
+export async function get_member_info(event_key) {
+  try {
+    const response = await axios.get('/api/event_management/member_info/' + event_key)
+    return response.data
+  } catch (e) {
+    if (e.response.status == 401) {
+      return { roles: ['guest'] }
+    } else {
+      console.log(e)
+    }
+  }
+}

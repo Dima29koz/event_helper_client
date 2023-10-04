@@ -4,6 +4,7 @@
       <div>{{ event.title }}</div>
       <div class="dropdown">
         <button
+          v-if="eventMemberStore.hasOneOfRoles(['organizer', 'creator'])"
           class="btn btn-outline-secondary"
           type="button"
           data-bs-toggle="dropdown"
@@ -13,12 +14,14 @@
         </button>
         <ul class="dropdown-menu">
           <li><button class="dropdown-item" @click="this.$emit('editEvent')">Изменить</button></li>
-          <li><hr class="dropdown-divider" /></li>
-          <li>
-            <button class="dropdown-item text-danger" @click="this.$emit('delEvent')">
-              Удалить
-            </button>
-          </li>
+          <template v-if="eventMemberStore.hasOneOfRoles(['creator'])">
+            <li><hr class="dropdown-divider" /></li>
+            <li>
+              <button class="dropdown-item text-danger" @click="this.$emit('delEvent')">
+                Удалить
+              </button>
+            </li>
+          </template>
         </ul>
       </div>
     </h5>
@@ -35,14 +38,16 @@
   </div>
 </template>
 
-<script setup>
-import { formatedDate } from '@/utils/time'
-</script>
-
 <script>
 import LocationCard from '@/components/Cards/LocationCard.vue'
+import { formatedDate } from '@/utils/time'
+import { useEventMemberStore } from '@/stores/eventMemberStore'
 
 export default {
+  setup() {
+    const eventMemberStore = useEventMemberStore()
+    return { formatedDate, eventMemberStore }
+  },
   name: 'event-about-card',
   components: { LocationCard },
   props: {

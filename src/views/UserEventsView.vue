@@ -5,11 +5,7 @@
         <div class="d-flex justify-content-between">
           <h1>События</h1>
           <div>
-            <button
-              type="button"
-              class="btn btn-primary me-2"
-              @click="$router.push({ name: 'event', params: { key: '123' } })"
-            >
+            <button type="button" class="btn btn-primary me-2" @click="joinDialogVisible = true">
               Присоединиться
             </button>
             <button type="button" class="btn btn-success" @click="onCreateEvent">Создать</button>
@@ -26,20 +22,30 @@
         </tr>
       </thead>
       <tbody class="table-group-divider">
-        <tr
-          v-for="(event, index) in [...events_creator, ...events_member]"
-          :key="index"
-          @click="eventInfo(event)"
-        >
+        <tr v-for="(event, index) in events" :key="index" @click="eventInfo(event)">
           <th scope="row">{{ index + 1 }}</th>
           <td>{{ event.title }}</td>
           <td>{{ formatedDate(event.date_start, event.date_tz) }}</td>
           <td>{{ formatedDate(event.date_end, event.date_tz) }}</td>
 
-          <td>{{ event.role ? event.role : 'creator' }}</td>
+          <td>{{ event.role }}</td>
         </tr>
       </tbody>
     </table>
+
+    <b-modal
+      v-if="joinDialogVisible"
+      :title="'Присоединиться'"
+      @close="joinDialogVisible = false"
+      ref="modalJoin"
+    >
+      <template #body>
+        <event-join-form id="eventJoinForm" :onSubmit="joinEvent"></event-join-form>
+      </template>
+      <template #footer>
+        <button type="submit" class="btn btn-primary" form="eventJoinForm">Присоединиться</button>
+      </template>
+    </b-modal>
 
     <b-modal
       v-if="dialogVisible"
@@ -57,18 +63,20 @@
   </div>
 </template>
 
-<script setup>
-import { formatedDate } from '@/utils/time'
-</script>
-
 <script>
-import EventCreationForm from '../components/Forms/EventCreationForm.vue'
+import EventCreationForm from '@/components/Forms/EventCreationForm.vue'
+import EventJoinForm from '@/components/Forms/EventJoinForm.vue'
 import { get_events, create_event } from '@/utils/api_event_management'
+import { formatedDate } from '@/utils/time'
 
 export default {
+  setup() {
+    return { formatedDate }
+  },
   data() {
     return {
       dialogVisible: false,
+      joinDialogVisible: false,
       selectedEventIdx: NaN,
       events_creator: [],
       events_member: []
@@ -76,7 +84,8 @@ export default {
   },
 
   components: {
-    EventCreationForm
+    EventCreationForm,
+    EventJoinForm
   },
 
   methods: {
@@ -100,16 +109,33 @@ export default {
 
     eventInfo(event) {
       this.$router.push({ name: 'event', params: { key: event.key } })
-      // let event_data = await get_location(event.id);
-      // this.selectedEventIdx = index;
-      // this.events[index] = event_data;
-      // this.dialogVisible = true;
+    },
+
+    joinEvent(key) {
+      this.$refs.modalJoin.modal.hide()
+      key = key.split('/').at(-1)
+      this.$router.push({ name: 'event', params: { key: key } })
     },
 
     async getEvents() {
       const data = await get_events()
       this.events_creator = data.creator_on
       this.events_member = data.member_on
+    }
+  },
+  computed: {
+    events() {
+      let joinedEvents = [...this.events_member]
+      this.events_creator.forEach((event) => {
+        let sameEvent = this.events_member.find((e) => e.key === event.key)
+        if (sameEvent) {
+          sameEvent.role = sameEvent.role + ', creator'
+        } else {
+          event.role = 'creator'
+          joinedEvents.push(event)
+        }
+      })
+      return joinedEvents
     }
   },
 

@@ -47,6 +47,7 @@
       @editEvent="edit_event"
       @editLocation="edit_location"
       @addMember="add_member"
+      @joinEvent="join_event"
       @editMember="edit_member"
       @delMember="del_member"
     ></component>
@@ -59,8 +60,13 @@ import TabAbout from '@/components/EventTabs/TabAbout.vue'
 import TabMembers from '@/components/EventTabs/TabMembers.vue'
 import TabProducts from '@/components/EventTabs/TabProducts.vue'
 import TabResults from '@/components/EventTabs/TabResults.vue'
+import { useEventMemberStore } from '@/stores/eventMemberStore'
 
 export default {
+  setup() {
+    const eventMemberStore = useEventMemberStore()
+    return { eventMemberStore }
+  },
   data() {
     return {
       socket: null,
@@ -125,6 +131,14 @@ export default {
         member: member_data
       })
     },
+    join_event(member_data) {
+      this.socket.emit('join_event', {
+        auth: {
+          csrf_access_token: this.$cookies.get('csrf_access_token')
+        },
+        member: member_data
+      })
+    },
     edit_member(member_data) {
       this.socket.emit('update_data', {
         auth: {
@@ -159,9 +173,11 @@ export default {
   },
 
   mounted() {
-    this.socket = setupIO(this.$route.params.key)
+    let event_key = this.$route.params.key
+    this.socket = setupIO(event_key)
     this.get_data()
     this.get_location()
+    this.eventMemberStore.fetchMemberInfo(event_key)
 
     this.socket.on('message', (msg) => {
       console.log(msg)

@@ -1,92 +1,94 @@
 <template>
   <VForm @submit="onBeforeSubmit" :validation-schema="schema" ref="eventEditForm">
-    <div class="form-floating">
-      <Field
-        v-focus
-        v-model="member.nickname"
-        name="nickname"
-        type="text"
-        class="form-control"
-        placeholder="Как к вам обращаться?"
-      />
-      <label>Как к вам обращаться?</label>
-      <ErrorMessage as="div" name="nickname" class="alert alert-danger p-1" />
-    </div>
-
-    <div class="row">
-      <div class="col">
-        <date-picker
-          v-model:model="member.date_from"
-          :label="'Приеду (дата)'"
-          :name="'date_from'"
-        ></date-picker>
+    <fieldset :disabled="!is_editable">
+      <div class="form-floating">
+        <Field
+          v-focus
+          v-model="member.nickname"
+          name="nickname"
+          type="text"
+          class="form-control"
+          placeholder="Как к вам обращаться?"
+        />
+        <label>Как к вам обращаться?</label>
+        <ErrorMessage as="div" name="nickname" class="alert alert-danger p-1" />
       </div>
 
-      <div class="col">
-        <date-picker
-          v-model:model="member.date_to"
-          :label="'Уеду (дата)'"
-          :name="'date_to'"
-        ></date-picker>
-      </div>
-      <div class="col">
-        <div class="form-floating">
-          <Field
-            v-model="member.days_amount"
-            name="days_amount"
-            type="number"
-            class="form-control-plaintext"
-            placeholder="Количество дней"
-            readonly
-          ></Field>
-          <label>Количество дней</label>
+      <div class="row">
+        <div class="col">
+          <date-picker
+            v-model:model="member.date_from"
+            :label="'Приеду (дата)'"
+            :name="'date_from'"
+          ></date-picker>
+        </div>
+
+        <div class="col">
+          <date-picker
+            v-model:model="member.date_to"
+            :label="'Уеду (дата)'"
+            :name="'date_to'"
+          ></date-picker>
+        </div>
+        <div class="col">
+          <div class="form-floating">
+            <Field
+              v-model="member.days_amount"
+              name="days_amount"
+              type="number"
+              class="form-control-plaintext"
+              placeholder="Количество дней"
+              readonly
+            ></Field>
+            <label>Количество дней</label>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="form-check text-start my-3">
-      <Field
-        as="input"
-        v-model="member.is_drinker"
-        ref="checkDrinker"
-        name="is_drinker"
-        type="checkbox"
-        :value="true"
-        class="form-check-input"
-      />
+      <div class="form-check text-start my-3">
+        <Field
+          as="input"
+          v-model="member.is_drinker"
+          ref="checkDrinker"
+          name="is_drinker"
+          type="checkbox"
+          :value="true"
+          class="form-check-input"
+        />
 
-      <label class="form-check-label"> Пьющий </label>
-      <ErrorMessage as="div" name="is_drinker" class="alert alert-danger p-1" />
-    </div>
-    <div class="form-check text-start my-3">
-      <Field
-        v-model="member.is_involved"
-        name="is_involved"
-        type="checkbox"
-        :value="true"
-        class="form-check-input"
-        checked
-      />
+        <label class="form-check-label"> Пьющий </label>
+        <ErrorMessage as="div" name="is_drinker" class="alert alert-danger p-1" />
+      </div>
+      <div class="form-check text-start my-3">
+        <Field
+          v-model="member.is_involved"
+          name="is_involved"
+          type="checkbox"
+          :value="true"
+          class="form-check-input"
+          checked
+        />
 
-      <label class="form-check-label"> Приеду </label>
-      <ErrorMessage as="div" name="is_involved" class="alert alert-danger p-1" />
-    </div>
-    <div class="form-floating">
-      <Field
-        as="select"
-        v-model="member.role"
-        name="role"
-        class="form-select"
-        aria-label="Выберите один из вариантов"
-      >
-        <option selected disabled value="">Выберите роль</option>
-        <option v-for="(role, index) in roles" :key="index" v-bind:value="role">
-          {{ role }}
-        </option>
-      </Field>
-      <label>Роль</label>
-      <ErrorMessage as="div" name="role" class="alert alert-danger p-1" />
-    </div>
+        <label class="form-check-label"> Приеду </label>
+        <ErrorMessage as="div" name="is_involved" class="alert alert-danger p-1" />
+      </div>
+      <div v-if="mode != 'join'" class="form-floating">
+        <Field
+          as="select"
+          v-model="member.role"
+          name="role"
+          class="form-select"
+          aria-label="Выберите один из вариантов"
+        >
+          <option selected disabled value="">Выберите роль</option>
+          <option v-for="(role, index) in roles" :key="index" v-bind:value="role">
+            {{ role }}
+          </option>
+        </Field>
+        <label>Роль</label>
+        <ErrorMessage as="div" name="role" class="alert alert-danger p-1" />
+      </div>
+    </fieldset>
   </VForm>
 </template>
 
@@ -126,6 +128,11 @@ export default {
 
   props: {
     member_data: {},
+    mode: undefined,
+    is_editable: {
+      type: Boolean,
+      default: false
+    },
     onSubmit: {
       type: Function,
       default: null
@@ -134,9 +141,13 @@ export default {
 
   methods: {
     setDaysAmount() {
-      this.member.days_amount = Math.ceil(
-        (this.member.date_to.getTime() - this.member.date_from.getTime()) / (1000 * 3600 * 24)
-      )
+      if (this.member.date_to && this.member.date_from) {
+        this.member.days_amount = Math.ceil(
+          (this.member.date_to.getTime() - this.member.date_from.getTime()) / (1000 * 3600 * 24)
+        )
+      } else {
+        this.member.days_amount = 0
+      }
     },
     onBeforeSubmit() {
       this.member.is_drinker = this.member.is_drinker === undefined ? false : true
@@ -147,14 +158,10 @@ export default {
 
   watch: {
     'member.date_from'() {
-      if (this.member.date_to && this.member.date_from) {
-        this.setDaysAmount()
-      }
+      this.setDaysAmount()
     },
     'member.date_to'() {
-      if (this.member.date_to && this.member.date_from) {
-        this.setDaysAmount()
-      }
+      this.setDaysAmount()
     }
   }
 }

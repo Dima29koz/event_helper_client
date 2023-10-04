@@ -29,10 +29,15 @@
 <script>
 import EventAboutCard from '@/components/Cards/EventAboutCard.vue'
 import EventEditForm from '@/components/Forms/EventEditForm.vue'
+import { useEventMemberStore } from '@/stores/eventMemberStore'
 
 export default {
   name: 'tab-about',
   components: { EventAboutCard, EventEditForm },
+  setup() {
+    const eventMemberStore = useEventMemberStore()
+    return { eventMemberStore }
+  },
   data() {
     return {
       dialogVisible: false
