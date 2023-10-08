@@ -81,7 +81,9 @@
           id="memberForm"
           :member_data="sellectedMember()"
           :is_editable="
-            eventMemberStore.hasOneOfRoles(['organizer', 'creator']) || dialogMode === 'editMe'
+            eventMemberStore.hasOneOfRoles(['organizer', 'creator']) ||
+            dialogMode === 'editMe' ||
+            dialogMode === 'join'
           "
           :onSubmit="dialogOnSubmit"
         ></event-member-form>
@@ -187,6 +189,9 @@ export default {
       const idx = this.data.findIndex((e) => e.user === this.currentUserStore.username)
       return idx > -1 ? idx : NaN
     }
+  },
+  mounted() {
+    this.$emit('getMembers')
   }
 }
 </script>

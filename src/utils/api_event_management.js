@@ -42,3 +42,39 @@ export async function get_member_info(event_key) {
     }
   }
 }
+
+export async function get_base_products() {
+  try {
+    const response = await axios.get('/api/event_management/product/base')
+    return response.data
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+export async function get_product_categories() {
+  try {
+    const response = await axios.get('/api/event_management/product/category')
+    return response.data
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+export async function get_product_types() {
+  try {
+    const response = await axios.get('/api/event_management/product/type')
+    return response.data
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+export async function get_product_units() {
+  try {
+    const response = await axios.get('/api/event_management/product/unit')
+    return response.data
+  } catch (e) {
+    console.log(e)
+  }
+}

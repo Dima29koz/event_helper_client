@@ -23,7 +23,7 @@
         <button
           class="nav-link"
           :class="{ active: currentTab === 'members' }"
-          @click="(currentTab = 'members'), get_members()"
+          @click="currentTab = 'members'"
         >
           Люди
         </button>
@@ -39,20 +39,26 @@
       </li>
     </ul>
 
-    <component
-      :is="currentTabComponent"
-      :data="currentTabData"
-      class="tab"
-      @delEvent="del_event"
-      @editEvent="edit_event"
-      @editLocation="edit_location"
-      @addMember="add_member"
-      @joinEvent="join_event"
-      @editMember="edit_member"
-      @editMe="edit_me"
-      @delMe="del_me"
-      @delMember="del_member"
-    ></component>
+    <keep-alive>
+      <component
+        :is="currentTabComponent"
+        :data="currentTabData"
+        class="tab"
+        @getMembers="get_members"
+        @getEventProducts="get_event_products"
+        @delEvent="del_event"
+        @editEvent="edit_event"
+        @editLocation="edit_location"
+        @addMember="add_member"
+        @joinEvent="join_event"
+        @editMember="edit_member"
+        @editMe="edit_me"
+        @delMe="del_me"
+        @delMember="del_member"
+        @addEventProduct="add_event_product"
+        @editEventProduct="edit_event_product"
+      ></component>
+    </keep-alive>
   </div>
 </template>
 
@@ -76,7 +82,8 @@ export default {
       socket: null,
       currentTab: 'about',
       event_data: {},
-      event_members: []
+      event_members: [],
+      event_products: []
     }
   },
   components: { TabAbout, TabMembers, TabProducts, TabResults },
@@ -100,6 +107,11 @@ export default {
     get_members() {
       this.socket.emit('get_data', {
         entity: 'members'
+      })
+    },
+    get_event_products() {
+      this.socket.emit('get_data', {
+        entity: 'products'
       })
     },
     del_event() {
@@ -174,6 +186,18 @@ export default {
         },
         member_id: member.id
       })
+    },
+    add_event_product(product) {
+      console.log(product)
+      // this.socket.emit('add_product', {
+      //   auth: {
+      //     csrf_access_token: this.$cookies.get('csrf_access_token')
+      //   },
+      //   product: product
+      // })
+    },
+    edit_event_product(product) {
+      console.log(product)
     }
   },
   computed: {
@@ -186,6 +210,9 @@ export default {
       }
       if (this.currentTab === 'members') {
         return this.event_members
+      }
+      if (this.currentTab === 'products') {
+        return this.event_products
       }
       return null
     }
@@ -226,6 +253,10 @@ export default {
         }
       })
       this.event_members = event_members
+    })
+
+    this.socket.on('get_event_products', (event_products) => {
+      this.event_products = event_products
     })
 
     this.socket.on('update_event', (event_data) => {
