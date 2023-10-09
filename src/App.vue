@@ -1,16 +1,13 @@
 <template>
-  <div>
+  <v-app>
     <Navbar></Navbar>
-    <RouterView />
-  </div>
+    <v-main>
+      <RouterView />
+    </v-main>
+  </v-app>
 </template>
 
 <script>
-import 'bootstrap/dist/css/bootstrap.min.css'
-import 'bootstrap/js/dist/dropdown'
-import 'bootstrap/js/dist/collapse'
-import 'bootstrap/js/dist/modal'
-
 import Navbar from './components/NavbarHeader.vue'
 import { useCurrentUserStore } from './stores/currentUserStore'
 

@@ -1,9 +1,5 @@
 <template>
-  <div>
-    <RegistrationForm @register="createUser">
-      <div v-if="error">{{ error }}</div>
-    </RegistrationForm>
-  </div>
+  <RegistrationForm @register="createUser" :error="error"> </RegistrationForm>
 </template>
 
 <script>

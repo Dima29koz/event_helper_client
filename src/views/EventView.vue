@@ -1,43 +1,11 @@
 <template>
-  <div class="container">
-    <ul class="nav nav-tabs">
-      <li class="nav-item">
-        <button
-          class="nav-link"
-          :class="{ active: currentTab === 'about' }"
-          @click="currentTab = 'about'"
-        >
-          Информация о событии
-        </button>
-      </li>
-      <li class="nav-item">
-        <button
-          class="nav-link"
-          :class="{ active: currentTab === 'products' }"
-          @click="currentTab = 'products'"
-        >
-          Продукты
-        </button>
-      </li>
-      <li class="nav-item">
-        <button
-          class="nav-link"
-          :class="{ active: currentTab === 'members' }"
-          @click="currentTab = 'members'"
-        >
-          Люди
-        </button>
-      </li>
-      <li class="nav-item">
-        <button
-          class="nav-link"
-          :class="{ active: currentTab === 'results' }"
-          @click="currentTab = 'results'"
-        >
-          Итоги
-        </button>
-      </li>
-    </ul>
+  <v-container>
+    <v-tabs v-model="currentTab" background-color="transparent">
+      <v-tab @click="currentTab = 'about'" value="about"> Информация о событии </v-tab>
+      <v-tab @click="currentTab = 'products'" value="products"> Продукты </v-tab>
+      <v-tab @click="currentTab = 'members'" value="members"> Люди </v-tab>
+      <v-tab @click="currentTab = 'results'" value="results"> Итоги </v-tab>
+    </v-tabs>
 
     <keep-alive>
       <component
@@ -59,7 +27,7 @@
         @editEventProduct="edit_event_product"
       ></component>
     </keep-alive>
-  </div>
+  </v-container>
 </template>
 
 <script>
@@ -202,7 +170,7 @@ export default {
   },
   computed: {
     currentTabComponent() {
-      return 'tab-' + this.currentTab.toLowerCase()
+      return 'tab-' + this.currentTab
     },
     currentTabData() {
       if (this.currentTab === 'about') {

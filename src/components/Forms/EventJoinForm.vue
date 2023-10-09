@@ -1,22 +1,26 @@
 <template>
-  <form @submit.prevent="this.onSubmit(this.key)">
-    <div class="form-floating">
-      <input
-        v-focus
-        v-model="key"
-        type="text"
-        class="form-control"
-        id="floatingInput"
-        placeholder="Ключ события"
-      />
-      <label for="floatingInput">Ключ события</label>
-    </div>
-  </form>
+  <v-form ref="form" @submit.prevent="this.onSubmit(this.key)">
+    <v-text-field
+      v-model="key"
+      name="event_key"
+      :rules="[(v) => validateField(v, schema.key)]"
+      label="Ключ события"
+    ></v-text-field>
+  </v-form>
 </template>
 
 <script>
+import * as yup from 'yup'
+import { validateField } from '../../utils/validate_field'
+
 export default {
   name: 'event-join-form',
+  setup() {
+    const schema = {
+      key: yup.string().required('Поле не заполнено')
+    }
+    return { schema, validateField }
+  },
   data() {
     return {
       key: ''

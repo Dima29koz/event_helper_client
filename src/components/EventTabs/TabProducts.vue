@@ -1,21 +1,15 @@
 <template>
-  <div class="container">
-    <table class="table table-hover caption-top">
-      <caption>
-        <div class="d-flex justify-content-between">
-          <h1>Продукты:</h1>
-          <div>
-            <button
-              v-if="eventMemberStore.hasOneOfRoles(['organizer', 'creator'])"
-              type="button"
-              class="btn btn-success"
-              @click="(sellectedProductIdx = NaN), (dialogVisible = true)"
-            >
-              Добавить
-            </button>
-          </div>
-        </div>
-      </caption>
+  <v-container>
+    <div class="d-flex justify-space-between">
+      <h1>Продукты:</h1>
+      <v-btn
+        v-if="eventMemberStore.hasOneOfRoles(['organizer', 'creator'])"
+        @click="(sellectedProductIdx = NaN), (dialogVisible = true)"
+        color="success"
+        icon="mdi-plus"
+      ></v-btn>
+    </div>
+    <v-table class="table table-hover caption-top">
       <thead>
         <tr>
           <th scope="col">#</th>
@@ -51,32 +45,37 @@
           <td>{{ product.market }}</td>
           <td>{{ product.description }}</td>
           <td v-if="eventMemberStore.hasOneOfRoles(['organizer', 'creator'])">
-            <button class="btn btn-outline-danger" name="delete-product">x</button>
+            <v-btn name="delete-product" icon="mdi-trash-can-outline" color="red"></v-btn>
           </td>
         </tr>
       </tbody>
-    </table>
+    </v-table>
 
-    <b-modal
-      v-if="dialogVisible"
-      :title="dialogTitle"
-      :size="'modal-lg'"
-      @close="dialogVisible = false"
-      ref="modalElem"
-    >
-      <template #body>
-        <event-product-form
-          id="eventProductForm"
-          :product_data="sellectedProduct"
-          :is_editable="eventMemberStore.hasOneOfRoles(['organizer', 'creator'])"
-          :onSubmit="dialogOnSubmit"
-        ></event-product-form>
-      </template>
-      <template #footer>
-        <button type="submit" class="btn btn-primary" form="eventProductForm">Сохранить</button>
-      </template>
-    </b-modal>
-  </div>
+    <v-dialog v-model="dialogVisible" width="1000">
+      <v-card>
+        <v-card-title>
+          <span class="text-h5">{{ dialogTitle }}</span>
+        </v-card-title>
+        <v-card-text>
+          <event-product-form
+            id="eventProductForm"
+            :product_data="sellectedProduct"
+            :is_editable="eventMemberStore.hasOneOfRoles(['organizer', 'creator'])"
+            :onSubmit="dialogOnSubmit"
+          ></event-product-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn @click="dialogVisible = false" color="blue-darken-1" variant="text">
+            Закрыть
+          </v-btn>
+          <v-btn type="submit" form="eventProductForm" color="blue-darken-1" variant="text"
+            >Сохранить
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </v-container>
 </template>
 
 <script>

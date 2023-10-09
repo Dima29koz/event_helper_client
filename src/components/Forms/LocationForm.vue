@@ -1,63 +1,46 @@
 <template>
-  <form @submit.prevent>
-    <div class="form-floating">
-      <input
-        v-focus
-        v-model="local_location.name"
-        ref="name"
-        type="text"
-        class="form-control"
-        placeholder="Название"
-      />
-      <label>Название</label>
-    </div>
-    <div class="form-floating">
-      <input
-        v-model="local_location.description"
-        ref="description"
-        type="text"
-        class="form-control"
-        placeholder="Описание"
-      />
-      <label>Описание</label>
-    </div>
-    <div class="form-floating">
-      <textarea
-        v-model="local_location.address"
-        ref="address"
-        rows="4"
-        class="form-control"
-        placeholder="Адрес"
-        style="height: 100px"
-      ></textarea>
-      <label>Адрес</label>
-    </div>
-    <div class="form-floating">
-      <input
-        v-model="local_location.geo"
-        ref="geo"
-        type="text"
-        class="form-control"
-        placeholder="Геолокация"
-      />
-      <label>Координаты</label>
-    </div>
-    <div class="form-floating">
-      <input
-        v-model="local_location.maps_link"
-        ref="maps_link"
-        type="text"
-        class="form-control"
-        placeholder="Ссылка на карту"
-      />
-      <label>Ссылка на карту</label>
-    </div>
-  </form>
+  <v-form ref="form" @submit="beforeSubmit">
+    <v-text-field
+      v-model="local_location.name"
+      :rules="[(v) => validateField(v, schema.name)]"
+      label="Название"
+    ></v-text-field>
+    <v-text-field v-model="local_location.description" label="Описание"></v-text-field>
+    <v-textarea
+      v-model="local_location.address"
+      :rules="[(v) => validateField(v, schema.address)]"
+      label="Адрес"
+      auto-grow
+      rows="2"
+    ></v-textarea>
+    <v-text-field
+      v-model="local_location.geo"
+      :rules="[(v) => validateField(v, schema.geo)]"
+      label="Координаты"
+    ></v-text-field>
+    <v-text-field
+      v-model="local_location.maps_link"
+      :rules="[(v) => validateField(v, schema.maps_link)]"
+      label="Ссылка на карту"
+    ></v-text-field>
+  </v-form>
 </template>
 
 <script>
+import * as yup from 'yup'
+import { validateField } from '../../utils/validate_field'
+
 export default {
   name: 'location-form',
+  setup() {
+    const schema = {
+      name: yup.string().required('Поле не заполнено'),
+      address: yup.string().required('Поле не заполнено'),
+      geo: yup.string().required('Поле не заполнено'),
+      maps_link: yup.string().required('Поле не заполнено')
+    }
+    return { schema, validateField }
+  },
   data() {
     return {
       local_location: this.location
@@ -92,10 +75,9 @@ export default {
       default: false
     }
   },
-
-  watch: {
-    isSubmited(newValue) {
-      if (newValue) {
+  methods: {
+    async beforeSubmit() {
+      if ((await this.$refs.form.validate()).valid) {
         this.onSubmit(this.local_location)
       }
     }

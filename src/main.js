@@ -1,5 +1,3 @@
-// import './assets/main.css'
-
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 
@@ -9,7 +7,11 @@ import directives from '@/directives'
 import components from '@/components/UI'
 import VueCookies from 'vue-cookies'
 
-import VueDatePicker from '@vuepic/vue-datepicker'
+// Vuetify
+import 'vuetify/styles'
+import '@mdi/font/css/materialdesignicons.css'
+import { createVuetify } from 'vuetify'
+
 import '@vuepic/vue-datepicker/dist/main.css'
 
 const app = createApp(App)
@@ -17,13 +19,13 @@ const app = createApp(App)
 components.forEach((component) => {
   app.component(component.name, component)
 })
-app.component('VueDatePicker', VueDatePicker)
 
 directives.forEach((directive) => {
   app.directive(directive.name, directive)
 })
 
 app.use(createPinia())
+app.use(createVuetify())
 app.use(router)
 app.use(VueCookies)
 

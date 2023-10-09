@@ -1,17 +1,17 @@
 <template>
-  <div class="container">
-    <table class="table table-hover caption-top">
+  <v-container>
+    <v-table class="table table-hover caption-top">
       <caption>
-        <div class="d-flex justify-content-between">
+        <div class="d-flex justify-space-between">
           <h1>Мои адреса</h1>
-          <button type="button" class="btn btn-success" @click="onCreateLocation">Добавить</button>
+          <v-btn @click="onCreateLocation" color="success" icon="mdi-plus"></v-btn>
         </div>
       </caption>
       <thead>
         <tr>
           <th scope="col">#</th>
-          <th scope="col">Название</th>
-          <th scope="col">Удалить</th>
+          <th scope="col" class="text-left">Название</th>
+          <th scope="col" class="text-center">Удалить</th>
         </tr>
       </thead>
       <tbody class="table-group-divider">
@@ -21,38 +21,39 @@
           @click="locationInfo(location, index, $event)"
         >
           <th scope="row">{{ index + 1 }}</th>
-          <td>{{ location.name }}</td>
-          <td><button class="btn btn-outline-danger" name="delete-location">x</button></td>
+          <td class="text-left">{{ location.name }}</td>
+          <td>
+            <v-btn name="delete-location" icon="mdi-trash-can-outline" color="red"></v-btn>
+          </td>
         </tr>
       </tbody>
-    </table>
+    </v-table>
 
-    <b-modal
-      v-if="dialogVisible"
-      :title="
-        !isNaN(this.selectedLocationIdx) ? 'Адрес ' + locationByIdx().name : 'Создание адреса'
-      "
-      @close="dialogVisible = false"
-    >
-      <template #body>
-        <location-form
-          :location="locationByIdx()"
-          :onSubmit="!isNaN(this.selectedLocationIdx) ? updateLocation : addLocation"
-          v-model:isSubmited="isSubmited"
-        ></location-form>
-      </template>
-      <template #footer>
-        <button
-          type="button"
-          class="btn btn-primary"
-          data-bs-dismiss="modal"
-          @click="isSubmited = true"
-        >
-          Сохранить
-        </button>
-      </template>
-    </b-modal>
-  </div>
+    <v-dialog v-model="dialogVisible" width="1024">
+      <v-card>
+        <v-card-title>
+          <span class="text-h5"> {{ dialogTitle }} </span>
+        </v-card-title>
+        <v-card-text>
+          <location-form
+            id="locationForm"
+            :location="locationByIdx()"
+            :onSubmit="!isNaN(this.selectedLocationIdx) ? updateLocation : addLocation"
+            v-model:isSubmited="isSubmited"
+          ></location-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn @click="dialogVisible = false" color="blue-darken-1" variant="text">
+            Закрыть
+          </v-btn>
+          <v-btn type="submit" form="locationForm" color="blue-darken-1" variant="text">
+            Сохранить
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </v-container>
 </template>
 
 <script>
@@ -98,7 +99,7 @@ export default {
     },
 
     async locationInfo(location, index, event) {
-      if (event.target.name == 'delete-location') {
+      if (event.target.name == 'delete-location' || event.target.tagName == 'I') {
         this.deleteLocation(location)
         return
       }
@@ -123,6 +124,13 @@ export default {
       this.isSubmited = false
       let new_location = await create_location(location_data)
       this.locations.push(new_location)
+    }
+  },
+  computed: {
+    dialogTitle() {
+      return !isNaN(this.selectedLocationIdx)
+        ? 'Адрес ' + this.locationByIdx().name
+        : 'Создание адреса'
     }
   },
   mounted() {

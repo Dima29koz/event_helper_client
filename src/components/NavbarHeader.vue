@@ -1,84 +1,79 @@
 <template>
-  <div class="container">
-    <header
-      class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom"
-    >
-      <div class="mb-2 mb-md-0 border">logo</div>
+  <v-navigation-drawer v-model="sidebar" temporary>
+    <v-list-item to="/">Главная</v-list-item>
+    <template v-if="currentUser.isAuth">
+      <v-list-item to="/events">События</v-list-item>
+    </template>
+    <v-list-item to="/about">FAQ</v-list-item>
+  </v-navigation-drawer>
 
-      <ul id="123" class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
-        <li><router-link to="/">Главная</router-link></li>
-        <template v-if="currentUser.isAuth">
-          <li><router-link to="/events">События</router-link></li>
-        </template>
-        <li><router-link to="/about">FAQ</router-link></li>
-      </ul>
-
-      <div class="col-md-3 text-end">
-        <div class="d-flex justify-content-end">
-          <template v-if="currentUser.isAuth">
-            <div class="nav-item dropdown">
-              <button
-                class="d-flex ms-sm-auto nav-link active text-decoration-none"
-                id="dropdownUser"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                <img
-                  src="@/assets/default_avatar.jpg"
-                  alt=""
-                  width="32"
-                  height="32"
-                  class="rounded-circle me-2"
-                />
-                <p class="my-0 dropdown-toggle">{{ currentUser.username }}</p>
-              </button>
-              <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser">
-                <li>
-                  <router-link to="/profile_settings" class="dropdown-item"
-                    >Настройки профиля</router-link
-                  >
-                </li>
-                <li><router-link to="/locations" class="dropdown-item">Мои адреса</router-link></li>
-                <li>
-                  <hr class="dropdown-divider" />
-                </li>
-                <a @click="logout" type="button" class="dropdown-item">Выйти</a>
-              </ul>
-            </div>
-          </template>
-
-          <template v-else>
-            <button
-              @click="$router.push({ name: 'login' })"
-              type="button"
-              class="btn btn-outline-primary me-2"
-            >
-              Вход
-            </button>
-            <button
-              @click="$router.push({ name: 'registration' })"
-              type="button"
-              class="btn btn-primary"
-            >
-              Регистрация
-            </button>
-          </template>
-          <color-mode-toggler></color-mode-toggler>
-        </div>
+  <v-app-bar flat>
+    <template v-slot:prepend>
+      <div>
+        <v-app-bar-nav-icon
+          @click="sidebar = !sidebar"
+          class="hidden-sm-and-up"
+        ></v-app-bar-nav-icon>
       </div>
-    </header>
-  </div>
+    </template>
+
+    <v-tabs class="hidden-xs">
+      <v-tab to="/">Главная</v-tab>
+      <template v-if="currentUser.isAuth">
+        <v-tab to="/events">События</v-tab>
+      </template>
+      <v-tab to="/about">FAQ</v-tab>
+    </v-tabs>
+
+    <template v-slot:append>
+      <template v-if="currentUser.isAuth">
+        <v-menu class="nav-item dropdown">
+          <template v-slot:activator="{ props }">
+            <v-btn v-bind="props">
+              <v-avatar :image="avatarSrc" size="32"> </v-avatar>
+              <p class="my-0">{{ currentUser.username }}</p>
+              <v-icon icon="mdi-menu-down"></v-icon>
+            </v-btn>
+          </template>
+          <v-list>
+            <v-list-item to="/profile_settings">Настройки профиля</v-list-item>
+            <v-list-item to="/locations">Мои адреса</v-list-item>
+            <v-divider class="mt-2"></v-divider>
+            <v-list-item @click="logout" type="button" class="font-weight-bold">Выйти</v-list-item>
+          </v-list>
+        </v-menu>
+      </template>
+
+      <template v-else>
+        <v-btn :to="{ name: 'login' }" type="button" class="me-2" variant="outlined"> Вход </v-btn>
+
+        <v-btn :to="{ name: 'registration' }" type="button" variant="flat" color="indigo-darken-3">
+          Регистрация
+        </v-btn>
+      </template>
+      <color-mode-toggler></color-mode-toggler>
+    </template>
+  </v-app-bar>
 </template>
 
 <script>
 import { useCurrentUserStore } from '../stores/currentUserStore'
 import ColorModeToggler from '@/components/ColorModeToggler.vue'
 import { logout } from '@/utils/api_user_account'
+import { ref } from 'vue'
 
 export default {
+  name: 'navbar-header',
   setup() {
     const currentUserStore = useCurrentUserStore()
-    return { currentUserStore }
+    const avatarSrc = ref('/src/assets/default_avatar.jpg')
+
+    return { currentUserStore, avatarSrc }
+  },
+  data() {
+    return {
+      sidebar: false
+    }
   },
   components: {
     ColorModeToggler
@@ -100,14 +95,8 @@ export default {
 </script>
 
 <style scoped>
-li a {
-  padding-right: 0.5rem !important;
-  padding-left: 0.5rem !important;
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-li a.router-link-exact-active {
+a.v-slide-group-item--active,
+a.v-tab--selected {
   color: #42b983;
 }
 </style>

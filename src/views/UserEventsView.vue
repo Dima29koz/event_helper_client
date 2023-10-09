@@ -1,24 +1,24 @@
 <template>
-  <div class="container">
-    <table class="table table-hover caption-top">
+  <v-container>
+    <v-table class="table table-hover caption-top">
       <caption>
-        <div class="d-flex justify-content-between">
+        <div class="d-flex justify-space-between">
           <h1>События</h1>
           <div>
-            <button type="button" class="btn btn-primary me-2" @click="joinDialogVisible = true">
+            <v-btn type="button" color="primary" class="me-2" @click="joinDialogVisible = true">
               Присоединиться
-            </button>
-            <button type="button" class="btn btn-success" @click="onCreateEvent">Создать</button>
+            </v-btn>
+            <v-btn type="button" color="success" @click="onCreateEvent">Создать</v-btn>
           </div>
         </div>
       </caption>
       <thead>
         <tr>
           <th scope="col">#</th>
-          <th scope="col">Название</th>
-          <th scope="col">Дата начала</th>
-          <th scope="col">Дата окончания</th>
-          <th scope="col">Роль</th>
+          <th scope="col" class="text-center">Название</th>
+          <th scope="col" class="text-center">Дата начала</th>
+          <th scope="col" class="text-center">Дата окончания</th>
+          <th scope="col" class="text-center">Роль</th>
         </tr>
       </thead>
       <tbody class="table-group-divider">
@@ -31,36 +31,48 @@
           <td>{{ event.role }}</td>
         </tr>
       </tbody>
-    </table>
+    </v-table>
 
-    <b-modal
-      v-if="joinDialogVisible"
-      :title="'Присоединиться'"
-      @close="joinDialogVisible = false"
-      ref="modalJoin"
-    >
-      <template #body>
-        <event-join-form id="eventJoinForm" :onSubmit="joinEvent"></event-join-form>
-      </template>
-      <template #footer>
-        <button type="submit" class="btn btn-primary" form="eventJoinForm">Присоединиться</button>
-      </template>
-    </b-modal>
+    <v-dialog v-model="joinDialogVisible">
+      <v-card>
+        <v-card-title>
+          <span class="text-h5">Присоединиться</span>
+        </v-card-title>
+        <v-card-text>
+          <event-join-form id="eventJoinForm" :onSubmit="joinEvent"></event-join-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn @click="joinDialogVisible = false" color="blue-darken-1" variant="text">
+            Закрыть
+          </v-btn>
+          <v-btn type="submit" form="eventJoinForm" color="blue-darken-1" variant="text"
+            >Присоединиться
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
-    <b-modal
-      v-if="dialogVisible"
-      :title="'Создание события'"
-      @close="dialogVisible = false"
-      ref="modalElem"
-    >
-      <template #body>
-        <event-creation-form id="eventForm" :onSubmit="addEvent"></event-creation-form>
-      </template>
-      <template #footer>
-        <button type="submit" class="btn btn-primary" form="eventForm">Создать</button>
-      </template>
-    </b-modal>
-  </div>
+    <v-dialog v-model="dialogVisible">
+      <v-card>
+        <v-card-title>
+          <span class="text-h5">Создание события</span>
+        </v-card-title>
+        <v-card-text>
+          <event-creation-form id="eventForm" :onSubmit="addEvent"></event-creation-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn @click="dialogVisible = false" color="blue-darken-1" variant="text">
+            Закрыть
+          </v-btn>
+          <v-btn type="submit" form="eventForm" color="blue-darken-1" variant="text"
+            >Создать
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </v-container>
 </template>
 
 <script>
@@ -102,7 +114,7 @@ export default {
     },
 
     async addEvent(new_event) {
-      this.$refs.modalElem.modal.hide()
+      this.dialogVisible = false
       let key = await create_event(new_event)
       this.$router.push({ name: 'event', params: { key: key } })
     },
@@ -112,7 +124,7 @@ export default {
     },
 
     joinEvent(key) {
-      this.$refs.modalJoin.modal.hide()
+      this.joinDialogVisible = false
       key = key.split('/').at(-1)
       this.$router.push({ name: 'event', params: { key: key } })
     },

@@ -1,3 +1,3 @@
-import Modal from '@/components/UI/BModal.vue'
+import DatePicker from '@/components/UI/DatePicker.vue'
 
-export default [Modal]
+export default [DatePicker]

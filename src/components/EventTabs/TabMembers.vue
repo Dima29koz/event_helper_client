@@ -1,46 +1,46 @@
 <template>
-  <div class="container">
-    <table class="table table-hover caption-top">
-      <caption>
-        <div class="d-flex justify-content-between">
-          <h1>Участники:</h1>
-          <div>
-            <button
-              v-if="isNaN(meMemberIdx)"
-              type="button"
-              class="btn btn-primary me-2"
-              @click="(sellectedMemberIdx = NaN), (dialogMode = 'join'), (dialogVisible = true)"
-            >
-              Присоединиться
-            </button>
-            <template v-else>
-              <button
-                type="button"
-                class="btn btn-primary me-2"
-                @click="
-                  (sellectedMemberIdx = meMemberIdx),
-                    (dialogMode = 'editMe'),
-                    (dialogVisible = true)
-                "
-              >
-                Изменить себя
-              </button>
-              <button type="button" class="btn btn-danger me-2" @click="this.$emit('delMe')">
-                Покинуть событие
-              </button>
-            </template>
+  <v-container>
+    <div class="d-flex justify-space-between">
+      <h1>Участники:</h1>
+      <div>
+        <v-btn
+          v-if="isNaN(meMemberIdx)"
+          type="button"
+          color="primary"
+          class="me-2"
+          @click="(sellectedMemberIdx = NaN), (dialogMode = 'join'), (dialogVisible = true)"
+        >
+          Присоединиться
+        </v-btn>
+        <template v-else>
+          <v-btn
+            type="button"
+            color="primary"
+            class="me-2"
+            @click="
+              (sellectedMemberIdx = meMemberIdx), (dialogMode = 'editMe'), (dialogVisible = true)
+            "
+          >
+            Изменить себя
+          </v-btn>
+          <v-btn type="button" color="red" class="me-2" @click="this.$emit('delMe')">
+            Покинуть событие
+          </v-btn>
+        </template>
 
-            <button
-              v-if="eventMemberStore.hasOneOfRoles(['organizer', 'creator'])"
-              type="button"
-              class="btn btn-success"
-              @click="(sellectedMemberIdx = NaN), (dialogMode = 'add'), (dialogVisible = true)"
-            >
-              Добавить
-            </button>
-          </div>
-        </div>
-      </caption>
+        <v-btn
+          v-if="eventMemberStore.hasOneOfRoles(['organizer', 'creator'])"
+          type="button"
+          color="success"
+          class="me-2"
+          @click="(sellectedMemberIdx = NaN), (dialogMode = 'add'), (dialogVisible = true)"
+        >
+          Добавить
+        </v-btn>
+      </div>
+    </div>
+
+    <v-table class="table table-hover caption-top">
       <thead>
         <tr>
           <th scope="col">#</th>
@@ -63,36 +63,41 @@
           <td>{{ member.is_drinker }}</td>
           <td>{{ member.is_involved }}</td>
           <td v-if="eventMemberStore.hasOneOfRoles(['organizer', 'creator'])">
-            <button class="btn btn-outline-danger" name="delete-member">x</button>
+            <v-btn name="delete-member" icon="mdi-trash-can-outline" color="red"></v-btn>
           </td>
         </tr>
       </tbody>
-    </table>
+    </v-table>
 
-    <b-modal
-      v-if="dialogVisible"
-      :title="dialogTitle"
-      :size="'modal-lg'"
-      @close="dialogVisible = false"
-      ref="modalElem"
-    >
-      <template #body>
-        <event-member-form
-          id="memberForm"
-          :member_data="sellectedMember()"
-          :is_editable="
-            eventMemberStore.hasOneOfRoles(['organizer', 'creator']) ||
-            dialogMode === 'editMe' ||
-            dialogMode === 'join'
-          "
-          :onSubmit="dialogOnSubmit"
-        ></event-member-form>
-      </template>
-      <template #footer>
-        <button type="submit" class="btn btn-primary" form="memberForm">Сохранить</button>
-      </template>
-    </b-modal>
-  </div>
+    <v-dialog v-model="dialogVisible" width="1000">
+      <v-card>
+        <v-card-title>
+          <span class="text-h5">{{ dialogTitle }}</span>
+        </v-card-title>
+        <v-card-text>
+          <event-member-form
+            id="memberForm"
+            :member_data="sellectedMember()"
+            :is_editable="
+              eventMemberStore.hasOneOfRoles(['organizer', 'creator']) ||
+              dialogMode === 'editMe' ||
+              dialogMode === 'join'
+            "
+            :onSubmit="dialogOnSubmit"
+          ></event-member-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn @click="dialogVisible = false" color="blue-darken-1" variant="text">
+            Закрыть
+          </v-btn>
+          <v-btn type="submit" form="memberForm" color="blue-darken-1" variant="text"
+            >Сохранить
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </v-container>
 </template>
 
 <script>

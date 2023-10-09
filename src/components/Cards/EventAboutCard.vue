@@ -1,41 +1,28 @@
 <template>
-  <div class="card text-start">
-    <h5 class="card-header d-flex justify-content-between">
+  <v-card class="text-start">
+    <v-card-title class="d-flex justify-space-between">
       <div>{{ event.title }}</div>
-      <div class="dropdown">
-        <button
-          v-if="eventMemberStore.hasOneOfRoles(['organizer', 'creator'])"
-          class="btn btn-outline-secondary"
-          type="button"
-          data-bs-toggle="dropdown"
-          aria-expanded="false"
-        >
-          ⁝
-        </button>
-        <ul class="dropdown-menu">
-          <li><button class="dropdown-item" @click="this.$emit('editEvent')">Изменить</button></li>
+      <v-menu v-if="eventMemberStore.hasOneOfRoles(['organizer', 'creator'])" offset-y>
+        <template v-slot:activator="{ props }">
+          <v-btn v-bind="props" icon="mdi-dots-vertical"></v-btn>
+        </template>
+        <v-list>
+          <v-list-item title="Изменить" @click="this.$emit('editEvent')"></v-list-item>
           <template v-if="eventMemberStore.hasOneOfRoles(['creator'])">
-            <li><hr class="dropdown-divider" /></li>
-            <li>
-              <button class="dropdown-item text-danger" @click="this.$emit('delEvent')">
-                Удалить
-              </button>
-            </li>
+            <v-divider></v-divider>
+            <v-list-item title="Удалить" class="text-red" @click="this.$emit('delEvent')">
+            </v-list-item>
           </template>
-        </ul>
-      </div>
-    </h5>
-    <div class="card-body">
-      <h5 class="card-title">
-        {{ formatedDate(event.date_start, '') }} - {{ formatedDate(event.date_end, '') }}
-      </h5>
-      <div class="card-text">
-        <p>{{ event.description }}</p>
-        <p>{{ event.cost_reduction_factor }}</p>
-        <location-card :location="event.location"></location-card>
-      </div>
-    </div>
-  </div>
+        </v-list>
+      </v-menu>
+    </v-card-title>
+    <v-card-text>
+      <h5>{{ formatedDate(event.date_start, '') }} - {{ formatedDate(event.date_end, '') }}</h5>
+      <p>{{ event.description }}</p>
+      <p>{{ event.cost_reduction_factor }}</p>
+      <location-card :location="event.location"></location-card>
+    </v-card-text>
+  </v-card>
 </template>
 
 <script>

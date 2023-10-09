@@ -1,15 +1,11 @@
 <template>
-  <div class="card text-start">
-    <h5 class="card-header">{{ location.name }}</h5>
-    <div class="card-body">
-      <h5 class="card-title">Адрес: {{ location.address }}</h5>
-      <div class="card-text">
-        <p>{{ location.description }}</p>
-        <p>{{ location.geo }}</p>
-        <a :href="location.maps_link" target="_blank">Посмотреть на карте</a>
-      </div>
-    </div>
-  </div>
+  <v-card :title="location.name" class="text-start">
+    <v-card-text>
+      <p>{{ location.description }}</p>
+      <p>{{ location.geo }}</p>
+      <a :href="location.maps_link" target="_blank">Посмотреть на карте</a>
+    </v-card-text>
+  </v-card>
 </template>
 
 <script>

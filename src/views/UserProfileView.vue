@@ -1,49 +1,38 @@
 <template>
-  <div class="container">
+  <v-container>
     <h1>Настройки профиля</h1>
-    <!-- Email -->
-    <div class="card card-body">
-      <div class="d-flex flex-row justify-content-between pb-2">
-        <div class="d-flex align-items-left">
-          <div class="p-2 px-0">Электронная почта</div>
-          <span v-if="currentUser.is_email_verified" class="p-2 px-0">✅</span>
-          <span v-else class="p-2 px-0">❌</span>
-        </div>
 
-        <div class="p-2">{{ currentUser.email }}</div>
-        <div>
-          <button
-            class="btn btn-primary"
-            data-bs-toggle="collapse"
-            href="#EmailCollapse"
-            role="button"
-            aria-expanded="false"
-            aria-controls="EmailCollapse"
-          >
-            Изменить
-          </button>
-        </div>
-      </div>
-      <div class="collapse" id="EmailCollapse">
-        <form @submit.prevent class="form-contact">
-          <div class="row g-3 align-items-left">
-            <div class="col-3">
-              <label class="col-form-label" for="new_email">Новый адрес:</label>
-            </div>
-            <div class="col-5">
-              <div class="d-flex flex-row">
-                <input class="form-control" id="new_email" name="new_email" required type="email" />
-              </div>
-            </div>
-            <div class="col">
-              <button class="btn btn-primary" id="ChangeEmail" name="submit" type="submit" disabled>
-                Сохранить адрес
-              </button>
-            </div>
+    <!-- Email -->
+    <v-expansion-panels>
+      <v-expansion-panel>
+        <v-expansion-panel-title>
+          <template v-slot:default="{ expanded }">
+            <v-row no-gutters>
+              <v-col cols="4" class="d-flex justify-start">
+                Электронная почта
+                <span v-if="currentUser.is_email_verified" class="p-2 px-0">✅</span>
+                <span v-else class="p-2 px-0">❌</span>
+              </v-col>
+
+              <v-col cols="8" class="text-grey">
+                <v-fade-transition leave-absolute>
+                  <span v-if="expanded" key="0"> Укажите новую почту </span>
+                  <span v-else key="1">
+                    {{ currentUser.email }}
+                  </span>
+                </v-fade-transition>
+              </v-col>
+            </v-row>
+          </template>
+        </v-expansion-panel-title>
+        <v-expansion-panel-text>
+          <div class="d-flex flex-row">
+            <v-text-field v-model="email" hide-details placeholder="email@yours.com"></v-text-field>
+            <v-btn class="ms-2 align-self-center" disabled>Сохранить</v-btn>
           </div>
-        </form>
-      </div>
-    </div>
+        </v-expansion-panel-text>
+      </v-expansion-panel>
+    </v-expansion-panels>
 
     <div class="mt-3 text-start">
       <p>id: {{ currentUser.id }}</p>
@@ -54,7 +43,7 @@
       <p>phone: {{ currentUser.phone }}</p>
       <p>is_email_verified: {{ currentUser.is_email_verified }}</p>
     </div>
-  </div>
+  </v-container>
 </template>
 
 <script>
@@ -64,6 +53,11 @@ export default {
   setup() {
     const currentUserStore = useCurrentUserStore()
     return { currentUserStore }
+  },
+  data() {
+    return {
+      email: ''
+    }
   },
   computed: {
     currentUser() {

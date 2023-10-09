@@ -6,23 +6,29 @@
       @editEvent="dialogVisible = true"
     ></event-about-card>
 
-    <b-modal
-      v-if="dialogVisible"
-      :title="'Изменение события'"
-      @close="dialogVisible = false"
-      ref="modalElem"
-    >
-      <template #body>
-        <event-edit-form
-          id="eventForm"
-          :event_data="data"
-          :onSubmit="onEditEvent"
-        ></event-edit-form>
-      </template>
-      <template #footer>
-        <button type="submit" class="btn btn-primary" form="eventForm">Сохранить</button>
-      </template>
-    </b-modal>
+    <v-dialog v-model="dialogVisible" width="1000">
+      <v-card>
+        <v-card-title>
+          <span class="text-h5">Изменение события</span>
+        </v-card-title>
+        <v-card-text>
+          <event-edit-form
+            id="eventForm"
+            :event_data="data"
+            :onSubmit="onEditEvent"
+          ></event-edit-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn @click="dialogVisible = false" color="blue-darken-1" variant="text">
+            Закрыть
+          </v-btn>
+          <v-btn type="submit" form="eventForm" color="blue-darken-1" variant="text"
+            >Сохранить
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -48,7 +54,7 @@ export default {
   },
   methods: {
     onEditEvent(data) {
-      this.$refs.modalElem.modal.hide()
+      this.dialogVisible = false
       this.$emit('editEvent', data)
       this.$emit('editLocation', data.location)
     }

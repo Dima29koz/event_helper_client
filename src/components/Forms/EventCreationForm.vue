@@ -1,92 +1,60 @@
 <template>
-  <VForm @submit="this.onSubmit(this.event)" :validation-schema="schema" ref="eventForm">
-    <div class="form-floating">
-      <Field
-        v-focus
-        v-model="event.title"
-        name="title"
-        type="text"
-        class="form-control"
-        placeholder="Название"
-      />
-      <label>Название</label>
-      <ErrorMessage as="div" name="title" class="alert alert-danger p-1" />
-    </div>
-    <div class="form-floating">
-      <Field
-        as="select"
-        v-model="event.location_id"
-        name="location_id"
-        class="form-select"
-        aria-label="Выберите один из вариантов"
-      >
-        <option selected disabled value="">Укажите адрес</option>
-        <option v-for="location in locations" :key="location.id" v-bind:value="location.id">
-          {{ location.name }}
-        </option>
-      </Field>
-      <label>Адрес</label>
-      <ErrorMessage as="div" name="location_id" class="alert alert-danger p-1" />
-    </div>
-    <div class="row">
-      <div class="col">
+  <v-form @submit="submit" ref="eventForm">
+    <v-text-field
+      v-model="event.title"
+      :rules="[(v) => validateField(v, schema.title)]"
+      label="Название"
+    ></v-text-field>
+    <v-select
+      v-model="event.location_id"
+      :items="locations"
+      :rules="[(v) => validateField(v, schema.location_id)]"
+      item-title="name"
+      item-value="id"
+      label="Адрес"
+    ></v-select>
+    <v-row>
+      <v-col>
         <date-picker
+          id="date_start"
           v-model:model="event.date_start"
-          :label="'Дата начала'"
-          :name="'date_start'"
+          :rules="[(v) => validateField(v, schema.date_start)]"
+          label="Дата начала"
         ></date-picker>
-      </div>
-
-      <div class="col">
+      </v-col>
+      <v-col>
         <date-picker
+          id="date_end"
           v-model:model="event.date_end"
-          :label="'Дата окончания'"
-          :name="'date_end'"
+          :rules="[(v) => validateField(v, schema.date_end)]"
+          label="Дата окончания"
         ></date-picker>
-      </div>
-    </div>
-    <div class="form-floating">
-      <Field
-        as="textarea"
-        v-model="event.description"
-        name="description"
-        class="form-control"
-        placeholder="Описание"
-        style="height: 100px"
-      ></Field>
-      <label>Описание</label>
-      <ErrorMessage as="div" name="description" class="alert alert-danger p-1" />
-    </div>
-
-    <div class="form-floating">
-      <Field
-        v-model="event.cost_reduction_factor"
-        name="cost_reduction_factor"
-        type="number"
-        class="form-control"
-        placeholder="cost_reduction_factor"
-      />
-      <label>cost_reduction_factor</label>
-      <ErrorMessage as="div" name="cost_reduction_factor" class="alert alert-danger p-1" />
-    </div>
-  </VForm>
+      </v-col>
+    </v-row>
+    <v-textarea v-model="event.description" label="Описание" auto-grow rows="2"></v-textarea>
+    <v-text-field
+      v-model="event.cost_reduction_factor"
+      :rules="[(v) => validateField(v, schema.cost_reduction_factor)]"
+      label="cost_reduction_factor"
+      type="number"
+    ></v-text-field>
+  </v-form>
 </template>
 
 <script setup>
 import * as yup from 'yup'
+import { validateField } from '../../utils/validate_field'
 
-const schema = yup.object({
+const schema = {
   title: yup.string().required('Название не указано'),
   location_id: yup.number().required('Адрес не указан').typeError('Адрес не указан'),
   date_start: yup.string().required('Дата не выбрана'),
   date_end: yup.string().required('Дата не выбрана'),
   cost_reduction_factor: yup.number().required().typeError('Зачение не указано')
-})
+}
 </script>
 
 <script>
-import { Form as VForm, Field, ErrorMessage } from 'vee-validate'
-import DatePicker from '@/components/UI/DatePicker.vue'
 import { get_locations } from '@/utils/api_user_account'
 
 export default {
@@ -105,8 +73,6 @@ export default {
       locations: []
     }
   },
-
-  components: { DatePicker },
   props: {
     onSubmit: {
       type: Function,
@@ -117,6 +83,11 @@ export default {
   methods: {
     async getLocations() {
       this.locations = await get_locations()
+    },
+    async submit() {
+      if ((await this.$refs.eventForm.validate()).valid) {
+        this.onSubmit(this.event)
+      }
     }
   },
 

@@ -1,40 +1,32 @@
 <template>
-  <div>
-    <VueDatePicker
-      v-model="dateTime"
-      :start-time="{ hours: 12, minutes: 0 }"
-      month-name-format="long"
-      locale="ru"
-      format="dd.MM.yyyy HH:mm"
-      time-picker-inline
-      minutes-increment="15"
-      no-hours-overlay
-      no-minutes-overlay
-      auto-apply
-    >
-      <template #dp-input="{ value }">
-        <div class="form-floating">
-          <Field
-            :modelValue="value"
-            :validateOnBlur="false"
-            :name="name"
-            type="text"
-            class="form-control"
-          />
-          <label>{{ label }}</label>
-        </div>
-      </template>
-    </VueDatePicker>
-    <ErrorMessage as="div" :name="name" class="alert alert-danger p-1" />
-  </div>
+  <VueDatePicker
+    v-model="dateTime"
+    :start-time="{ hours: 12, minutes: 0 }"
+    month-name-format="long"
+    locale="ru"
+    format="dd.MM.yyyy HH:mm"
+    time-picker-inline
+    minutes-increment="15"
+    no-hours-overlay
+    no-minutes-overlay
+    auto-apply
+  >
+    <template #dp-input="{ value }">
+      <v-text-field
+        :modelValue="value"
+        :validateOnBlur="false"
+        :rules="rules"
+        :label="label"
+      ></v-text-field>
+    </template>
+  </VueDatePicker>
 </template>
 
 <script>
-import { Field, ErrorMessage } from 'vee-validate'
-
+import VueDatePicker from '@vuepic/vue-datepicker'
 export default {
   name: 'date-picker',
-  components: { Field, ErrorMessage },
+  components: { VueDatePicker },
   props: {
     label: {
       type: String,
@@ -44,6 +36,7 @@ export default {
       type: String,
       default: '<<Name goes here>>'
     },
+    rules: { type: Array, default: () => [] },
     model: null
   },
   computed: {

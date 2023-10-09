@@ -1,59 +1,39 @@
 <template>
-  <VForm @submit="isLocationSubmited = true" :validation-schema="schema" ref="eventEditForm">
-    <div class="form-floating">
-      <Field
-        v-focus
-        v-model="event.title"
-        name="title"
-        type="text"
-        class="form-control"
-        placeholder="Название"
-      />
-      <label>Название</label>
-      <ErrorMessage as="div" name="title" class="alert alert-danger p-1" />
-    </div>
-    <div class="row">
-      <div class="col">
+  <v-form ref="eventEditForm" @submit="isLocationSubmited = true">
+    <v-text-field
+      v-model="event.title"
+      :rules="[(v) => validateField(v, schema.title)]"
+      label="Название"
+    ></v-text-field>
+
+    <v-row>
+      <v-col>
         <date-picker
+          id="date_start"
           v-model:model="event.date_start"
+          :rules="[(v) => validateField(v, schema.date_start)]"
           :label="'Дата начала'"
-          :name="'date_start'"
         ></date-picker>
-      </div>
-
-      <div class="col">
+      </v-col>
+      <v-col>
         <date-picker
+          id="date_end"
           v-model:model="event.date_end"
-          :label="'Дата окончания'"
-          :name="'date_end'"
+          :rules="[(v) => validateField(v, schema.date_end)]"
+          label="Дата окончания"
         ></date-picker>
-      </div>
-    </div>
-    <div class="form-floating">
-      <Field
-        as="textarea"
-        v-model="event.description"
-        name="description"
-        class="form-control"
-        placeholder="Описание"
-        style="height: 100px"
-      ></Field>
-      <label>Описание</label>
-      <ErrorMessage as="div" name="description" class="alert alert-danger p-1" />
-    </div>
+      </v-col>
+    </v-row>
 
-    <div class="form-floating">
-      <Field
-        v-model="event.cost_reduction_factor"
-        name="cost_reduction_factor"
-        type="number"
-        class="form-control"
-        placeholder="cost_reduction_factor"
-      />
-      <label>cost_reduction_factor</label>
-      <ErrorMessage as="div" name="cost_reduction_factor" class="alert alert-danger p-1" />
-    </div>
-    <div class="form-floating">
+    <v-textarea v-model="event.description" label="Описание" auto-grow rows="2"></v-textarea>
+
+    <v-text-field
+      v-model="event.cost_reduction_factor"
+      :rules="[(v) => validateField(v, schema.cost_reduction_factor)]"
+      label="cost_reduction_factor"
+      type="number"
+    ></v-text-field>
+    <div>
       <h5>Изменение адреса</h5>
       <location-form
         :location="event_data.location"
@@ -61,24 +41,22 @@
         v-model:isSubmited="isLocationSubmited"
       ></location-form>
     </div>
-  </VForm>
+  </v-form>
 </template>
 
 <script setup>
 import * as yup from 'yup'
+import { validateField } from '../../utils/validate_field'
 
-const schema = yup.object({
+const schema = {
   title: yup.string().required('Название не указано'),
   date_start: yup.string().required('Дата не выбрана'),
   date_end: yup.string().required('Дата не выбрана'),
   cost_reduction_factor: yup.number().required().typeError('Зачение не указано')
-})
+}
 </script>
 
 <script>
-import { Form as VForm, Field, ErrorMessage } from 'vee-validate'
-import DatePicker from '@/components/UI/DatePicker.vue'
-
 import LocationForm from '@/components/Forms/LocationForm.vue'
 
 export default {
@@ -89,8 +67,6 @@ export default {
       isLocationSubmited: false
     }
   },
-
-  components: { DatePicker, LocationForm },
   props: {
     event_data: {},
     onSubmit: {

@@ -1,119 +1,73 @@
 <template>
   <div class="form-signin">
-    <VForm @submit="registrateUser" :validation-schema="schema">
-      <h1 class="h3 mb-3 fw-normal">Регистрация</h1>
+    <h1 class="h3 mb-3 fw-normal">Регистрация</h1>
+    <v-form ref="form">
+      <v-text-field
+        v-model="new_user.username"
+        :rules="[(v) => validateField(v, schema.username)]"
+        :error-messages="error"
+        name="username"
+        label="Логин"
+      ></v-text-field>
 
-      <div class="form-floating">
-        <Field
-          v-focus
-          v-model="new_user.username"
-          name="username"
-          type="text"
-          class="form-control"
-          placeholder="Логин"
-        />
-        <label for="username">Логин</label>
-        <slot>
-          <ErrorMessage as="div" name="username" class="alert alert-danger p-1" />
-        </slot>
-      </div>
-      <div class="form-floating">
-        <Field
-          v-model="new_user.full_name"
-          name="name"
-          id="name"
-          type="text"
-          class="form-control"
-          placeholder="ФИО"
-        />
-        <label for="name">ФИО</label>
-        <ErrorMessage as="div" name="name" class="alert alert-danger p-1" />
-      </div>
-      <div class="form-floating">
-        <Field
-          v-model="new_user.email"
-          name="email"
-          id="email"
-          type="email"
-          class="form-control"
-          placeholder="email"
-        />
-        <label for="email">email</label>
-        <ErrorMessage as="div" name="email" class="alert alert-danger p-1" />
-      </div>
-      <div class="form-floating">
-        <Field
-          v-model="new_user.phone"
-          name="tel"
-          id="tel"
-          type="text"
-          class="form-control"
-          placeholder="Телефон"
-        />
-        <label for="tel">Телефон</label>
-        <ErrorMessage as="div" name="tel" class="alert alert-danger p-1" />
-      </div>
-      <div class="form-floating">
-        <Field
-          v-model="new_user.contacts"
-          name="contacts"
-          id="contacts"
-          type="text"
-          class="form-control"
-          placeholder="Контакты"
-        />
-        <label for="contacts">Контакты</label>
-        <ErrorMessage as="div" name="contacts" class="alert alert-danger p-1" />
-      </div>
-      <div class="form-floating">
-        <Field
-          v-model="new_user.password"
-          name="password"
-          id="password"
-          type="password"
-          class="form-control"
-          placeholder="Пароль"
-        />
-        <label for="password">Пароль</label>
-        <ErrorMessage as="div" name="password" class="alert alert-danger p-1" />
-      </div>
-      <div class="form-floating">
-        <Field
-          v-model="new_user.password_repeat"
-          name="passwordRepeat"
-          id="passwordRepeat"
-          type="password"
-          class="form-control"
-          placeholder="Повторите пароль"
-        />
-        <label for="passwordRepeat">Повторите пароль</label>
-        <ErrorMessage as="div" name="passwordRepeat" class="alert alert-danger p-1" />
-      </div>
+      <v-text-field
+        v-model="new_user.full_name"
+        :rules="[(v) => validateField(v, schema.full_name)]"
+        name="name"
+        label="ФИО"
+      ></v-text-field>
 
-      <button class="btn btn-primary w-100 py-2" type="submit">Создать аккаунт</button>
-    </VForm>
+      <v-text-field
+        v-model="new_user.email"
+        :rules="[(v) => validateField(v, schema.email)]"
+        name="email"
+        label="email"
+      ></v-text-field>
+
+      <v-text-field v-model="new_user.phone" name="tel" label="Телефон"></v-text-field>
+
+      <v-text-field v-model="new_user.contacts" name="contacts" label="Контакты"></v-text-field>
+
+      <v-text-field
+        v-model="new_user.password"
+        :rules="[(v) => validateField(v, schema.password)]"
+        type="password"
+        name="password"
+        label="Пароль"
+      ></v-text-field>
+
+      <v-text-field
+        v-model="new_user.password_repeat"
+        :rules="[(v) => validateField(v, schema.password_repeat(new_user.password))]"
+        type="password"
+        name="passwordRepeat"
+        label="Повторите пароль"
+      ></v-text-field>
+
+      <v-btn @click="registrateUser">Создать аккаунт</v-btn>
+    </v-form>
   </div>
 </template>
 
-<script setup>
-import * as yup from 'yup'
-
-const schema = yup.object({
-  username: yup.string().required(),
-  email: yup.string().required().email(),
-  password: yup.string().required(),
-  passwordRepeat: yup.string().oneOf([yup.ref('password'), null], 'Passwords must match')
-})
-</script>
+<script setup></script>
 
 <script>
-import { Form as VForm, Field, ErrorMessage } from 'vee-validate'
+import * as yup from 'yup'
+import { validateField } from '../../utils/validate_field'
 
 export default {
-  components: {
-    VForm,
-    Field,
-    ErrorMessage
+  setup() {
+    const schema = {
+      username: yup.string().required('Поле не заполнено'),
+      full_name: yup.string().required('Поле не заполнено'),
+      email: yup.string().required('Поле не заполнено').email('Некорректный ардес'),
+      password: yup.string().required('Поле не заполнено'),
+      password_repeat: (password) => yup.string().oneOf([password, null], 'Пароли не совпадают')
+    }
+    return { schema, validateField }
+  },
+  props: {
+    error: null
   },
 
   data() {
@@ -130,10 +84,9 @@ export default {
     }
   },
   methods: {
-    registrateUser() {
-      if (this.new_user.password != this.new_user.password_repeat) {
-        console.log('pass not eq')
-      } else {
+    async registrateUser() {
+      if ((await this.$refs.form.validate()).valid) {
+        console.log(this.new_user)
         this.$emit('register', this.new_user)
       }
     }

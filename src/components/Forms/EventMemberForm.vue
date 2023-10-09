@@ -1,114 +1,66 @@
 <template>
-  <VForm @submit="onBeforeSubmit" :validation-schema="schema" ref="eventEditForm">
-    <fieldset :disabled="!is_editable">
-      <div class="form-floating">
-        <Field
-          v-focus
-          v-model="member.nickname"
-          name="nickname"
-          type="text"
-          class="form-control"
-          placeholder="Как к вам обращаться?"
-        />
-        <label>Как к вам обращаться?</label>
-        <ErrorMessage as="div" name="nickname" class="alert alert-danger p-1" />
-      </div>
+  <v-form ref="form" @submit="submit" :disabled="!is_editable">
+    <v-text-field
+      v-model="member.nickname"
+      :rules="[(v) => validateField(v, schema.role)]"
+      label="Как к вам обращаться?"
+      type="text"
+    ></v-text-field>
 
-      <div class="row">
-        <div class="col">
-          <date-picker
-            v-model:model="member.date_from"
-            :label="'Приеду (дата)'"
-            :name="'date_from'"
-          ></date-picker>
-        </div>
-
-        <div class="col">
-          <date-picker
-            v-model:model="member.date_to"
-            :label="'Уеду (дата)'"
-            :name="'date_to'"
-          ></date-picker>
-        </div>
-        <div class="col">
-          <div class="form-floating">
-            <Field
-              v-model="member.days_amount"
-              name="days_amount"
-              type="number"
-              class="form-control-plaintext"
-              placeholder="Количество дней"
-              readonly
-            ></Field>
-            <label>Количество дней</label>
-          </div>
-        </div>
-      </div>
-
-      <div class="form-check text-start my-3">
-        <Field
-          as="input"
-          v-model="member.is_drinker"
-          ref="checkDrinker"
-          name="is_drinker"
-          type="checkbox"
-          :value="true"
-          class="form-check-input"
-        />
-
-        <label class="form-check-label"> Пьющий </label>
-        <ErrorMessage as="div" name="is_drinker" class="alert alert-danger p-1" />
-      </div>
-      <div class="form-check text-start my-3">
-        <Field
-          v-model="member.is_involved"
-          name="is_involved"
-          type="checkbox"
-          :value="true"
-          class="form-check-input"
-          checked
-        />
-
-        <label class="form-check-label"> Приеду </label>
-        <ErrorMessage as="div" name="is_involved" class="alert alert-danger p-1" />
-      </div>
-      <div v-if="eventMemberStore.hasOneOfRoles(['organizer', 'creator'])" class="form-floating">
-        <Field
-          as="select"
-          v-model="member.role"
-          name="role"
-          class="form-select"
-          aria-label="Выберите один из вариантов"
-        >
-          <option selected disabled value="">Выберите роль</option>
-          <option v-for="(role, index) in roles" :key="index" v-bind:value="role">
-            {{ role }}
-          </option>
-        </Field>
-        <label>Роль</label>
-        <ErrorMessage as="div" name="role" class="alert alert-danger p-1" />
-      </div>
-    </fieldset>
-  </VForm>
+    <v-row>
+      <v-col>
+        <date-picker
+          v-model:model="member.date_from"
+          :rules="[(v) => validateField(v, schema.date_from)]"
+          :label="'Приеду (дата)'"
+          :name="'date_from'"
+        ></date-picker>
+      </v-col>
+      <v-col>
+        <date-picker
+          v-model:model="member.date_to"
+          :rules="[(v) => validateField(v, schema.date_to)]"
+          :label="'Уеду (дата)'"
+          :name="'date_to'"
+        ></date-picker>
+      </v-col>
+      <v-col>
+        <v-text-field
+          v-model="member.days_amount"
+          label="Количество дней"
+          type="number"
+          readonly
+        ></v-text-field>
+      </v-col>
+    </v-row>
+    <v-checkbox v-model="member.is_drinker" label="Пьющий"></v-checkbox>
+    <v-checkbox v-model="member.is_involved" label="Приеду"></v-checkbox>
+    <v-select
+      v-if="eventMemberStore.hasOneOfRoles(['organizer', 'creator'])"
+      v-model="member.role"
+      :items="roles"
+      :rules="[(v) => validateField(v, schema.role)]"
+      label="Роль"
+    ></v-select>
+  </v-form>
 </template>
 
 <script>
 import * as yup from 'yup'
-import { Form as VForm, Field, ErrorMessage } from 'vee-validate'
-import DatePicker from '@/components/UI/DatePicker.vue'
+import { validateField } from '../../utils/validate_field'
 import { useEventMemberStore } from '@/stores/eventMemberStore'
 
 export default {
   name: 'event-member-form',
-  components: { VForm, Field, ErrorMessage, DatePicker },
   setup() {
-    const schema = yup.object({
+    const schema = {
       nickname: yup.string().required('Поле не заполнено'),
       date_from: yup.string().required('Дата не выбрана'),
-      date_to: yup.string().required('Дата не выбрана')
-    })
+      date_to: yup.string().required('Дата не выбрана'),
+      role: yup.string().required('Роль не выбрана')
+    }
     const eventMemberStore = useEventMemberStore()
-    return { schema, eventMemberStore }
+    return { schema, eventMemberStore, validateField }
   },
   data() {
     return {
@@ -150,10 +102,10 @@ export default {
         this.member.days_amount = 0
       }
     },
-    onBeforeSubmit() {
-      this.member.is_drinker = this.member.is_drinker === undefined ? false : true
-      this.member.is_involved = this.member.is_involved === undefined ? false : true
-      this.onSubmit(this.member)
+    async submit() {
+      if ((await this.$refs.eventForm.validate()).valid) {
+        this.onSubmit(this.member)
+      }
     }
   },
 
