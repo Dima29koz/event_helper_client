@@ -6,6 +6,7 @@
       :items-per-page="-1"
       :group-by="groupBy"
       :search="search"
+      hover
     >
       <template v-slot:top>
         <div class="d-flex justify-space-between mb-2">
@@ -27,15 +28,17 @@
 
       <template v-slot:group-header="{ item, columns, toggleGroup, isGroupOpen }">
         <tr>
-          <td :colspan="columns.length">
+          <td :colspan="columns.length" class="pa-0">
             <v-btn
-              size="small"
-              variant="text"
-              :icon="isGroupOpen(item) ? '$expand' : '$next'"
               @click="toggleGroup(item)"
-            ></v-btn>
-
-            {{ item.value }}
+              block
+              rounded="0"
+              variant="text"
+              class="justify-start h-100 text-none font-weight-medium text-subtitle-1"
+              :prepend-icon="isGroupOpen(item) ? '$expand' : '$next'"
+            >
+              {{ item.value }}
+            </v-btn>
           </td>
         </tr>
       </template>
@@ -49,12 +52,23 @@
             ></v-checkbox-btn>
           </td>
           <td>
-            <div class="d-flex">
-              <v-icon color="green" @click="reduceAmount(item)"> mdi-minus </v-icon>
+            <div class="d-flex justify-space-evenly">
+              <v-btn
+                @click="reduceAmount(item)"
+                density="compact"
+                variant="text"
+                icon
+                :disabled="item.amount == 0"
+              >
+                <v-icon color="green"> mdi-minus </v-icon>
+              </v-btn>
+
               <div class="mx-3">
                 {{ item.amount + item.bought_amount }} / {{ item.bought_amount }} {{ item.unit }}
               </div>
-              <v-icon color="red" @click="increaseAmount(item)"> mdi-plus </v-icon>
+              <v-btn @click="increaseAmount(item)" density="compact" variant="text" icon>
+                <v-icon color="red"> mdi-plus </v-icon>
+              </v-btn>
             </div>
           </td>
           <td>{{ item.name }}</td>
@@ -123,7 +137,7 @@ export default {
       search: '',
       groupBy: [{ key: 'category', order: 'asc' }],
       headers: [
-        { title: 'Количество', key: 'amount', align: 'start' },
+        { title: 'Количество', key: 'amount', align: 'center' },
         { title: 'Название', key: 'name' },
         { title: 'Тип', key: 'type' },
         { title: 'Цена', key: 'price_supposed' },
