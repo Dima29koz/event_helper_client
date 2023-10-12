@@ -52,9 +52,43 @@ export async function get_base_products() {
   }
 }
 
+export async function add_base_product(product_data) {
+  try {
+    const response = await axios.post(
+      '/api/event_management/product/base',
+      {
+        name: product_data.name,
+        category_id: product_data.category.id,
+        type_id: product_data.type.id,
+        unit_id: product_data.unit.id,
+        price_supposed: product_data.price_supposed
+      },
+      { headers: { 'X-CSRF-TOKEN': $cookies.get('csrf_access_token') } }
+    )
+    return response.data
+  } catch (e) {
+    console.log(e)
+  }
+}
+
 export async function get_product_categories() {
   try {
     const response = await axios.get('/api/event_management/product/category')
+    return response.data
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+export async function add_product_category(value) {
+  try {
+    const response = await axios.post(
+      '/api/event_management/product/category',
+      {
+        name: value
+      },
+      { headers: { 'X-CSRF-TOKEN': $cookies.get('csrf_access_token') } }
+    )
     return response.data
   } catch (e) {
     console.log(e)
@@ -70,9 +104,39 @@ export async function get_product_types() {
   }
 }
 
+export async function add_product_type(value) {
+  try {
+    const response = await axios.post(
+      '/api/event_management/product/type',
+      {
+        name: value
+      },
+      { headers: { 'X-CSRF-TOKEN': $cookies.get('csrf_access_token') } }
+    )
+    return response.data
+  } catch (e) {
+    console.log(e)
+  }
+}
+
 export async function get_product_units() {
   try {
     const response = await axios.get('/api/event_management/product/unit')
+    return response.data
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+export async function add_product_unit(value) {
+  try {
+    const response = await axios.post(
+      '/api/event_management/product/unit',
+      {
+        name: value
+      },
+      { headers: { 'X-CSRF-TOKEN': $cookies.get('csrf_access_token') } }
+    )
     return response.data
   } catch (e) {
     console.log(e)

@@ -1,0 +1,218 @@
+<template>
+  <v-container>
+    <v-data-table
+      :headers="headers"
+      :items="base_products"
+      :items-per-page="-1"
+      :group-by="groupBy"
+      :search="search"
+    >
+      <template v-slot:top>
+        <div class="d-flex justify-space-between mb-2">
+          <div>
+            <v-btn @click="addProducts" class="me-2" color="success">Добавить выбранные</v-btn>
+            <v-btn @click="dialogVisible = true" color="primary">Создать новый продукт</v-btn>
+          </div>
+
+          <v-btn @click="getBaseProducts()" color="red">Отменить выбор</v-btn>
+        </div>
+        <v-text-field
+          v-model="search"
+          append-inner-icon="mdi-magnify"
+          label="Поиск"
+          single-line
+          hide-details
+        ></v-text-field>
+      </template>
+
+      <template v-slot:group-header="{ item, columns, toggleGroup, isGroupOpen }">
+        <tr>
+          <td :colspan="columns.length">
+            <v-btn
+              size="small"
+              variant="text"
+              :icon="isGroupOpen(item) ? '$expand' : '$next'"
+              @click="toggleGroup(item)"
+            ></v-btn>
+
+            {{ item.value }}
+          </td>
+        </tr>
+      </template>
+
+      <template v-slot:item="{ item }">
+        <tr>
+          <td>
+            <v-checkbox-btn
+              :modelValue="item.amount !== item.added_amount"
+              @update:modelValue="handleSelection(item)"
+            ></v-checkbox-btn>
+          </td>
+          <td>
+            <div class="d-flex">
+              <v-icon color="green" @click="reduceAmount(item)"> mdi-minus </v-icon>
+              <div class="mx-3">
+                {{ item.amount + item.bought_amount }} / {{ item.bought_amount }} {{ item.unit }}
+              </div>
+              <v-icon color="red" @click="increaseAmount(item)"> mdi-plus </v-icon>
+            </div>
+          </td>
+          <td>{{ item.name }}</td>
+          <td>{{ item.type }}</td>
+          <td>{{ item.price_supposed }}</td>
+          <td>
+            <div class="d-flex">
+              <div>{{ (item.amount + item.bought_amount) * item.price_supposed }}</div>
+            </div>
+          </td>
+        </tr>
+      </template>
+
+      <template v-slot:bottom></template>
+    </v-data-table>
+
+    <v-dialog v-model="dialogVisible" width="1000">
+      <v-card>
+        <v-card-title>
+          <span class="text-h5">Добавление продукта</span>
+        </v-card-title>
+        <v-card-text>
+          <base-product-form
+            id="ProductForm"
+            :base_product_data="null"
+            :is_editable="eventMemberStore.hasOneOfRoles(['organizer', 'creator'])"
+            :onSubmit="onAddBaseProduct"
+          ></base-product-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn @click="dialogVisible = false" color="blue-darken-1" variant="text">
+            Закрыть
+          </v-btn>
+          <v-btn type="submit" form="ProductForm" color="blue-darken-1" variant="text"
+            >Сохранить
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </v-container>
+</template>
+
+<script>
+import BaseProductForm from '@/components/Forms/BaseProductForm.vue'
+import { useEventMemberStore } from '@/stores/eventMemberStore'
+import { add_base_product, get_base_products } from '../../utils/api_event_management'
+
+export default {
+  name: 'tab-base-products',
+  components: { BaseProductForm },
+  setup() {
+    const eventMemberStore = useEventMemberStore()
+    return { eventMemberStore }
+  },
+  props: {
+    data: {
+      type: Array,
+      default: () => []
+    }
+  },
+  data() {
+    return {
+      base_products: [],
+      dialogVisible: false,
+      search: '',
+      groupBy: [{ key: 'category', order: 'asc' }],
+      headers: [
+        { title: 'Количество', key: 'amount', align: 'start' },
+        { title: 'Название', key: 'name' },
+        { title: 'Тип', key: 'type' },
+        { title: 'Цена', key: 'price_supposed' },
+        { title: 'Сумма', key: 'sum_supposed' }
+      ]
+    }
+  },
+  methods: {
+    async onAddBaseProduct(product_data) {
+      this.dialogVisible = false
+      const product = await add_base_product(product_data)
+      this._fixProduct(product, 0, 0, 0)
+      this.base_products.push(product)
+    },
+    async getBaseProducts() {
+      const base_products = await get_base_products()
+      base_products.forEach((product) => {
+        const baseProduct = this.base_products.find((p) => p.id === product.id)
+        if (
+          baseProduct &&
+          'amount' in baseProduct &&
+          baseProduct.amount !== baseProduct.added_amount
+        ) {
+          product.amount = baseProduct.amount
+        }
+      })
+      this.base_products = base_products
+      this.resetSelection(true)
+    },
+    addProducts() {
+      this.$emit('addEventProducts', this.selected)
+    },
+    resetSelection(resetAmount = false) {
+      this.base_products.forEach((product) => {
+        const event_products = this.data.filter(
+          (event_product) => event_product.base_product.id === product.id
+        )
+        let not_bought = 0
+        let bought = 0
+
+        if (event_products.length !== 0) {
+          event_products.forEach((event_product) => {
+            event_product.state === 'bought'
+              ? (bought += event_product.amount)
+              : (not_bought += event_product.amount)
+          })
+        }
+        this._fixProduct(product, not_bought, not_bought, bought, resetAmount)
+      })
+    },
+    _fixProduct(product, amount, added_amount, bought_amount, resetAmount = false) {
+      if (resetAmount || !('amount' in product)) {
+        product.amount = amount
+      }
+      product.added_amount = added_amount
+      product.bought_amount = bought_amount
+    },
+    increaseAmount(item) {
+      item.amount += 1
+    },
+    reduceAmount(item) {
+      if (item.amount > 0) {
+        item.amount -= 1
+      }
+    },
+    handleSelection(item) {
+      if (item.amount !== item.added_amount) {
+        item.amount = item.added_amount
+      } else {
+        item.amount += 1
+      }
+    }
+  },
+  computed: {
+    selected() {
+      return this.base_products.filter((product) => product.amount != product.added_amount)
+    }
+  },
+  watch: {
+    data: {
+      handler() {
+        this.getBaseProducts()
+      },
+      deep: true
+    }
+  },
+  async mounted() {
+    this.$emit('getEventProducts')
+    await this.getBaseProducts()
+  }
+}
+</script>

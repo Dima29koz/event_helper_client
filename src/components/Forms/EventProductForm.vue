@@ -1,5 +1,5 @@
 <template>
-  <v-form ref="form" @submit="submit" :disabled="!is_editable">
+  <v-form ref="form" @submit.prevent="submit" :disabled="!is_editable">
     <div class="d-flex">
       <v-select
         v-model="product.base_product"

@@ -3,6 +3,7 @@
     <v-tabs v-model="currentTab" background-color="transparent">
       <v-tab @click="currentTab = 'about'" value="about"> Информация о событии </v-tab>
       <v-tab @click="currentTab = 'products'" value="products"> Продукты </v-tab>
+      <v-tab @click="currentTab = 'base-products'" value="base-products"> Корзина </v-tab>
       <v-tab @click="currentTab = 'members'" value="members"> Люди </v-tab>
       <v-tab @click="currentTab = 'results'" value="results"> Итоги </v-tab>
     </v-tabs>
@@ -24,6 +25,7 @@
         @delMe="del_me"
         @delMember="del_member"
         @addEventProduct="add_event_product"
+        @addEventProducts="add_event_products"
         @editEventProduct="edit_event_product"
       ></component>
     </keep-alive>
@@ -35,6 +37,7 @@ import { setupIO } from '@/utils/event-socket'
 import TabAbout from '@/components/EventTabs/TabAbout.vue'
 import TabMembers from '@/components/EventTabs/TabMembers.vue'
 import TabProducts from '@/components/EventTabs/TabProducts.vue'
+import TabBaseProducts from '@/components/EventTabs/TabBaseProducts.vue'
 import TabResults from '@/components/EventTabs/TabResults.vue'
 import { useCurrentUserStore } from '@/stores/currentUserStore'
 import { useEventMemberStore } from '@/stores/eventMemberStore'
@@ -54,7 +57,7 @@ export default {
       event_products: []
     }
   },
-  components: { TabAbout, TabMembers, TabProducts, TabResults },
+  components: { TabAbout, TabMembers, TabProducts, TabResults, TabBaseProducts },
   methods: {
     connect() {
       this.socket.connect()
@@ -78,9 +81,11 @@ export default {
       })
     },
     get_event_products() {
-      this.socket.emit('get_data', {
-        entity: 'products'
-      })
+      if (this.event_products.length === 0) {
+        this.socket.emit('get_data', {
+          entity: 'products'
+        })
+      }
     },
     del_event() {
       this.socket.emit('delete_event', {
@@ -156,13 +161,28 @@ export default {
       })
     },
     add_event_product(product) {
-      console.log(product)
-      // this.socket.emit('add_product', {
-      //   auth: {
-      //     csrf_access_token: this.$cookies.get('csrf_access_token')
-      //   },
-      //   product: product
-      // })
+      Object.defineProperty(product, 'product_id', Object.getOwnPropertyDescriptor(product, 'id'))
+      delete product['id']
+      this.socket.emit('add_product', {
+        auth: {
+          csrf_access_token: this.$cookies.get('csrf_access_token')
+        },
+        product: product
+      })
+    },
+    add_event_products(products) {
+      let fixed_products = products.map((product) => {
+        return { ...product, product_id: product.id }
+      })
+      fixed_products.forEach((product) => {
+        delete product.id
+      })
+      this.socket.emit('add_products', {
+        auth: {
+          csrf_access_token: this.$cookies.get('csrf_access_token')
+        },
+        products: fixed_products
+      })
     },
     edit_event_product(product) {
       console.log(product)
@@ -180,6 +200,9 @@ export default {
         return this.event_members
       }
       if (this.currentTab === 'products') {
+        return this.event_products
+      }
+      if (this.currentTab === 'base-products') {
         return this.event_products
       }
       return null
@@ -269,6 +292,20 @@ export default {
     })
     this.socket.on('delete_member', (response) => {
       this.event_members = this.event_members.filter((member) => member.id !== response.member_id)
+    })
+    this.socket.on('add_products', (products) => {
+      products.forEach((product) => this.event_products.push(product))
+    })
+    this.socket.on('add_product', (product) => {
+      this.event_products.push(product)
+    })
+    this.socket.on('update_event_products', (products) => {
+      products.forEach((product) => {
+        let index = this.event_products.findIndex((p) => p.id === product.id)
+        if (index !== -1) {
+          this.event_products[index] = product
+        }
+      })
     })
   }
 }
