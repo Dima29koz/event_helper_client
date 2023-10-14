@@ -39,7 +39,6 @@
             id="locationForm"
             :location="locationByIdx()"
             :onSubmit="!isNaN(this.selectedLocationIdx) ? updateLocation : addLocation"
-            v-model:isSubmited="isSubmited"
           ></location-form>
         </v-card-text>
         <v-card-actions>
@@ -71,7 +70,6 @@ export default {
     return {
       dialogVisible: false,
       selectedLocationIdx: NaN,
-      isSubmited: false,
       locations: []
     }
   },
@@ -114,14 +112,14 @@ export default {
     },
 
     updateLocation(location_data) {
-      this.isSubmited = false
+      this.dialogVisible = false
       edit_location(location_data.id, location_data)
       let location_idx = this.locations.findIndex((element) => element.id == location_data.id)
       this.locations[location_idx] = location_data
     },
 
     async addLocation(location_data) {
-      this.isSubmited = false
+      this.dialogVisible = false
       let new_location = await create_location(location_data)
       this.locations.push(new_location)
     }

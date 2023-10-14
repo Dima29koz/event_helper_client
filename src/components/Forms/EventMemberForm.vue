@@ -1,5 +1,5 @@
 <template>
-  <v-form ref="form" @submit="submit" :disabled="!is_editable">
+  <v-form ref="form" @submit.prevent="submit" :disabled="!is_editable">
     <v-text-field
       v-model="member.nickname"
       :rules="[(v) => validateField(v, schema.role)]"
@@ -103,7 +103,7 @@ export default {
       }
     },
     async submit() {
-      if ((await this.$refs.eventForm.validate()).valid) {
+      if ((await this.$refs.form.validate()).valid) {
         this.onSubmit(this.member)
       }
     }

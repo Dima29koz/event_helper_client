@@ -1,5 +1,5 @@
 <template>
-  <v-form ref="form" @submit="beforeSubmit">
+  <v-form ref="form" @submit.prevent="submit">
     <v-text-field
       v-model="local_location.name"
       :rules="[(v) => validateField(v, schema.name)]"
@@ -69,14 +69,13 @@ export default {
         }
       }
     },
-    onSubmit: null,
-    isSubmited: {
-      type: Boolean,
-      default: false
+    onSubmit: {
+      type: Function,
+      default: () => {}
     }
   },
   methods: {
-    async beforeSubmit() {
+    async submit() {
       if ((await this.$refs.form.validate()).valid) {
         this.onSubmit(this.local_location)
       }

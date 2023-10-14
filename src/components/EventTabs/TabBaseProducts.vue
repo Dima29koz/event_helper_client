@@ -52,7 +52,7 @@
             ></v-checkbox-btn>
           </td>
           <td>
-            <div class="d-flex justify-space-evenly">
+            <div class="d-flex align-center justify-space-evenly">
               <v-btn
                 @click="reduceAmount(item)"
                 density="compact"
@@ -63,7 +63,7 @@
                 <v-icon color="green"> mdi-minus </v-icon>
               </v-btn>
 
-              <div class="mx-3">
+              <div class="mx-3" style="white-space: nowrap !important">
                 {{ item.amount + item.bought_amount }} / {{ item.bought_amount }} {{ item.unit }}
               </div>
               <v-btn @click="increaseAmount(item)" density="compact" variant="text" icon>

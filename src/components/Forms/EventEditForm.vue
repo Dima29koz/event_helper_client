@@ -1,5 +1,5 @@
 <template>
-  <v-form ref="eventEditForm" @submit="isLocationSubmited = true">
+  <v-form ref="eventEditForm" @submit.prevent="submit">
     <v-text-field
       v-model="event.title"
       :rules="[(v) => validateField(v, schema.title)]"
@@ -36,9 +36,9 @@
     <div>
       <h5>Изменение адреса</h5>
       <location-form
+        ref="locationForm"
         :location="event_data.location"
         :onSubmit="submitForms"
-        v-model:isSubmited="isLocationSubmited"
       ></location-form>
     </div>
   </v-form>
@@ -63,8 +63,7 @@ export default {
   name: 'event-edit-form',
   data() {
     return {
-      event: { ...this.event_data },
-      isLocationSubmited: false
+      event: { ...this.event_data }
     }
   },
   props: {
@@ -75,6 +74,11 @@ export default {
     }
   },
   methods: {
+    async submit() {
+      if ((await this.$refs.eventEditForm.validate()).valid) {
+        this.$refs.locationForm.submit()
+      }
+    },
     submitForms(location_data) {
       this.event.location = location_data
       this.onSubmit(this.event)

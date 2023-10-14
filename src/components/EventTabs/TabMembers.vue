@@ -145,19 +145,19 @@ export default {
     },
 
     onAddMember(member_data) {
-      this.$refs.modalElem.modal.hide()
+      this.dialogVisible = false
       this.$emit('addMember', member_data)
     },
     onJoinEvent(member_data) {
-      this.$refs.modalElem.modal.hide()
+      this.dialogVisible = false
       this.$emit('joinEvent', member_data)
     },
     onEditMember(member_data) {
-      this.$refs.modalElem.modal.hide()
+      this.dialogVisible = false
       this.$emit('editMember', member_data)
     },
     onEditMe(member_data) {
-      this.$refs.modalElem.modal.hide()
+      this.dialogVisible = false
       this.$emit('editMe', member_data)
     }
   },
