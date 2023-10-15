@@ -6,7 +6,7 @@
         :items="base_products"
         :rules="[(v) => validateField(v, schema.base_product)]"
         item-title="name"
-        item-value="id"
+        return-object
         label="Продукт"
       ></v-select>
       <v-btn color="success" icon="mdi-plus"></v-btn>
@@ -14,7 +14,8 @@
 
     <v-select
       v-model="product.state"
-      :items="product_states"
+      :items="states"
+      item-value="key"
       :rules="[(v) => validateField(v, schema.state)]"
       label="Статус"
     ></v-select>
@@ -22,14 +23,21 @@
     <v-row>
       <v-col>
         <v-text-field
-          v-model="product.amount"
+          v-model.number="product.amount"
           :rules="[(v) => validateField(v, schema.amount)]"
+          :min="0"
           label="Количество"
           type="number"
         ></v-text-field>
       </v-col>
       <v-col>
-        <v-text-field v-model="product.price_final" label="Цена" type="number"></v-text-field>
+        <v-text-field
+          v-model.number="product.price_final"
+          :rules="[(v) => validateField(v, schema.price_final)]"
+          :min="0"
+          label="Цена"
+          type="number"
+        ></v-text-field>
       </v-col>
       <v-col>
         <v-text-field
@@ -55,9 +63,21 @@ export default {
   name: 'event-product-form',
   setup() {
     const schema = {
-      base_product: yup.number().required('Продукт не указан'),
+      base_product: yup.object().required('Продукт не указан'),
       state: yup.string().required('Состояние не выбрано'),
-      amount: yup.number().required('Количество не указано')
+      amount: yup
+        .number()
+        .moreThan(0, 'Количество должно быть больше 0')
+        .required('Количество не указано')
+        .typeError('Количество не указано'),
+      price_final: yup
+        .number()
+        .transform((value, originalValue) => {
+          return originalValue === '' ? undefined : value
+        })
+        .when('price_final', (price_final, schema) =>
+          price_final !== '' ? schema.positive('Цена должна быть больше 0') : schema
+        )
     }
     const eventMemberStore = useEventMemberStore()
     return { schema, eventMemberStore, validateField }
@@ -70,16 +90,16 @@ export default {
             base_product: null,
             state: 'added',
             amount: 0,
-            price_final: 0,
+            price_final: '',
             description: '',
             market: ''
           },
-      base_products: [],
-      product_states: ['not_added', 'added', 'in_cart', 'bought']
+      base_products: []
     }
   },
   props: {
     product_data: {},
+    states: { default: [] },
     is_editable: {
       type: Boolean,
       default: false

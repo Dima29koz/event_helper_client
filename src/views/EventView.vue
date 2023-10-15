@@ -1,9 +1,8 @@
 <template>
-  <v-container>
+  <div>
     <v-tabs v-model="currentTab" background-color="transparent">
       <v-tab @click="currentTab = 'about'" value="about"> Информация о событии </v-tab>
       <v-tab @click="currentTab = 'products'" value="products"> Продукты </v-tab>
-      <v-tab @click="currentTab = 'base-products'" value="base-products"> Корзина </v-tab>
       <v-tab @click="currentTab = 'members'" value="members"> Люди </v-tab>
       <v-tab @click="currentTab = 'results'" value="results"> Итоги </v-tab>
     </v-tabs>
@@ -29,7 +28,7 @@
         @editEventProduct="edit_event_product"
       ></component>
     </keep-alive>
-  </v-container>
+  </div>
 </template>
 
 <script>
@@ -37,7 +36,6 @@ import { setupIO } from '@/utils/event-socket'
 import TabAbout from '@/components/EventTabs/TabAbout.vue'
 import TabMembers from '@/components/EventTabs/TabMembers.vue'
 import TabProducts from '@/components/EventTabs/TabProducts.vue'
-import TabBaseProducts from '@/components/EventTabs/TabBaseProducts.vue'
 import TabResults from '@/components/EventTabs/TabResults.vue'
 import { useCurrentUserStore } from '@/stores/currentUserStore'
 import { useEventMemberStore } from '@/stores/eventMemberStore'
@@ -57,7 +55,7 @@ export default {
       event_products: []
     }
   },
-  components: { TabAbout, TabMembers, TabProducts, TabResults, TabBaseProducts },
+  components: { TabAbout, TabMembers, TabProducts, TabResults },
   methods: {
     connect() {
       this.socket.connect()
@@ -185,7 +183,13 @@ export default {
       })
     },
     edit_event_product(product) {
-      console.log(product)
+      this.socket.emit('update_data', {
+        auth: {
+          csrf_access_token: this.$cookies.get('csrf_access_token')
+        },
+        entity: 'product',
+        data: product
+      })
     }
   },
   computed: {
@@ -200,9 +204,6 @@ export default {
         return this.event_members
       }
       if (this.currentTab === 'products') {
-        return this.event_products
-      }
-      if (this.currentTab === 'base-products') {
         return this.event_products
       }
       return null
@@ -306,6 +307,12 @@ export default {
           this.event_products[index] = product
         }
       })
+    })
+    this.socket.on('update_event_product', (product) => {
+      let index = this.event_products.findIndex((p) => p.id === product.id)
+      if (index !== -1) {
+        this.event_products[index] = product
+      }
     })
   }
 }

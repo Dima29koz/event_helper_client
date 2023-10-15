@@ -79,7 +79,7 @@
 import EventCreationForm from '@/components/Forms/EventCreationForm.vue'
 import EventJoinForm from '@/components/Forms/EventJoinForm.vue'
 import { get_events, create_event } from '@/utils/api_event_management'
-import { formatedDate } from '@/utils/time'
+import { formatedDate } from '@/utils/formatters'
 
 export default {
   setup() {

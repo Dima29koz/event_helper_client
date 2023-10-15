@@ -9,21 +9,19 @@
       hover
     >
       <template v-slot:top>
-        <div class="d-flex justify-space-between mb-2">
-          <div>
-            <v-btn @click="addProducts" class="me-2" color="success">Добавить выбранные</v-btn>
-            <v-btn @click="dialogVisible = true" color="primary">Создать новый продукт</v-btn>
-          </div>
-
-          <v-btn @click="getBaseProducts()" color="red">Отменить выбор</v-btn>
-        </div>
         <v-text-field
           v-model="search"
           append-inner-icon="mdi-magnify"
           label="Поиск"
           single-line
           hide-details
-        ></v-text-field>
+        >
+          <template v-slot:append>
+            <v-btn @click="dialogVisible = true" variant="tonal" color="success" class="h-100">
+              <v-icon size="x-large">mdi-table-plus</v-icon>
+            </v-btn>
+          </template>
+        </v-text-field>
       </template>
 
       <template v-slot:group-header="{ item, columns, toggleGroup, isGroupOpen }">
@@ -73,11 +71,9 @@
           </td>
           <td>{{ item.name }}</td>
           <td>{{ item.type }}</td>
-          <td>{{ item.price_supposed }}</td>
+          <td>{{ getNumberFormat(item.price_supposed) }}</td>
           <td>
-            <div class="d-flex">
-              <div>{{ (item.amount + item.bought_amount) * item.price_supposed }}</div>
-            </div>
+            {{ getNumberFormat((item.amount + item.bought_amount) * item.price_supposed) }}
           </td>
         </tr>
       </template>
@@ -116,13 +112,14 @@
 import BaseProductForm from '@/components/Forms/BaseProductForm.vue'
 import { useEventMemberStore } from '@/stores/eventMemberStore'
 import { add_base_product, get_base_products } from '../../utils/api_event_management'
+import { getNumberFormat } from '@/utils/formatters'
 
 export default {
-  name: 'tab-base-products',
+  name: 'cart-products',
   components: { BaseProductForm },
   setup() {
     const eventMemberStore = useEventMemberStore()
-    return { eventMemberStore }
+    return { eventMemberStore, getNumberFormat }
   },
   props: {
     data: {

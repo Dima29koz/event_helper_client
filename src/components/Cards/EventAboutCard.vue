@@ -27,7 +27,7 @@
 
 <script>
 import LocationCard from '@/components/Cards/LocationCard.vue'
-import { formatedDate } from '@/utils/time'
+import { formatedDate } from '@/utils/formatters'
 import { useEventMemberStore } from '@/stores/eventMemberStore'
 
 export default {

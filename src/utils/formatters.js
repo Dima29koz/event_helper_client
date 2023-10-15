@@ -15,3 +15,10 @@ export function fixDate(date_str, tz) {
   // date.setHours(date.getHours() - date.getTimezoneOffset() / 60)
   return date
 }
+
+export function getNumberFormat(value) {
+  if (value === null) {
+    return null
+  }
+  return value.toLocaleString(undefined, { maximumFractionDigits: 2 })
+}
