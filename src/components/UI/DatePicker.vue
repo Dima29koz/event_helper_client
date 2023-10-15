@@ -17,6 +17,8 @@
         :validateOnBlur="false"
         :rules="rules"
         :label="label"
+        readonly
+        density="compact"
       ></v-text-field>
     </template>
   </VueDatePicker>

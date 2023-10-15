@@ -28,6 +28,8 @@
         <v-text-field
           v-model="member.days_amount"
           label="Количество дней"
+          variant="solo"
+          flat
           type="number"
           readonly
         ></v-text-field>

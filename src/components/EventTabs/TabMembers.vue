@@ -29,7 +29,7 @@
         </template>
 
         <v-btn
-          v-if="eventMemberStore.hasOneOfRoles(['organizer', 'creator'])"
+          v-if="canEdit"
           type="button"
           color="success"
           class="me-2"
@@ -40,7 +40,7 @@
       </div>
     </div>
 
-    <v-table class="table table-hover caption-top">
+    <v-table hover>
       <thead>
         <tr>
           <th scope="col">#</th>
@@ -49,21 +49,27 @@
           <th scope="col">число дней</th>
           <th scope="col">пьет</th>
           <th scope="col">приедет</th>
-          <th v-if="eventMemberStore.hasOneOfRoles(['organizer', 'creator'])" scope="col">
-            Удалить
-          </th>
+          <th v-if="canEdit" scope="col">Удалить</th>
         </tr>
       </thead>
       <tbody class="table-group-divider">
         <tr v-for="(member, index) in data" :key="index" @click="editMember(member, index, $event)">
-          <th scope="row">{{ index + 1 }}</th>
+          <th>{{ index + 1 }}</th>
           <td>{{ member.user }}</td>
           <td>{{ member.nickname }}</td>
           <td>{{ member.days_amount }}</td>
-          <td>{{ member.is_drinker }}</td>
-          <td>{{ member.is_involved }}</td>
-          <td v-if="eventMemberStore.hasOneOfRoles(['organizer', 'creator'])">
-            <v-btn name="delete-member" icon="mdi-trash-can-outline" color="red"></v-btn>
+          <td>
+            <v-icon v-if="member.is_drinker" icon="mdi-checkbox-marked" color="success"></v-icon>
+            <v-icon v-else icon="mdi-close-box" color="red"></v-icon>
+          </td>
+          <td>
+            <v-icon v-if="member.is_involved" icon="mdi-checkbox-marked" color="success"></v-icon>
+            <v-icon v-else icon="mdi-close-box" color="red"></v-icon>
+          </td>
+          <td v-if="canEdit">
+            <v-btn density="compact" name="delete-member" icon>
+              <v-icon icon="mdi-trash-can-outline" color="red"></v-icon>
+            </v-btn>
           </td>
         </tr>
       </tbody>
@@ -78,11 +84,7 @@
           <event-member-form
             id="memberForm"
             :member_data="sellectedMember()"
-            :is_editable="
-              eventMemberStore.hasOneOfRoles(['organizer', 'creator']) ||
-              dialogMode === 'editMe' ||
-              dialogMode === 'join'
-            "
+            :is_editable="canEdit || dialogMode === 'editMe' || dialogMode === 'join'"
             :onSubmit="dialogOnSubmit"
           ></event-member-form>
         </v-card-text>
@@ -91,7 +93,7 @@
           <v-btn @click="dialogVisible = false" color="blue-darken-1" variant="text">
             Закрыть
           </v-btn>
-          <v-btn type="submit" form="memberForm" color="blue-darken-1" variant="text"
+          <v-btn v-if="canEdit" type="submit" form="memberForm" color="blue-darken-1" variant="text"
             >Сохранить
           </v-btn>
         </v-card-actions>
@@ -162,6 +164,9 @@ export default {
     }
   },
   computed: {
+    canEdit() {
+      return this.eventMemberStore.hasOneOfRoles(['organizer', 'creator'])
+    },
     dialogTitle() {
       switch (this.dialogMode) {
         case 'add':

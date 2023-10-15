@@ -41,9 +41,11 @@
       </v-col>
       <v-col>
         <v-text-field
-          :modelValue="product.amount * product.price_final"
-          label="Итоговая стоимость"
-          type="number"
+          :modelValue="getNumberFormat(product.amount * product.price_final)"
+          label="Сумма"
+          variant="solo"
+          flat
+          type="text"
           readonly
         ></v-text-field>
       </v-col>
@@ -58,6 +60,7 @@ import * as yup from 'yup'
 import { validateField } from '../../utils/validate_field'
 import { useEventMemberStore } from '@/stores/eventMemberStore'
 import { get_base_products } from '@/utils/api_event_management'
+import { getNumberFormat } from '@/utils/formatters'
 
 export default {
   name: 'event-product-form',
@@ -67,6 +70,7 @@ export default {
       state: yup.string().required('Состояние не выбрано'),
       amount: yup
         .number()
+        .integer('Доступны только целые значения')
         .moreThan(0, 'Количество должно быть больше 0')
         .required('Количество не указано')
         .typeError('Количество не указано'),
@@ -76,11 +80,11 @@ export default {
           return originalValue === '' ? undefined : value
         })
         .when('price_final', (price_final, schema) =>
-          price_final !== '' ? schema.positive('Цена должна быть больше 0') : schema
+          price_final !== '' ? schema.min(0, 'Цена должна быть больше или равна 0') : schema
         )
     }
     const eventMemberStore = useEventMemberStore()
-    return { schema, eventMemberStore, validateField }
+    return { schema, eventMemberStore, validateField, getNumberFormat }
   },
   data() {
     return {

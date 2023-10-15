@@ -26,6 +26,7 @@
         @addEventProduct="add_event_product"
         @addEventProducts="add_event_products"
         @editEventProduct="edit_event_product"
+        @deleteEventProduct="delete_event_product"
       ></component>
     </keep-alive>
   </div>
@@ -159,8 +160,6 @@ export default {
       })
     },
     add_event_product(product) {
-      Object.defineProperty(product, 'product_id', Object.getOwnPropertyDescriptor(product, 'id'))
-      delete product['id']
       this.socket.emit('add_product', {
         auth: {
           csrf_access_token: this.$cookies.get('csrf_access_token')
@@ -189,6 +188,14 @@ export default {
         },
         entity: 'product',
         data: product
+      })
+    },
+    delete_event_product(product_id) {
+      this.socket.emit('delete_event_product', {
+        auth: {
+          csrf_access_token: this.$cookies.get('csrf_access_token')
+        },
+        product_id: product_id
       })
     }
   },
@@ -313,6 +320,9 @@ export default {
       if (index !== -1) {
         this.event_products[index] = product
       }
+    })
+    this.socket.on('delete_event_product', (response) => {
+      this.event_products = this.event_products.filter((p) => p.id !== response.product_id)
     })
   }
 }

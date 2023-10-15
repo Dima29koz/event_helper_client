@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div class="pa-4">
     <v-data-table
-      :headers="headers"
+      :headers="tableHeaders"
       :items="data"
       :items-per-page="-1"
       :group-by="groupBy"
@@ -9,30 +9,19 @@
       hover
     >
       <template v-slot:top>
-        <div class="d-flex justify-space-between">
-          <h1>Продукты:</h1>
-          <div>
-            <v-btn
-              v-if="canEdit"
-              @click="(sellectedProduct = null), (dialogVisible = true)"
-              color="success"
-              icon="mdi-plus"
-            ></v-btn>
-            <v-btn
-              v-if="canEdit"
-              @click="dialogCart = true"
-              color="success"
-              icon="mdi-cart-variant"
-            ></v-btn>
-          </div>
-        </div>
         <v-text-field
           v-model="search"
           append-inner-icon="mdi-magnify"
           label="Найти..."
           single-line
           hide-details
-        ></v-text-field>
+        >
+          <template v-slot:append v-if="canEdit">
+            <v-btn @click="dialogCart = true" variant="tonal" color="success" class="h-100">
+              <v-icon size="x-large">mdi-cart-variant</v-icon>
+            </v-btn>
+          </template>
+        </v-text-field>
       </template>
 
       <template v-slot:group-header="{ item, columns, toggleGroup, isGroupOpen }">
@@ -60,6 +49,7 @@
           :can_delete="canDelete"
           @editRow="(product_data) => this.$emit('editEventProduct', product_data)"
           @onModalEdit="modalEdit(item)"
+          @onDelete="this.$emit('deleteEventProduct', item.id)"
         ></product-table-row>
       </template>
 
@@ -148,9 +138,9 @@ export default {
           { title: 'Действия', key: 'actions', rowspan: 2 }
         ],
         [
-          { title: 'Предполагаемая', key: 'base_product.price_supposed' },
+          { title: 'Ожидаемая', key: 'base_product.price_supposed' },
           { title: 'Итоговая', key: 'price_final' },
-          { title: 'Предполагаемая', key: 'sum_supposed' },
+          { title: 'Ожидаемая', key: 'sum_supposed' },
           { title: 'Итоговая', key: 'sum_final' }
         ]
       ],
@@ -171,6 +161,8 @@ export default {
   methods: {
     onAddEventProduct(product_data) {
       this.dialogVisible = false
+      product_data['product_id'] = product_data.base_product.id
+      delete product_data['base_product']
       this.$emit('addEventProduct', product_data)
     },
     onEditEventProduct(product_data) {
@@ -190,6 +182,12 @@ export default {
     },
     canDelete() {
       return this.eventMemberStore.hasOneOfRoles(['organizer', 'creator'])
+    },
+    tableHeaders() {
+      if (!this.canEdit && !this.canDelete) {
+        return [this.headers[0].slice(0, -1), this.headers[1]]
+      }
+      return this.headers
     },
     dialogTitle() {
       if (this.sellectedProduct === null) {
