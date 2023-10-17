@@ -103,7 +103,7 @@
       </v-card>
     </v-dialog>
 
-    <v-dialog v-model="moneyDialogVisible">
+    <v-dialog v-model="moneyDialogVisible" width="500">
       <v-card>
         <v-card-title>
           <span class="text-h5">Изменение взноса участника '{{ sellectedMember().nickname }}'</span>

@@ -1,4 +1,7 @@
 import axios from 'axios'
+import $cookies from 'vue-cookies'
+
+const authHeaders = { headers: { 'X-CSRF-TOKEN': $cookies.get('csrf_access_token') } }
 
 export async function get_events() {
   try {
@@ -22,7 +25,7 @@ export async function create_event(event) {
         cost_reduction_factor: event.cost_reduction_factor,
         location_id: event.location_id
       },
-      { headers: { 'X-CSRF-TOKEN': $cookies.get('csrf_access_token') } }
+      authHeaders
     )
     return response.data.key
   } catch (e) {
@@ -63,7 +66,7 @@ export async function add_base_product(product_data) {
         unit_id: product_data.unit.id,
         price_supposed: product_data.price_supposed
       },
-      { headers: { 'X-CSRF-TOKEN': $cookies.get('csrf_access_token') } }
+      authHeaders
     )
     return response.data
   } catch (e) {
@@ -87,7 +90,7 @@ export async function add_product_category(value) {
       {
         name: value
       },
-      { headers: { 'X-CSRF-TOKEN': $cookies.get('csrf_access_token') } }
+      authHeaders
     )
     return response.data
   } catch (e) {
@@ -111,7 +114,7 @@ export async function add_product_type(value) {
       {
         name: value
       },
-      { headers: { 'X-CSRF-TOKEN': $cookies.get('csrf_access_token') } }
+      authHeaders
     )
     return response.data
   } catch (e) {
@@ -132,10 +135,8 @@ export async function add_product_unit(value) {
   try {
     const response = await axios.post(
       '/api/event_management/product/unit',
-      {
-        name: value
-      },
-      { headers: { 'X-CSRF-TOKEN': $cookies.get('csrf_access_token') } }
+      { name: value },
+      authHeaders
     )
     return response.data
   } catch (e) {

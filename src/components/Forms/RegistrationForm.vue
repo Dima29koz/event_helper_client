@@ -1,7 +1,7 @@
 <template>
-  <div class="form-signin">
+  <v-sheet class="pa-4 text-center mx-auto my-16 form-register rounded" :elevation="8">
     <h1 class="h3 mb-3 fw-normal">Регистрация</h1>
-    <v-form ref="form">
+    <v-form ref="form" @submit.prevent="registrateUser">
       <v-text-field
         v-model="new_user.username"
         :rules="[(v) => validateField(v, schema.username)]"
@@ -44,9 +44,9 @@
         label="Повторите пароль"
       ></v-text-field>
 
-      <v-btn @click="registrateUser">Создать аккаунт</v-btn>
+      <v-btn type="submit" color="success" size="large" block>Создать аккаунт</v-btn>
     </v-form>
-  </div>
+  </v-sheet>
 </template>
 
 <script setup></script>
@@ -86,7 +86,6 @@ export default {
   methods: {
     async registrateUser() {
       if ((await this.$refs.form.validate()).valid) {
-        console.log(this.new_user)
         this.$emit('register', this.new_user)
       }
     }
@@ -95,7 +94,7 @@ export default {
 </script>
 
 <style scoped>
-.form-signin {
+.form-register {
   width: 100%;
   max-width: 600px;
   padding: 15px;

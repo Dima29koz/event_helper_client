@@ -1,7 +1,5 @@
 <template>
-  <div>
-    <LoginForm @login="loginUser"></LoginForm>
-  </div>
+  <LoginForm @login="loginUser" :error="error"></LoginForm>
 </template>
 
 <script>
@@ -18,9 +16,18 @@ export default {
   components: {
     LoginForm
   },
+  data() {
+    return {
+      error: null
+    }
+  },
   methods: {
     async loginUser(user) {
-      await login(user.username, user.password)
+      const res = await login(user.username, user.password)
+      if ('msg' in res && res.msg == 'Wrong username or password') {
+        this.error = 'Неверный логин или пароль'
+        return
+      }
 
       this.currentUserStore.authenticate()
       this.getUserData()

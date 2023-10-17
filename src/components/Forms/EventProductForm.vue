@@ -34,6 +34,7 @@
         <v-text-field
           v-model.number="product.price_final"
           :rules="[(v) => validateField(v, schema.price_final)]"
+          @blur="product.price_final = Number(product.price_final.toFixed(2))"
           :min="0"
           label="Цена"
           type="number"
@@ -76,12 +77,11 @@ export default {
         .typeError('Количество не указано'),
       price_final: yup
         .number()
-        .transform((value, originalValue) => {
-          return originalValue === '' ? undefined : value
-        })
-        .when('price_final', (price_final, schema) =>
-          price_final !== '' ? schema.min(0, 'Цена должна быть больше или равна 0') : schema
+        .min(0, 'Цена должна быть больше или равна 0')
+        .test('two-decimals', 'Цена должна иметь не более двух десятичных знаков', (value) =>
+          /^\d+(\.\d{1,2})?$/.test(value)
         )
+        .typeError('Цена не указана')
     }
     const eventMemberStore = useEventMemberStore()
     return { schema, eventMemberStore, validateField, getNumberFormat }
@@ -94,7 +94,7 @@ export default {
             base_product: null,
             state: 'added',
             amount: 0,
-            price_final: '',
+            price_final: NaN,
             description: '',
             market: ''
           },

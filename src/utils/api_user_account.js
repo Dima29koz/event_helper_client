@@ -1,4 +1,7 @@
 import axios from 'axios'
+import $cookies from 'vue-cookies'
+
+const authHeaders = { headers: { 'X-CSRF-TOKEN': $cookies.get('csrf_access_token') } }
 
 export async function login(username, pwd) {
   try {
@@ -8,7 +11,11 @@ export async function login(username, pwd) {
     })
     return response.data
   } catch (e) {
-    console.log(e)
+    try {
+      return e.response.data
+    } catch (ex) {
+      console.log(ex)
+    }
   }
 }
 
@@ -91,9 +98,11 @@ export async function get_location(location_id) {
 
 export async function edit_location(location_id, location_data) {
   try {
-    const response = await axios.post('/api/user_account/location/' + location_id, location_data, {
-      headers: { 'X-CSRF-TOKEN': $cookies.get('csrf_access_token') }
-    })
+    const response = await axios.post(
+      '/api/user_account/location/' + location_id,
+      location_data,
+      authHeaders
+    )
     return response.data
   } catch (e) {
     console.log(e)
@@ -102,9 +111,7 @@ export async function edit_location(location_id, location_data) {
 
 export async function delete_location(location_id) {
   try {
-    const response = await axios.delete('/api/user_account/location/' + location_id, {
-      headers: { 'X-CSRF-TOKEN': $cookies.get('csrf_access_token') }
-    })
+    const response = await axios.delete('/api/user_account/location/' + location_id, authHeaders)
     return response.data
   } catch (e) {
     console.log(e)
@@ -122,7 +129,7 @@ export async function create_location(location_data) {
         maps_link: location_data.maps_link,
         description: location_data.description
       },
-      { headers: { 'X-CSRF-TOKEN': $cookies.get('csrf_access_token') } }
+      authHeaders
     )
     return response.data.data
   } catch (e) {

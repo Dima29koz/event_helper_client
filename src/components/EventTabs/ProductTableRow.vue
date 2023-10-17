@@ -77,7 +77,7 @@
         :value="product_data.price_final"
         :formatter="getNumberFormat"
         :type="'number'"
-        @submit="(v) => updateProduct({ price_final: v })"
+        @submit="(v) => updateProduct({ price_final: Number(v.toFixed(2)) })"
       ></v-editable-field>
       <span v-else>{{ getNumberFormat(product_data.price_final) }}</span>
     </td>
