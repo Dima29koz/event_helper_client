@@ -14,6 +14,8 @@
           :rules="[(v) => validateField(v, schema.date_from)]"
           :label="'Приеду (дата)'"
           :name="'date_from'"
+          :minDate="eventMemberStore.getEventInfo.date_start"
+          :maxDate="eventMemberStore.getEventInfo.date_end"
         ></date-picker>
       </v-col>
       <v-col>
@@ -22,6 +24,8 @@
           :rules="[(v) => validateField(v, schema.date_to)]"
           :label="'Уеду (дата)'"
           :name="'date_to'"
+          :minDate="eventMemberStore.getEventInfo.date_start"
+          :maxDate="eventMemberStore.getEventInfo.date_end"
         ></date-picker>
       </v-col>
       <v-col>

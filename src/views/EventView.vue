@@ -27,6 +27,7 @@
         @addEventProducts="add_event_products"
         @editEventProduct="edit_event_product"
         @deleteEventProduct="delete_event_product"
+        @setMemberMoney="set_member_money"
       ></component>
     </keep-alive>
   </div>
@@ -197,6 +198,14 @@ export default {
         },
         product_id: product_id
       })
+    },
+    set_member_money(member_data) {
+      this.socket.emit('set_member_money', {
+        auth: {
+          csrf_access_token: this.$cookies.get('csrf_access_token')
+        },
+        data: member_data
+      })
     }
   },
   computed: {
@@ -212,6 +221,13 @@ export default {
       }
       if (this.currentTab === 'products') {
         return this.event_products
+      }
+      if (this.currentTab === 'results') {
+        return {
+          event_data: this.event_data,
+          event_products: this.event_products,
+          event_members: this.event_members
+        }
       }
       return null
     }
@@ -236,6 +252,7 @@ export default {
       this.event_data = event_data
       this.event_data.date_start = new Date(event_data.date_start)
       this.event_data.date_end = new Date(event_data.date_end)
+      this.eventMemberStore.setEvent(this.event_data)
     })
 
     this.socket.on('get_event_location', (location_data) => {

@@ -1,9 +1,17 @@
 <template>
-  <v-card :title="location.name" class="text-start">
+  <v-card class="text-start">
+    <v-card-title class="d-flex align-center">
+      <div>{{ location.name }}</div>
+      <v-btn icon>
+        <a :href="location.maps_link" target="_blank"
+          ><v-icon size="x-large">mdi-map-marker</v-icon></a
+        >
+      </v-btn>
+    </v-card-title>
     <v-card-text>
+      <p>{{ location.address }}</p>
       <p>{{ location.description }}</p>
       <p>{{ location.geo }}</p>
-      <a :href="location.maps_link" target="_blank">Посмотреть на карте</a>
     </v-card-text>
   </v-card>
 </template>

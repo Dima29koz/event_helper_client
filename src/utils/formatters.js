@@ -20,5 +20,8 @@ export function getNumberFormat(value) {
   if (value === null) {
     return null
   }
-  return value.toLocaleString(undefined, { maximumFractionDigits: 2 })
+  return value.toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  })
 }

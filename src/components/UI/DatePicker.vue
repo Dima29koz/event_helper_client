@@ -2,6 +2,10 @@
   <VueDatePicker
     v-model="dateTime"
     :start-time="{ hours: 12, minutes: 0 }"
+    :min-date="minDate"
+    :max-date="maxDate"
+    :start-date="minDate"
+    prevent-min-max-navigation
     month-name-format="long"
     locale="ru"
     format="dd.MM.yyyy HH:mm"
@@ -38,6 +42,8 @@ export default {
       type: String,
       default: '<<Name goes here>>'
     },
+    minDate: null,
+    maxDate: null,
     rules: { type: Array, default: () => [] },
     model: null
   },

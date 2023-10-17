@@ -70,8 +70,8 @@
         {{ product_data.amount }} {{ product_data.base_product.unit }}
       </span>
     </td>
-    <td>{{ getNumberFormat(product_data.base_product.price_supposed) }}</td>
-    <td>
+    <td class="text-end">{{ getNumberFormat(product_data.base_product.price_supposed) }}</td>
+    <td class="text-end">
       <v-editable-field
         v-if="can_edit"
         :value="product_data.price_final"
@@ -81,8 +81,12 @@
       ></v-editable-field>
       <span v-else>{{ getNumberFormat(product_data.price_final) }}</span>
     </td>
-    <td>{{ getNumberFormat(product_data.base_product.price_supposed * product_data.amount) }}</td>
-    <td>{{ getNumberFormat(product_data.price_final * product_data.amount) }}</td>
+    <td class="text-end">
+      {{ getNumberFormat(product_data.base_product.price_supposed * product_data.amount) }}
+    </td>
+    <td class="text-end">
+      {{ getNumberFormat(product_data.price_final * product_data.amount) }}
+    </td>
     <td>
       <v-editable-field
         v-if="can_edit"
@@ -91,7 +95,12 @@
       ></v-editable-field>
       <span v-else>{{ product_data.market }}</span>
     </td>
-    <td>{{ product_data.description }}</td>
+    <td>
+      <span class="d-inline-block text-truncate" style="max-width: 10rem">
+        {{ product_data.description }}
+        <v-tooltip activator="parent" location="bottom">{{ product_data.description }}</v-tooltip>
+      </span>
+    </td>
     <td v-if="can_edit || can_delete">
       <div class="d-flex">
         <v-btn

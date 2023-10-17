@@ -49,7 +49,7 @@
           <th scope="col">число дней</th>
           <th scope="col">пьет</th>
           <th scope="col">приедет</th>
-          <th v-if="canEdit" scope="col">Удалить</th>
+          <th v-if="canEdit" scope="col">Действия</th>
         </tr>
       </thead>
       <tbody class="table-group-divider">
@@ -67,8 +67,11 @@
             <v-icon v-else icon="mdi-close-box" color="red"></v-icon>
           </td>
           <td v-if="canEdit">
-            <v-btn density="compact" name="delete-member" icon>
-              <v-icon icon="mdi-trash-can-outline" color="red"></v-icon>
+            <v-btn density="compact" icon>
+              <v-icon icon="mdi-cash" color="success" id="btn-money-member"></v-icon>
+            </v-btn>
+            <v-btn density="compact" icon>
+              <v-icon icon="mdi-trash-can-outline" color="red" id="btn-delete-member"></v-icon>
             </v-btn>
           </td>
         </tr>
@@ -99,17 +102,42 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-dialog v-model="moneyDialogVisible">
+      <v-card>
+        <v-card-title>
+          <span class="text-h5">Изменение взноса участника '{{ sellectedMember().nickname }}'</span>
+        </v-card-title>
+        <v-card-text>
+          <event-member-money-form
+            id="memberMoneyForm"
+            :member_data="sellectedMember()"
+            :onSubmit="onSetMoney"
+          ></event-member-money-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn @click="moneyDialogVisible = false" color="blue-darken-1" variant="text">
+            Закрыть
+          </v-btn>
+          <v-btn type="submit" form="memberMoneyForm" color="blue-darken-1" variant="text"
+            >Сохранить
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
 <script>
 import EventMemberForm from '@/components/Forms/EventMemberForm.vue'
+import EventMemberMoneyForm from '@/components/Forms/EventMemberMoneyForm.vue'
 import { useCurrentUserStore } from '@/stores/currentUserStore'
 import { useEventMemberStore } from '@/stores/eventMemberStore'
 
 export default {
   name: 'tab-members',
-  components: { EventMemberForm },
+  components: { EventMemberForm, EventMemberMoneyForm },
   setup() {
     const currentUserStore = useCurrentUserStore()
     const eventMemberStore = useEventMemberStore()
@@ -119,6 +147,7 @@ export default {
     return {
       dialogMode: undefined,
       dialogVisible: false,
+      moneyDialogVisible: false,
       sellectedMemberIdx: NaN
     }
   },
@@ -137,8 +166,13 @@ export default {
     },
 
     editMember(member, index, event) {
-      if (event.target.name == 'delete-member') {
+      if (event.target.id == 'btn-delete-member') {
         this.$emit('delMember', member)
+        return
+      }
+      if (event.target.id == 'btn-money-member') {
+        this.sellectedMemberIdx = index
+        this.moneyDialogVisible = true
         return
       }
       this.sellectedMemberIdx = index
@@ -161,6 +195,10 @@ export default {
     onEditMe(member_data) {
       this.dialogVisible = false
       this.$emit('editMe', member_data)
+    },
+    onSetMoney(member_data) {
+      this.moneyDialogVisible = false
+      this.$emit('setMemberMoney', member_data)
     }
   },
   computed: {

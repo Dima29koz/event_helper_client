@@ -71,8 +71,8 @@
           </td>
           <td>{{ item.name }}</td>
           <td>{{ item.type }}</td>
-          <td>{{ getNumberFormat(item.price_supposed) }}</td>
-          <td>
+          <td class="text-end">{{ getNumberFormat(item.price_supposed) }}</td>
+          <td class="text-end">
             {{ getNumberFormat((item.amount + item.bought_amount) * item.price_supposed) }}
           </td>
         </tr>

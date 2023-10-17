@@ -37,7 +37,7 @@ export default {
     return {
       editedValue: undefined,
       isEdit: false,
-      justifyClass: this.type === 'number' ? 'justify-start' : 'justify-center'
+      justifyClass: this.type === 'number' ? 'justify-end' : 'justify-center'
     }
   },
   props: {
