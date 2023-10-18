@@ -2,7 +2,7 @@
   <v-card class="text-start">
     <v-card-title class="d-flex align-center">
       <div>{{ location.name }}</div>
-      <v-btn icon>
+      <v-btn icon class="ms-4">
         <a :href="location.maps_link" target="_blank"
           ><v-icon size="x-large">mdi-map-marker</v-icon></a
         >
@@ -10,7 +10,7 @@
     </v-card-title>
     <v-card-text>
       <p>{{ location.address }}</p>
-      <p>{{ location.description }}</p>
+      <div v-html="location.description"></div>
       <p>{{ location.geo }}</p>
     </v-card-text>
   </v-card>

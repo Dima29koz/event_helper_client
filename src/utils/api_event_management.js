@@ -19,7 +19,7 @@ export const create_event = requestHandler(async function (event) {
       cost_reduction_factor: event.cost_reduction_factor,
       location_id: event.location_id
     },
-    authHeaders
+    authHeaders()
   )
   return response.data.key
 })
@@ -44,7 +44,7 @@ export const add_base_product = requestHandler(async function (product_data) {
       unit_id: product_data.unit.id,
       price_supposed: product_data.price_supposed
     },
-    authHeaders
+    authHeaders()
   )
   return response.data
 })
@@ -60,7 +60,7 @@ export const add_product_category = requestHandler(async function (value) {
     {
       name: value
     },
-    authHeaders
+    authHeaders()
   )
   return response.data
 })
@@ -76,7 +76,7 @@ export const add_product_type = requestHandler(async function (value) {
     {
       name: value
     },
-    authHeaders
+    authHeaders()
   )
   return response.data
 })
@@ -90,7 +90,7 @@ export const add_product_unit = requestHandler(async function (value) {
   const response = await axios.post(
     '/api/event_management/product/unit',
     { name: value },
-    authHeaders
+    authHeaders()
   )
   return response.data
 })

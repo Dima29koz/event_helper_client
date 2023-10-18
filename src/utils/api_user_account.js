@@ -2,7 +2,9 @@ import axios from 'axios'
 import $cookies from 'vue-cookies'
 import router from '@/router'
 
-export const authHeaders = { headers: { 'X-CSRF-TOKEN': $cookies.get('csrf_access_token') } }
+export const authHeaders = () => {
+  return { headers: { 'X-CSRF-TOKEN': $cookies.get('csrf_access_token') } }
+}
 
 export function requestHandler(fn) {
   return async function (...args) {
@@ -112,13 +114,13 @@ export const edit_location = requestHandler(async function (location_id, locatio
   const response = await axios.post(
     '/api/user_account/location/' + location_id,
     location_data,
-    authHeaders
+    authHeaders()
   )
   return response.data
 })
 
 export const delete_location = requestHandler(async function (location_id) {
-  const response = await axios.delete('/api/user_account/location/' + location_id, authHeaders)
+  const response = await axios.delete('/api/user_account/location/' + location_id, authHeaders())
   return response.data
 })
 
@@ -132,7 +134,12 @@ export const create_location = requestHandler(async function (location_data) {
       maps_link: location_data.maps_link,
       description: location_data.description
     },
-    authHeaders
+    authHeaders()
   )
   return response.data.data
+})
+
+export const confirm_email = requestHandler(async function (token) {
+  const response = await axios.get('/api/user_account/confirm_email/' + token)
+  return response.data.msg
 })

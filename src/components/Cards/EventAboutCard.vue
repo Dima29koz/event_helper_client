@@ -18,8 +18,7 @@
     </v-card-title>
     <v-card-text>
       <h5>{{ formatedDate(event.date_start, '') }} - {{ formatedDate(event.date_end, '') }}</h5>
-      <p>{{ event.description }}</p>
-      <p>{{ event.cost_reduction_factor }}</p>
+      <div v-html="event.description" class="mt-2"></div>
       <location-card :location="event.location"></location-card>
     </v-card-text>
   </v-card>
