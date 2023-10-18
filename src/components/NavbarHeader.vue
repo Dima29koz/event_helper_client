@@ -80,8 +80,7 @@ export default {
   },
   methods: {
     async logout() {
-      let r = await logout()
-      console.log(r)
+      await logout()
       this.currentUserStore.logout()
       this.$router.push({ name: 'login' })
     }

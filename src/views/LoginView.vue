@@ -31,7 +31,11 @@ export default {
 
       this.currentUserStore.authenticate()
       this.getUserData()
-      this.$router.push({ name: 'events' })
+      if (this.$route.query.redirect) {
+        this.$router.push({ path: this.$route.query.redirect })
+      } else {
+        this.$router.push({ name: 'events' })
+      }
     },
     async getUserData() {
       let user_data = await profileSettings()

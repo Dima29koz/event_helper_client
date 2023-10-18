@@ -8,7 +8,7 @@
           type="button"
           color="primary"
           class="me-2"
-          @click="(sellectedMemberIdx = NaN), (dialogMode = 'join'), (dialogVisible = true)"
+          @click="joinEvent"
         >
           Присоединиться
         </v-btn>
@@ -96,7 +96,12 @@
           <v-btn @click="dialogVisible = false" color="blue-darken-1" variant="text">
             Закрыть
           </v-btn>
-          <v-btn v-if="canEdit" type="submit" form="memberForm" color="blue-darken-1" variant="text"
+          <v-btn
+            v-if="canEdit || dialogMode === 'editMe' || dialogMode === 'join'"
+            type="submit"
+            form="memberForm"
+            color="blue-darken-1"
+            variant="text"
             >Сохранить
           </v-btn>
         </v-card-actions>
@@ -177,6 +182,15 @@ export default {
       }
       this.sellectedMemberIdx = index
       this.dialogMode = 'editMember'
+      this.dialogVisible = true
+    },
+
+    joinEvent() {
+      if (!this.currentUserStore.isAuth) {
+        this.$router.push({ name: 'login', query: { redirect: this.$route.fullPath } })
+      }
+      this.sellectedMemberIdx = NaN
+      this.dialogMode = 'join'
       this.dialogVisible = true
     },
 

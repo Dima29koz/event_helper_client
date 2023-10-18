@@ -233,12 +233,32 @@ export default {
     }
   },
 
-  mounted() {
+  async mounted() {
     let event_key = this.$route.params.key
+    try {
+      await this.eventMemberStore.fetchMemberInfo(event_key)
+    } catch (e) {
+      if (
+        e.response.status == 400 &&
+        'msg' in e.response.data &&
+        e.response.data.msg == 'Wrong event key'
+      ) {
+        this.$router.push({ name: 'events', query: { err: 'Wrong event key' } })
+      }
+    }
     this.socket = setupIO(event_key)
     this.get_data()
     this.get_location()
-    this.eventMemberStore.fetchMemberInfo(event_key)
+
+    this.socket.on('connect', () => {
+      setTimeout(
+        () => {
+          this.socket.disconnect()
+          this.socket.connect()
+        },
+        1000 * 60 * 30
+      )
+    })
 
     this.socket.on('message', (msg) => {
       console.log(msg)

@@ -35,10 +35,11 @@ export const useCurrentUserStore = defineStore('currentUser', {
       this.$reset()
     },
     async fetch_user() {
-      if (!this.id) {
-        await profileSettings().then((user_data) => {
+      if (this.id === null) {
+        const user_data = await profileSettings()
+        if (user_data != undefined) {
           this.setData(user_data)
-        })
+        }
       }
     }
   }
