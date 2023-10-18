@@ -11,7 +11,7 @@
     @update:search="updateSearchValue"
   >
     <template v-slot:no-data>
-      <v-form ref="form">
+      <v-form @submit.prevent ref="form">
         <v-text-field
           v-model="searchValue"
           :rules="[(v) => validateField(v, schema.searchValue)]"

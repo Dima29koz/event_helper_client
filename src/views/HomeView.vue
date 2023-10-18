@@ -4,11 +4,40 @@
     <div class="align-end">
       <v-footer class="text-center d-flex flex-column" :elevation="20">
         <h4>Связаться с нами</h4>
-        <div>
+        <div class="w-100">
           <v-spacer></v-spacer>
-          <v-btn class="mx-4" variant="text" :href="icons.discord" target="_blank" icon>
-            <v-icon><IconDiscord></IconDiscord></v-icon>
-          </v-btn>
+
+          <v-container>
+            <v-row>
+              <v-col cols="12">
+                <v-text-field
+                  v-model="message"
+                  variant="filled"
+                  clear-icon="mdi-close-circle"
+                  clearable
+                  label="Message"
+                  type="text"
+                >
+                  <template v-slot:prepend>
+                    <v-btn class="mx-4" variant="text" :href="icons.discord" target="_blank" icon>
+                      <v-icon><IconDiscord></IconDiscord></v-icon>
+                    </v-btn>
+                  </template>
+                  <template v-slot:append>
+                    <v-btn
+                      @click="sendMessage"
+                      :disabled="!message"
+                      class="mx-4"
+                      variant="text"
+                      icon
+                    >
+                      <v-icon icon="mdi-send"></v-icon>
+                    </v-btn>
+                  </template>
+                </v-text-field>
+              </v-col>
+            </v-row>
+          </v-container>
         </div>
 
         <div class="px-4 py-2 text-center w-100">
@@ -20,13 +49,41 @@
 </template>
 
 <script>
+import axios from 'axios'
 import IconDiscord from '@/components/icons/IconDiscord.vue'
+import { useCurrentUserStore } from '@/stores/currentUserStore'
+
 export default {
   name: 'home-view',
   components: { IconDiscord },
+  setup() {
+    const currentUserStore = useCurrentUserStore()
+
+    return { currentUserStore }
+  },
   data() {
     return {
-      icons: { discord: 'https://discord.gg/MJvvSudxGV' }
+      message: '',
+      icons: { discord: 'https://discord.gg/MJvvSudxGV' },
+      webhookUrl:
+        'https://discord.com/api/webhooks/1164312648062603356/Rbz-b5U-12J-XQTKmYvTnAXMNvdBGzCdZnfL7lm2HPrZq-0b38Q2xIvfPnNxLivPtbCV'
+    }
+  },
+  methods: {
+    sendMessage() {
+      const message = {
+        username: this.currentUserStore.isAuth ? this.currentUserStore.username : 'guest',
+        content: this.message
+      }
+      axios
+        .post(this.webhookUrl, message)
+        .then((response) => {
+          console.log('Message sent successfully:', response.data)
+          this.message = ''
+        })
+        .catch((error) => {
+          console.error('Error sending message:', error)
+        })
     }
   }
 }

@@ -1,5 +1,5 @@
 <template>
-  <v-form @submit="submit" ref="eventForm">
+  <v-form @submit.prevent="submit" ref="eventForm">
     <v-text-field
       v-model="event.title"
       :rules="[(v) => validateField(v, schema.title)]"
