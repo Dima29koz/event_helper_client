@@ -44,7 +44,6 @@
       <thead>
         <tr>
           <th scope="col">#</th>
-          <th scope="col">User</th>
           <th scope="col">Ник</th>
           <th scope="col">число дней</th>
           <th scope="col">пьет</th>
@@ -55,7 +54,6 @@
       <tbody class="table-group-divider">
         <tr v-for="(member, index) in data" :key="index" @click="editMember(member, index, $event)">
           <th>{{ index + 1 }}</th>
-          <td>{{ member.user }}</td>
           <td>
             <user-contacts-card :member="member"></user-contacts-card>
           </td>
