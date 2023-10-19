@@ -75,17 +75,40 @@ export const logout = requestHandler(async function () {
   return response.data
 })
 
+export const reset_password_request = requestHandler(async function (username) {
+  const response = await axios.post(
+    '/api/user_account/reset_password_request',
+    {
+      username: username
+    },
+    { headers: { 'X-ORIGIN': window.location.origin } }
+  )
+  return response.data
+})
+
+export const reset_password = requestHandler(async function (token, pwd, pwd_repeat) {
+  const response = await axios.post('/api/user_account/reset_password/' + token, {
+    pwd: pwd,
+    pwd_repeat: pwd_repeat
+  })
+  return response.data
+})
+
 export const registration = requestHandler(
   async function (userName, fullName, email, password, phone, contacts) {
     try {
-      const response = await axios.post('/api/user_account/registration', {
-        username: userName,
-        full_name: fullName,
-        email: email,
-        phone: phone,
-        contacts: contacts,
-        pwd: password
-      })
+      const response = await axios.post(
+        '/api/user_account/registration',
+        {
+          username: userName,
+          full_name: fullName,
+          email: email,
+          phone: phone,
+          contacts: contacts,
+          pwd: password
+        },
+        { headers: { 'X-ORIGIN': window.location.origin } }
+      )
       return response.data
     } catch (e) {
       if (

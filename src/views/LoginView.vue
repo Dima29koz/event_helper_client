@@ -1,5 +1,5 @@
 <template>
-  <LoginForm @login="loginUser" :error="error"></LoginForm>
+  <LoginForm @login="loginUser" :error="error" :msg="msg"></LoginForm>
 </template>
 
 <script>
@@ -18,7 +18,8 @@ export default {
   },
   data() {
     return {
-      error: null
+      error: null,
+      msg: 'msg' in this.$route.query ? this.$route.query.msg : ''
     }
   },
   methods: {

@@ -64,9 +64,7 @@ export default {
   data() {
     return {
       message: '',
-      icons: { discord: 'https://discord.gg/MJvvSudxGV' },
-      webhookUrl:
-        'https://discord.com/api/webhooks/1164312648062603356/Rbz-b5U-12J-XQTKmYvTnAXMNvdBGzCdZnfL7lm2HPrZq-0b38Q2xIvfPnNxLivPtbCV'
+      icons: { discord: import.meta.env.VITE_DISCORD_INVITE_URL }
     }
   },
   methods: {
@@ -76,7 +74,7 @@ export default {
         content: this.message
       }
       axios
-        .post(this.webhookUrl, message)
+        .post(import.meta.env.VITE_DISCORD_WEBHOOK_URL, message)
         .then((response) => {
           console.log('Message sent successfully:', response.data)
           this.message = ''

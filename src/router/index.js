@@ -51,6 +51,11 @@ const router = createRouter({
       path: '/confirm_email',
       name: 'confirm_email',
       component: () => import('../views/ConfirmEmailView.vue')
+    },
+    {
+      path: '/reset_password',
+      name: 'reset_password',
+      component: () => import('../views/ResetPasswordView.vue')
     }
   ]
 })

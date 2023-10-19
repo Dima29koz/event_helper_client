@@ -28,7 +28,7 @@ export default {
       if ('msg' in res && res.msg == 'username is not allowed') {
         this.error = 'Пользователь с таким именем уже существует'
       } else {
-        this.$router.push('login')
+        this.$router.push({ name: 'login', query: { msg: 'success_registration' } })
       }
     }
   }
