@@ -25,3 +25,13 @@ export function getNumberFormat(value) {
     maximumFractionDigits: 2
   })
 }
+
+export function formatPhoneNumber(phoneNumberString) {
+  let cleaned = ('' + phoneNumberString).replace(/\D/g, '')
+  let match = cleaned.match(/^(\d{1})(\d{3})(\d{3})(\d{4})$/)
+  if (match) {
+    let code = match[1] === '8' ? '8' : '+' + match[1]
+    return code + ' (' + match[2] + ') ' + match[3] + '-' + match[4]
+  }
+  return null
+}

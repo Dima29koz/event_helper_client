@@ -56,7 +56,9 @@
         <tr v-for="(member, index) in data" :key="index" @click="editMember(member, index, $event)">
           <th>{{ index + 1 }}</th>
           <td>{{ member.user }}</td>
-          <td>{{ member.nickname }}</td>
+          <td>
+            <user-contacts-card :member="member"></user-contacts-card>
+          </td>
           <td>{{ member.days_amount }}</td>
           <td>
             <v-icon v-if="member.is_drinker" icon="mdi-checkbox-marked" color="success"></v-icon>
@@ -137,12 +139,13 @@
 <script>
 import EventMemberForm from '@/components/Forms/EventMemberForm.vue'
 import EventMemberMoneyForm from '@/components/Forms/EventMemberMoneyForm.vue'
+import UserContactsCard from '@/components/Cards/UserContactsCard.vue'
 import { useCurrentUserStore } from '@/stores/currentUserStore'
 import { useEventMemberStore } from '@/stores/eventMemberStore'
 
 export default {
   name: 'tab-members',
-  components: { EventMemberForm, EventMemberMoneyForm },
+  components: { EventMemberForm, EventMemberMoneyForm, UserContactsCard },
   setup() {
     const currentUserStore = useCurrentUserStore()
     const eventMemberStore = useEventMemberStore()

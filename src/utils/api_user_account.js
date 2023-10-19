@@ -70,6 +70,11 @@ export const profileSettings = requestHandler(async function () {
   return response.data
 })
 
+export const profileInfo = requestHandler(async function (username) {
+  const response = await axios.get('/api/user_account/profile_settings/' + username)
+  return response.data
+})
+
 export const logout = requestHandler(async function () {
   const response = await axios.get('/api/user_account/logout')
   return response.data
