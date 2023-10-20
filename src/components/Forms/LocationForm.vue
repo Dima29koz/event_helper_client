@@ -5,7 +5,12 @@
       :rules="[(v) => validateField(v, schema.name)]"
       label="Название"
     ></v-text-field>
-    <v-text-field v-model="local_location.description" label="Описание"></v-text-field>
+    <v-textarea
+      v-model="local_location.description"
+      label="Описание"
+      auto-grow
+      rows="2"
+    ></v-textarea>
     <v-textarea
       v-model="local_location.address"
       :rules="[(v) => validateField(v, schema.address)]"

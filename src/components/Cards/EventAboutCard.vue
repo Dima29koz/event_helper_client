@@ -1,26 +1,35 @@
 <template>
-  <v-card class="text-start">
-    <v-card-title class="d-flex justify-space-between">
-      <div>{{ event.title }}</div>
-      <v-menu v-if="eventMemberStore.hasOneOfRoles(['organizer', 'creator'])" offset-y>
-        <template v-slot:activator="{ props }">
-          <v-btn v-bind="props" icon="mdi-dots-vertical"></v-btn>
-        </template>
-        <v-list>
-          <v-list-item title="Изменить" @click="this.$emit('editEvent')"></v-list-item>
-          <template v-if="eventMemberStore.hasOneOfRoles(['creator'])">
-            <v-divider></v-divider>
-            <v-list-item title="Удалить" class="text-red" @click="this.$emit('delEvent')">
-            </v-list-item>
+  <v-card class="flex-fill">
+    <v-card-title>
+      <div v-if="canEdit" class="d-flex justify-space-between align-center">
+        <div></div>
+        <div class="text-h6 text-md-h5 text-lg-h4 font-weight-bold">{{ event.title }}</div>
+
+        <v-menu>
+          <template v-slot:activator="{ props }">
+            <v-btn v-bind="props" variant="text" icon="mdi-dots-vertical"></v-btn>
           </template>
-        </v-list>
-      </v-menu>
+          <v-list>
+            <v-list-item title="Изменить" @click="this.$emit('editEvent')"></v-list-item>
+            <template v-if="canDelete">
+              <v-divider></v-divider>
+              <v-list-item title="Удалить" class="text-red" @click="this.$emit('delEvent')">
+              </v-list-item>
+            </template>
+          </v-list>
+        </v-menu>
+      </div>
+      <div v-else class="text-center">
+        <h2>{{ event.title }}</h2>
+      </div>
     </v-card-title>
+    <v-card-subtitle class="text-center text-md-subtitle-2 text-lg-subtitle-1 font-weight-medium">
+      {{ formatedDate(event.date_start, '') }} - {{ formatedDate(event.date_end, '') }}
+    </v-card-subtitle>
     <v-card-text>
-      <h5>{{ formatedDate(event.date_start, '') }} - {{ formatedDate(event.date_end, '') }}</h5>
       <div v-html="event.description" class="mt-2"></div>
-      <location-card :location="event.location"></location-card>
     </v-card-text>
+    <location-card :location="event.location"></location-card>
   </v-card>
 </template>
 
@@ -50,6 +59,14 @@ export default {
           location: {}
         }
       }
+    }
+  },
+  computed: {
+    canEdit() {
+      return this.eventMemberStore.hasOneOfRoles(['organizer', 'creator'])
+    },
+    canDelete() {
+      return this.eventMemberStore.hasOneOfRoles(['creator'])
     }
   }
 }

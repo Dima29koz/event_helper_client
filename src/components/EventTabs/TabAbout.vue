@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <v-container>
     <event-about-card
       :event="data"
       @delEvent="this.$emit('delEvent')"
@@ -29,7 +29,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-  </div>
+  </v-container>
 </template>
 
 <script>

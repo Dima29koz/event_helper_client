@@ -3,7 +3,13 @@
     <v-spacer></v-spacer>
     <div class="align-end">
       <v-footer class="text-center d-flex flex-column" :elevation="20">
-        <h4>Связаться с нами</h4>
+        <div class="d-flex align-center">
+          <h4 class="">Связаться с нами</h4>
+          <v-btn class="mx-4" variant="text" :href="icons.discord" target="_blank" icon>
+            <v-icon><IconDiscord></IconDiscord></v-icon>
+          </v-btn>
+        </div>
+
         <div class="w-100">
           <v-spacer></v-spacer>
 
@@ -15,22 +21,12 @@
                   variant="filled"
                   clear-icon="mdi-close-circle"
                   clearable
+                  hide-details
                   label="Message"
                   type="text"
                 >
-                  <template v-slot:prepend>
-                    <v-btn class="mx-4" variant="text" :href="icons.discord" target="_blank" icon>
-                      <v-icon><IconDiscord></IconDiscord></v-icon>
-                    </v-btn>
-                  </template>
                   <template v-slot:append>
-                    <v-btn
-                      @click="sendMessage"
-                      :disabled="!message"
-                      class="mx-4"
-                      variant="text"
-                      icon
-                    >
+                    <v-btn @click="sendMessage" :disabled="!message" variant="text" icon>
                       <v-icon icon="mdi-send"></v-icon>
                     </v-btn>
                   </template>

@@ -1,37 +1,42 @@
 <template>
   <v-container>
-    <v-table class="table table-hover caption-top">
-      <caption>
+    <v-data-table :headers="headers" :items="events" :items-per-page="-1" hover>
+      <template v-slot:top>
         <div class="d-flex justify-space-between">
           <h1>События</h1>
-          <div>
+          <div class="hidden-sm-and-up">
+            <v-menu>
+              <template v-slot:activator="{ props }">
+                <v-btn v-bind="props" variant="text" icon="mdi-dots-vertical"></v-btn>
+              </template>
+              <v-list>
+                <v-list-item title="Присоединиться" @click="joinDialogVisible = true"></v-list-item>
+                <v-list-item title="Создать" class="text-success" @click="onCreateEvent">
+                </v-list-item>
+              </v-list>
+            </v-menu>
+          </div>
+          <div class="hidden-xs">
             <v-btn type="button" color="primary" class="me-2" @click="joinDialogVisible = true">
               Присоединиться
             </v-btn>
             <v-btn type="button" color="success" @click="onCreateEvent">Создать</v-btn>
           </div>
         </div>
-      </caption>
-      <thead>
-        <tr>
-          <th scope="col">#</th>
-          <th scope="col" class="text-center">Название</th>
-          <th scope="col" class="text-center">Дата начала</th>
-          <th scope="col" class="text-center">Дата окончания</th>
-          <th scope="col" class="text-center">Роль</th>
-        </tr>
-      </thead>
-      <tbody class="table-group-divider">
-        <tr v-for="(event, index) in events" :key="index" @click="eventInfo(event)">
-          <th scope="row">{{ index + 1 }}</th>
-          <td>{{ event.title }}</td>
-          <td>{{ formatedDate(event.date_start, event.date_tz) }}</td>
-          <td>{{ formatedDate(event.date_end, event.date_tz) }}</td>
+      </template>
 
-          <td>{{ event.role }}</td>
+      <template v-slot:item="{ item, index }">
+        <tr @click="eventInfo(item)">
+          <td>{{ index + 1 }}</td>
+          <td>{{ item.title }}</td>
+          <td>{{ formatedDate(item.date_start, item.date_tz) }}</td>
+          <td>{{ formatedDate(item.date_end, item.date_tz) }}</td>
+          <td>{{ item.role }}</td>
         </tr>
-      </tbody>
-    </v-table>
+      </template>
+
+      <template v-slot:bottom></template>
+    </v-data-table>
 
     <v-dialog v-model="joinDialogVisible">
       <v-card>
@@ -91,7 +96,14 @@ export default {
       joinDialogVisible: false,
       selectedEventIdx: NaN,
       events_creator: [],
-      events_member: []
+      events_member: [],
+      headers: [
+        { title: '#', key: '#', sortable: false },
+        { title: 'Название', key: 'title' },
+        { title: 'Дата начала', key: 'date_start' },
+        { title: 'Дата окончания', key: 'date_end' },
+        { title: 'Роль', key: 'role' }
+      ]
     }
   },
 

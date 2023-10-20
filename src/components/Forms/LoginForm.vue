@@ -72,8 +72,8 @@ export default {
   data() {
     return {
       user: {
-        username: 'Admin',
-        password: '1234',
+        username: '',
+        password: '',
         remember_me: false
       },
       dialogResetPassword: false,

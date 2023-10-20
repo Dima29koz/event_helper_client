@@ -1,17 +1,19 @@
 <template>
   <v-container>
-    <v-table class="table table-hover caption-top">
+    <v-table hover class="pa-2 rounded">
       <caption>
-        <div class="d-flex justify-space-between">
+        <div class="d-flex justify-space-between align-center">
           <h1>Мои адреса</h1>
-          <v-btn @click="onCreateLocation" color="success" icon="mdi-plus"></v-btn>
+          <v-btn @click="onCreateLocation" color="success">
+            <v-icon size="x-large">mdi-plus</v-icon>
+          </v-btn>
         </div>
       </caption>
       <thead>
         <tr>
           <th scope="col">#</th>
           <th scope="col" class="text-left">Название</th>
-          <th scope="col" class="text-center">Удалить</th>
+          <th scope="col" class="text-center">Действия</th>
         </tr>
       </thead>
       <tbody class="table-group-divider">
@@ -22,8 +24,10 @@
         >
           <th scope="row">{{ index + 1 }}</th>
           <td class="text-left">{{ location.name }}</td>
-          <td>
-            <v-btn name="delete-location" icon="mdi-trash-can-outline" color="red"></v-btn>
+          <td class="text-center">
+            <v-btn density="compact" name="delete-location" icon>
+              <v-icon icon="mdi-trash-can-outline" color="red"></v-icon>
+            </v-btn>
           </td>
         </tr>
       </tbody>

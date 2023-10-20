@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-tabs v-model="currentTab" background-color="transparent">
-      <v-tab @click="currentTab = 'about'" value="about"> Информация о событии </v-tab>
+      <v-tab @click="currentTab = 'about'" value="about"> О событии </v-tab>
       <v-tab @click="currentTab = 'products'" value="products"> Продукты </v-tab>
       <v-tab @click="currentTab = 'members'" value="members"> Люди </v-tab>
       <v-tab @click="currentTab = 'results'" value="results"> Итоги </v-tab>
