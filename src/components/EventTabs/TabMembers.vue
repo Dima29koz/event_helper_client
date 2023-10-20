@@ -2,7 +2,26 @@
   <v-container>
     <div class="d-flex justify-space-between">
       <h1>Участники:</h1>
-      <div>
+      <div class="hidden-md-and-up">
+        <v-menu>
+          <template v-slot:activator="{ props }">
+            <v-btn v-bind="props" variant="text" icon="mdi-dots-vertical"></v-btn>
+          </template>
+          <v-list>
+            <v-list-item
+              v-if="isNaN(meMemberIdx)"
+              title="Присоединиться"
+              @click="joinEvent"
+            ></v-list-item>
+            <template v-else>
+              <v-list-item title="Изменить себя" @click="joinEvent"></v-list-item>
+              <v-list-item title="Покинуть событие" @click="this.$emit('delMe')"></v-list-item>
+            </template>
+            <v-list-item v-if="canEdit" title="Добавить" @click="addMember"></v-list-item>
+          </v-list>
+        </v-menu>
+      </div>
+      <div class="hidden-sm-and-down">
         <v-btn
           v-if="isNaN(meMemberIdx)"
           type="button"
@@ -13,28 +32,13 @@
           Присоединиться
         </v-btn>
         <template v-else>
-          <v-btn
-            type="button"
-            color="primary"
-            class="me-2"
-            @click="
-              (sellectedMemberIdx = meMemberIdx), (dialogMode = 'editMe'), (dialogVisible = true)
-            "
-          >
-            Изменить себя
-          </v-btn>
+          <v-btn type="button" color="primary" class="me-2" @click="editMe"> Изменить себя </v-btn>
           <v-btn type="button" color="red" class="me-2" @click="this.$emit('delMe')">
             Покинуть событие
           </v-btn>
         </template>
 
-        <v-btn
-          v-if="canEdit"
-          type="button"
-          color="success"
-          class="me-2"
-          @click="(sellectedMemberIdx = NaN), (dialogMode = 'add'), (dialogVisible = true)"
-        >
+        <v-btn v-if="canEdit" type="button" color="success" class="me-2" @click="addMember">
           Добавить
         </v-btn>
       </div>
@@ -192,6 +196,16 @@ export default {
       }
       this.sellectedMemberIdx = NaN
       this.dialogMode = 'join'
+      this.dialogVisible = true
+    },
+    editMe() {
+      this.sellectedMemberIdx = this.meMemberIdx
+      this.dialogMode = 'editMe'
+      this.dialogVisible = true
+    },
+    addMember() {
+      this.sellectedMemberIdx = NaN
+      this.dialogMode = 'add'
       this.dialogVisible = true
     },
 
