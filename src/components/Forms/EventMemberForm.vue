@@ -45,6 +45,7 @@
       v-if="eventMemberStore.hasOneOfRoles(['organizer', 'creator'])"
       v-model="member.role"
       :items="roles"
+      item-value="key"
       :rules="[(v) => validateField(v, schema.role)]"
       label="Роль"
     ></v-select>
@@ -82,7 +83,10 @@ export default {
             role: 'member',
             user_id: null
           },
-      roles: ['member', 'organizer']
+      roles: [
+        { title: 'Участник', key: 'member' },
+        { title: 'Организатор', key: 'organizer' }
+      ]
     }
   },
 

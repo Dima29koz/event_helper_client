@@ -1,73 +1,73 @@
 <template>
   <v-container>
-    <div class="d-flex justify-space-between">
-      <h1>Участники:</h1>
-      <div class="hidden-md-and-up">
-        <v-menu>
-          <template v-slot:activator="{ props }">
-            <v-btn v-bind="props" variant="text" icon="mdi-dots-vertical"></v-btn>
-          </template>
-          <v-list>
-            <v-list-item
-              v-if="isNaN(meMemberIdx)"
-              title="Присоединиться"
-              @click="joinEvent"
-            ></v-list-item>
-            <template v-else>
-              <v-list-item title="Изменить себя" @click="joinEvent"></v-list-item>
-              <v-list-item title="Покинуть событие" @click="this.$emit('delMe')"></v-list-item>
-            </template>
-            <v-list-item v-if="canEdit" title="Добавить" @click="addMember"></v-list-item>
-          </v-list>
-        </v-menu>
-      </div>
-      <div class="hidden-sm-and-down">
-        <v-btn
-          v-if="isNaN(meMemberIdx)"
-          type="button"
-          color="primary"
-          class="me-2"
-          @click="joinEvent"
+    <v-data-table
+      :headers="tableHeaders"
+      :items="data"
+      :items-per-page="-1"
+      :search="search"
+      :sort-by="sortBy"
+      multi-sort
+      hover
+    >
+      <template v-slot:top>
+        <v-text-field
+          v-model="search"
+          append-inner-icon="mdi-magnify"
+          label="Найти..."
+          single-line
+          hide-details
         >
-          Присоединиться
-        </v-btn>
-        <template v-else>
-          <v-btn type="button" color="primary" class="me-2" @click="editMe"> Изменить себя </v-btn>
-          <v-btn type="button" color="red" class="me-2" @click="this.$emit('delMe')">
-            Покинуть событие
-          </v-btn>
-        </template>
+          <template v-slot:append>
+            <v-menu>
+              <template v-slot:activator="{ props }">
+                <v-btn v-bind="props" variant="text" icon="mdi-cog"></v-btn>
+              </template>
+              <v-list>
+                <v-list-item
+                  v-if="canEdit"
+                  title="Добавить"
+                  @click="addMember"
+                  append-icon="mdi-plus"
+                ></v-list-item>
+                <v-list-item
+                  v-if="isNaN(meMemberIdx)"
+                  title="Присоединиться"
+                  @click="joinEvent"
+                  append-icon="mdi-login"
+                ></v-list-item>
+                <template v-else>
+                  <v-list-item
+                    title="Изменить себя"
+                    @click="joinEvent"
+                    append-icon="mdi-pencil"
+                  ></v-list-item>
+                  <v-divider></v-divider>
+                  <v-list-item
+                    title="Покинуть событие"
+                    @click="this.$emit('delMe')"
+                    class="text-red"
+                    append-icon="mdi-logout"
+                  ></v-list-item>
+                </template>
+              </v-list>
+            </v-menu>
+          </template>
+        </v-text-field>
+      </template>
 
-        <v-btn v-if="canEdit" type="button" color="success" class="me-2" @click="addMember">
-          Добавить
-        </v-btn>
-      </div>
-    </div>
-
-    <v-table hover>
-      <thead>
-        <tr>
-          <th scope="col">#</th>
-          <th scope="col">Ник</th>
-          <th scope="col">число дней</th>
-          <th scope="col">пьет</th>
-          <th scope="col">приедет</th>
-          <th v-if="canEdit" scope="col">Действия</th>
-        </tr>
-      </thead>
-      <tbody class="table-group-divider">
-        <tr v-for="(member, index) in data" :key="index" @click="editMember(member, index, $event)">
-          <th>{{ index + 1 }}</th>
+      <template v-slot:item="{ item, index }">
+        <tr @click="editMember(item, index, $event)">
+          <td>{{ index + 1 }}</td>
           <td>
-            <user-contacts-card :member="member"></user-contacts-card>
+            <user-contacts-card :member="item"></user-contacts-card>
           </td>
-          <td>{{ member.days_amount }}</td>
+          <td>{{ item.days_amount }}</td>
           <td>
-            <v-icon v-if="member.is_drinker" icon="mdi-checkbox-marked" color="success"></v-icon>
+            <v-icon v-if="item.is_drinker" icon="mdi-checkbox-marked" color="success"></v-icon>
             <v-icon v-else icon="mdi-close-box" color="red"></v-icon>
           </td>
           <td>
-            <v-icon v-if="member.is_involved" icon="mdi-checkbox-marked" color="success"></v-icon>
+            <v-icon v-if="item.is_involved" icon="mdi-checkbox-marked" color="success"></v-icon>
             <v-icon v-else icon="mdi-close-box" color="red"></v-icon>
           </td>
           <td v-if="canEdit">
@@ -79,8 +79,10 @@
             </v-btn>
           </td>
         </tr>
-      </tbody>
-    </v-table>
+      </template>
+
+      <template v-slot:bottom></template>
+    </v-data-table>
 
     <v-dialog v-model="dialogVisible" width="1000">
       <v-card>
@@ -135,6 +137,8 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-confirm-dialog ref="confirm" />
   </v-container>
 </template>
 
@@ -158,7 +162,20 @@ export default {
       dialogMode: undefined,
       dialogVisible: false,
       moneyDialogVisible: false,
-      sellectedMemberIdx: NaN
+      sellectedMemberIdx: NaN,
+      search: '',
+      sortBy: [
+        { key: 'role', order: 'desc' },
+        { key: 'user', order: 'desc' }
+      ],
+      headers: [
+        { title: '#', key: '', sortable: false },
+        { title: 'Ник', key: 'nickname' },
+        { title: 'число дней', key: 'days_amount' },
+        { title: 'пьет', key: 'is_drinker' },
+        { title: 'приедет', key: 'is_involved' },
+        { title: 'Действия', key: 'actions', sortable: false }
+      ]
     }
   },
   props: {
@@ -177,7 +194,7 @@ export default {
 
     editMember(member, index, event) {
       if (event.target.id == 'btn-delete-member') {
-        this.$emit('delMember', member)
+        this.delMember(member)
         return
       }
       if (event.target.id == 'btn-money-member') {
@@ -188,6 +205,16 @@ export default {
       this.sellectedMemberIdx = index
       this.dialogMode = 'editMember'
       this.dialogVisible = true
+    },
+    async delMember(member) {
+      if (
+        await this.$refs.confirm.open(
+          'Подтвердите удаление участника',
+          'Вы уверены что хотите удалить участника события?'
+        )
+      ) {
+        this.$emit('delMember', member)
+      }
     },
 
     joinEvent() {
@@ -265,6 +292,12 @@ export default {
     meMemberIdx() {
       const idx = this.data.findIndex((e) => e.user === this.currentUserStore.username)
       return idx > -1 ? idx : NaN
+    },
+    tableHeaders() {
+      if (!this.canEdit) {
+        return this.headers.slice(0, -1)
+      }
+      return this.headers
     }
   },
   mounted() {

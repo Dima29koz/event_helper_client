@@ -56,6 +56,8 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-confirm-dialog ref="confirm" />
   </v-container>
 </template>
 
@@ -102,13 +104,24 @@ export default {
 
     async locationInfo(location, index, event) {
       if (event.target.name == 'delete-location' || event.target.tagName == 'I') {
-        this.deleteLocation(location)
+        this.onDeleteLocation(location)
         return
       }
       let location_data = await get_location(location.id)
       this.selectedLocationIdx = index
       this.locations[index] = location_data
       this.dialogVisible = true
+    },
+
+    async onDeleteLocation(location) {
+      if (
+        await this.$refs.confirm.open(
+          'Подтвердите удаление адреса',
+          'Вы уверены что хотите удалить адрес ' + location.name + '?'
+        )
+      ) {
+        this.deleteLocation(location)
+      }
     },
 
     async getLocations() {

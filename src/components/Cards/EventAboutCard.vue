@@ -13,8 +13,7 @@
             <v-list-item title="Изменить" @click="this.$emit('editEvent')"></v-list-item>
             <template v-if="canDelete">
               <v-divider></v-divider>
-              <v-list-item title="Удалить" class="text-red" @click="this.$emit('delEvent')">
-              </v-list-item>
+              <v-list-item title="Удалить" class="text-red" @click="deleteEvent"> </v-list-item>
             </template>
           </v-list>
         </v-menu>
@@ -24,24 +23,26 @@
       </div>
     </v-card-title>
     <v-card-subtitle class="text-center text-md-subtitle-2 text-lg-subtitle-1 font-weight-medium">
-      {{ formatedDate(event.date_start, '') }} - {{ formatedDate(event.date_end, '') }}
+      {{ formatDateTime(event.date_start, '') }} - {{ formatDateTime(event.date_end, '') }}
     </v-card-subtitle>
     <v-card-text>
       <div v-html="event.description" class="mt-2"></div>
     </v-card-text>
     <location-card :location="event.location"></location-card>
+
+    <v-confirm-dialog ref="confirm" />
   </v-card>
 </template>
 
 <script>
 import LocationCard from '@/components/Cards/LocationCard.vue'
-import { formatedDate } from '@/utils/formatters'
+import { formatDateTime } from '@/utils/formatters'
 import { useEventMemberStore } from '@/stores/eventMemberStore'
 
 export default {
   setup() {
     const eventMemberStore = useEventMemberStore()
-    return { formatedDate, eventMemberStore }
+    return { formatDateTime, eventMemberStore }
   },
   name: 'event-about-card',
   components: { LocationCard },
@@ -58,6 +59,18 @@ export default {
           cost_reduction_factor: 25,
           location: {}
         }
+      }
+    }
+  },
+  methods: {
+    async deleteEvent() {
+      if (
+        await this.$refs.confirm.open(
+          'Подтвердите удаление события',
+          'Вы уверены что хотите удалить событие?'
+        )
+      ) {
+        this.$emit('delEvent')
       }
     }
   },

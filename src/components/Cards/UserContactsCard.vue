@@ -11,7 +11,7 @@
           v-bind="props"
           @click="fetchUserInfo"
           class="d-flex text-capitalize text-subtitle-1"
-          variant="text"
+          variant="tonal"
         >
           <p>{{ member.nickname }}</p>
           <v-tooltip text="Организатор" v-if="member.role == 'organizer'">

@@ -1,10 +1,12 @@
 <template>
   <v-navigation-drawer v-model="sidebar" temporary>
-    <v-list-item to="/">Главная</v-list-item>
-    <template v-if="currentUser.isAuth">
-      <v-list-item to="/events">События</v-list-item>
-    </template>
-    <v-list-item to="/about">FAQ</v-list-item>
+    <v-list :lines="false" nav>
+      <v-list-item to="/">Главная</v-list-item>
+      <template v-if="currentUser.isAuth">
+        <v-list-item to="/events">События</v-list-item>
+      </template>
+      <v-list-item to="/about">FAQ</v-list-item>
+    </v-list>
   </v-navigation-drawer>
 
   <v-app-bar flat>
@@ -17,17 +19,17 @@
       </div>
     </template>
 
-    <v-tabs class="hidden-xs">
-      <v-tab to="/">Главная</v-tab>
+    <v-tabs v-model="currentTab" class="hidden-xs">
+      <v-tab to="/" value="home">Главная</v-tab>
       <template v-if="currentUser.isAuth">
-        <v-tab to="/events">События</v-tab>
+        <v-tab to="/events" value="events">События</v-tab>
       </template>
-      <v-tab to="/about">FAQ</v-tab>
+      <v-tab to="/about" value="about">FAQ</v-tab>
     </v-tabs>
 
     <template v-slot:append>
       <template v-if="currentUser.isAuth">
-        <v-menu class="nav-item dropdown">
+        <v-menu>
           <template v-slot:activator="{ props }">
             <v-btn v-bind="props">
               <v-avatar :image="avatarSrc" size="32"> </v-avatar>
@@ -35,11 +37,24 @@
               <v-icon icon="mdi-menu-down"></v-icon>
             </v-btn>
           </template>
-          <v-list>
-            <v-list-item to="/profile_settings">Настройки профиля</v-list-item>
-            <v-list-item to="/locations">Мои адреса</v-list-item>
+          <v-list :lines="false">
+            <v-list-item
+              to="/profile_settings"
+              @click="currentTab = 'profile'"
+              title="Профиль"
+            ></v-list-item>
+            <v-list-item
+              to="/locations"
+              @click="currentTab = 'locations'"
+              title="Мои адреса"
+            ></v-list-item>
             <v-divider class="mt-2"></v-divider>
-            <v-list-item @click="logout" type="button" class="font-weight-bold">Выйти</v-list-item>
+            <v-list-item
+              @click="logout"
+              type="button"
+              class="font-weight-bold"
+              title="Выйти"
+            ></v-list-item>
           </v-list>
         </v-menu>
       </template>
@@ -72,7 +87,9 @@ export default {
   },
   data() {
     return {
-      sidebar: false
+      sidebar: false,
+      currentTab: '',
+      selectedTab: []
     }
   },
   components: {

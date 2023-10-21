@@ -5,8 +5,11 @@
       <v-footer class="text-center d-flex flex-column" :elevation="20">
         <div class="d-flex align-center">
           <h4 class="">Связаться с нами</h4>
-          <v-btn class="mx-4" variant="text" :href="icons.discord" target="_blank" icon>
+          <v-btn class="ms-4" variant="text" :href="icons.discord" target="_blank" icon>
             <v-icon><IconDiscord></IconDiscord></v-icon>
+          </v-btn>
+          <v-btn variant="text" :href="icons.telegram" target="_blank" icon>
+            <v-icon><IconTelegram></IconTelegram></v-icon>
           </v-btn>
         </div>
 
@@ -48,10 +51,11 @@
 import axios from 'axios'
 import IconDiscord from '@/components/icons/IconDiscord.vue'
 import { useCurrentUserStore } from '@/stores/currentUserStore'
+import IconTelegram from '../components/icons/IconTelegram.vue'
 
 export default {
   name: 'home-view',
-  components: { IconDiscord },
+  components: { IconDiscord, IconTelegram },
   setup() {
     const currentUserStore = useCurrentUserStore()
 
@@ -60,7 +64,10 @@ export default {
   data() {
     return {
       message: '',
-      icons: { discord: import.meta.env.VITE_DISCORD_INVITE_URL }
+      icons: {
+        discord: import.meta.env.VITE_DISCORD_INVITE_URL,
+        telegram: import.meta.env.VITE_TELEGRAM_HELP_URL
+      }
     }
   },
   methods: {

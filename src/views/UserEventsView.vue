@@ -29,9 +29,9 @@
         <tr @click="eventInfo(item)">
           <td>{{ index + 1 }}</td>
           <td>{{ item.title }}</td>
-          <td>{{ formatedDate(item.date_start, item.date_tz) }}</td>
-          <td>{{ formatedDate(item.date_end, item.date_tz) }}</td>
-          <td>{{ item.role }}</td>
+          <td>{{ formatDateTime(item.date_start, item.date_tz) }}</td>
+          <td>{{ formatDateTime(item.date_end, item.date_tz) }}</td>
+          <td>{{ formatRoles(item.role) }}</td>
         </tr>
       </template>
 
@@ -84,11 +84,11 @@
 import EventCreationForm from '@/components/Forms/EventCreationForm.vue'
 import EventJoinForm from '@/components/Forms/EventJoinForm.vue'
 import { get_events, create_event } from '@/utils/api_event_management'
-import { formatedDate } from '@/utils/formatters'
+import { formatDateTime } from '@/utils/formatters'
 
 export default {
   setup() {
-    return { formatedDate }
+    return { formatDateTime }
   },
   data() {
     return {
@@ -103,7 +103,12 @@ export default {
         { title: 'Дата начала', key: 'date_start' },
         { title: 'Дата окончания', key: 'date_end' },
         { title: 'Роль', key: 'role' }
-      ]
+      ],
+      roles: {
+        member: 'Участник',
+        organizer: 'Организатор',
+        creator: 'Создатель'
+      }
     }
   },
 
@@ -145,6 +150,13 @@ export default {
       const data = await get_events()
       this.events_creator = data.creator_on
       this.events_member = data.member_on
+    },
+    formatRoles(roles) {
+      let formatted_roles = []
+      roles.split(',').forEach((role) => {
+        formatted_roles.push(this.roles[role.trim()])
+      })
+      return formatted_roles.join(', ')
     }
   },
   computed: {

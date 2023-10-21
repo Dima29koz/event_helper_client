@@ -1,4 +1,4 @@
-export function formatedDate(date_str, tz) {
+export function formatDateTime(date_str, tz) {
   let date = fixDate(date_str, tz)
   let res = date.toLocaleString('ru', {
     year: 'numeric',
