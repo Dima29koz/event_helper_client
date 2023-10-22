@@ -66,7 +66,7 @@ export default {
         this.theme.global.name.value = 'dark'
         this.currentTheme = 'auto'
       } else {
-        this.theme.global.name.value = theme
+        this.theme.global.name.value = theme === 'auto' ? 'light' : theme
         this.currentTheme = theme
       }
     },

@@ -35,3 +35,8 @@ export function formatPhoneNumber(phoneNumberString) {
   }
   return null
 }
+
+export function getDaysAmount(date_start, date_end) {
+  let days_amount = Math.floor((date_end.getTime() - date_start.getTime()) / (1000 * 3600 * 24))
+  return days_amount !== 0 ? days_amount : 1
+}

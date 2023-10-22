@@ -10,7 +10,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
-    "@vuepic/vue-datepicker": "^6.1.0",
+    "@vuepic/vue-datepicker": "^7.2.0",
     "axios": "^1.5.0",
     "pinia": "^2.1.6",
     "socket.io-client": "^4.7.2",

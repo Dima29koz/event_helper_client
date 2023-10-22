@@ -57,7 +57,7 @@
 </template>
 
 <script>
-import { getNumberFormat } from '@/utils/formatters'
+import { getNumberFormat, getDaysAmount } from '@/utils/formatters'
 export default {
   name: 'tab-results',
   setup() {
@@ -76,12 +76,8 @@ export default {
   },
   methods: {},
   computed: {
-    // todo remove copypaste from eventMemberForm.vue
     eventDaysAmount() {
-      return Math.ceil(
-        (this.data.event_data.date_end.getTime() - this.data.event_data.date_start.getTime()) /
-          (1000 * 3600 * 24)
-      )
+      return getDaysAmount(this.data.event_data.date_start, this.data.event_data.date_end)
     },
     membersAmount() {
       return this.data.event_members.length

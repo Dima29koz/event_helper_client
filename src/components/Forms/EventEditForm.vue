@@ -8,20 +8,20 @@
 
     <v-row>
       <v-col>
-        <date-picker
+        <datetime-picker
           id="date_start"
           v-model:model="event.date_start"
-          :rules="[(v) => validateField(v, schema.date_start)]"
+          :rules="[(v) => validateField(v, schema.date_start(v, event.date_end))]"
           :label="'Дата начала'"
-        ></date-picker>
+        ></datetime-picker>
       </v-col>
       <v-col>
-        <date-picker
+        <datetime-picker
           id="date_end"
           v-model:model="event.date_end"
-          :rules="[(v) => validateField(v, schema.date_end)]"
+          :rules="[(v) => validateField(v, schema.date_end(v, event.date_start))]"
           label="Дата окончания"
-        ></date-picker>
+        ></datetime-picker>
       </v-col>
     </v-row>
 
@@ -50,8 +50,16 @@ import { validateField } from '../../utils/validate_field'
 
 const schema = {
   title: yup.string().required('Название не указано'),
-  date_start: yup.string().required('Дата не выбрана'),
-  date_end: yup.string().required('Дата не выбрана'),
+  date_start: (v, date) =>
+    yup
+      .date()
+      .max(date ? date : v, 'Дата начала должна быть меньше даты окончания')
+      .required('Дата не выбрана'),
+  date_end: (v, date) =>
+    yup
+      .date()
+      .min(date ? date : v, 'Дата окончания должна быть больше даты начала')
+      .required('Дата не выбрана'),
   cost_reduction_factor: yup.number().required().typeError('Зачение не указано')
 }
 </script>

@@ -9,24 +9,30 @@
 
     <v-row>
       <v-col>
-        <date-picker
+        <datetime-picker
           v-model:model="member.date_from"
-          :rules="[(v) => validateField(v, schema.date_from)]"
+          :rules="[
+            (v) => validateField(v, schema.date),
+            (v) => validateField(v, schema.date_from(v, member.date_to))
+          ]"
           :label="'Приеду (дата)'"
           :name="'date_from'"
           :minDate="eventMemberStore.getEventInfo.date_start"
           :maxDate="eventMemberStore.getEventInfo.date_end"
-        ></date-picker>
+        ></datetime-picker>
       </v-col>
       <v-col>
-        <date-picker
+        <datetime-picker
           v-model:model="member.date_to"
-          :rules="[(v) => validateField(v, schema.date_to)]"
+          :rules="[
+            (v) => validateField(v, schema.date),
+            (v) => validateField(v, schema.date_to(v, member.date_from))
+          ]"
           :label="'Уеду (дата)'"
           :name="'date_to'"
           :minDate="eventMemberStore.getEventInfo.date_start"
           :maxDate="eventMemberStore.getEventInfo.date_end"
-        ></date-picker>
+        ></datetime-picker>
       </v-col>
       <v-col>
         <v-text-field
@@ -55,18 +61,29 @@
 <script>
 import * as yup from 'yup'
 import { validateField } from '../../utils/validate_field'
+import { getDaysAmount } from '../../utils/formatters'
 import { useEventMemberStore } from '@/stores/eventMemberStore'
 
 export default {
   name: 'event-member-form',
   setup() {
+    const eventMemberStore = useEventMemberStore()
+    const min_date = eventMemberStore.getEventInfo.date_start
+    const max_date = eventMemberStore.getEventInfo.date_end
     const schema = {
       nickname: yup.string().required('Поле не заполнено'),
-      date_from: yup.string().required('Дата не выбрана'),
-      date_to: yup.string().required('Дата не выбрана'),
+      date: yup
+        .date()
+        .min(min_date, 'Значение должно быть не меньше чем ' + min_date.toLocaleString())
+        .max(max_date, 'Значение должно быть не больше чем ' + max_date.toLocaleString())
+        .required('Дата не выбрана'),
+      date_to: (v, date) =>
+        yup.date().min(date ? date : v, 'Дата окончания должна быть больше даты начала'),
+      date_from: (v, date) =>
+        yup.date().max(date ? date : v, 'Дата начала должна быть меньше даты окончания'),
       role: yup.string().required('Роль не выбрана')
     }
-    const eventMemberStore = useEventMemberStore()
+
     return { schema, eventMemberStore, validateField }
   },
   data() {
@@ -105,9 +122,7 @@ export default {
   methods: {
     setDaysAmount() {
       if (this.member.date_to && this.member.date_from) {
-        this.member.days_amount = Math.ceil(
-          (this.member.date_to.getTime() - this.member.date_from.getTime()) / (1000 * 3600 * 24)
-        )
+        this.member.days_amount = getDaysAmount(this.member.date_from, this.member.date_to)
       } else {
         this.member.days_amount = 0
       }

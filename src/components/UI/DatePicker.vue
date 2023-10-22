@@ -5,7 +5,7 @@
     :min-date="minDate"
     :max-date="maxDate"
     :start-date="minDate"
-    prevent-min-max-navigation
+    :prevent-min-max-navigation="preventNavigation"
     month-name-format="long"
     locale="ru"
     format="dd.MM.yyyy HH:mm"
@@ -14,6 +14,7 @@
     no-hours-overlay
     no-minutes-overlay
     auto-apply
+    teleport-center
   >
     <template #dp-input="{ value }">
       <v-text-field
@@ -42,8 +43,8 @@ export default {
       type: String,
       default: '<<Name goes here>>'
     },
-    minDate: null,
-    maxDate: null,
+    minDate: { type: Date, default: null },
+    maxDate: { type: Date, default: null },
     rules: { type: Array, default: () => [] },
     model: null
   },
@@ -55,6 +56,9 @@ export default {
       set(newValue) {
         this.$emit('update:model', newValue)
       }
+    },
+    preventNavigation() {
+      return this.minDate !== null && this.maxDate !== null
     }
   }
 }
