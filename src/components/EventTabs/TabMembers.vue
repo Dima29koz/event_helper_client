@@ -5,7 +5,7 @@
       :items="data"
       :items-per-page="-1"
       :search="search"
-      :sort-by="sortBy"
+      v-model:sort-by="sortBy"
       multi-sort
       hover
     >
@@ -30,7 +30,7 @@
                   append-icon="mdi-plus"
                 ></v-list-item>
                 <v-list-item
-                  v-if="isNaN(meMemberIdx)"
+                  v-if="meMember === null"
                   title="Присоединиться"
                   @click="joinEvent"
                   append-icon="mdi-login"
@@ -38,7 +38,7 @@
                 <template v-else>
                   <v-list-item
                     title="Изменить себя"
-                    @click="joinEvent"
+                    @click="editMe"
                     append-icon="mdi-pencil"
                   ></v-list-item>
                   <v-divider></v-divider>
@@ -92,7 +92,7 @@
         <v-card-text>
           <event-member-form
             id="memberForm"
-            :member_data="sellectedMember()"
+            :member_data="selectedMember"
             :is_editable="canEdit || dialogMode === 'editMe' || dialogMode === 'join'"
             :onSubmit="dialogOnSubmit"
           ></event-member-form>
@@ -117,12 +117,12 @@
     <v-dialog v-model="moneyDialogVisible" width="500">
       <v-card>
         <v-card-title>
-          <span class="text-h5">Изменение взноса участника '{{ sellectedMember().nickname }}'</span>
+          <span class="text-h5">Изменение взноса участника '{{ selectedMember.nickname }}'</span>
         </v-card-title>
         <v-card-text>
           <event-member-money-form
             id="memberMoneyForm"
-            :member_data="sellectedMember()"
+            :member_data="selectedMember"
             :onSubmit="onSetMoney"
           ></event-member-money-form>
         </v-card-text>
@@ -162,9 +162,13 @@ export default {
       dialogMode: undefined,
       dialogVisible: false,
       moneyDialogVisible: false,
-      sellectedMemberIdx: NaN,
+      selectedMember: null,
       search: '',
       sortBy: [
+        { key: 'role', order: 'desc' },
+        { key: 'user', order: 'desc' }
+      ],
+      defaultSort: [
         { key: 'role', order: 'desc' },
         { key: 'user', order: 'desc' }
       ],
@@ -185,24 +189,20 @@ export default {
     }
   },
   methods: {
-    sellectedMember() {
-      if (isNaN(this.sellectedMemberIdx)) {
-        return null
-      }
-      return this.data[this.sellectedMemberIdx]
+    getMember(member) {
+      return this.data.find((e) => e.id === member.id)
     },
-
     editMember(member, index, event) {
       if (event.target.id == 'btn-delete-member') {
         this.delMember(member)
         return
       }
       if (event.target.id == 'btn-money-member') {
-        this.sellectedMemberIdx = index
+        this.selectedMember = this.getMember(member)
         this.moneyDialogVisible = true
         return
       }
-      this.sellectedMemberIdx = index
+      this.selectedMember = this.getMember(member)
       this.dialogMode = 'editMember'
       this.dialogVisible = true
     },
@@ -221,17 +221,17 @@ export default {
       if (!this.currentUserStore.isAuth) {
         this.$router.push({ name: 'login', query: { redirect: this.$route.fullPath } })
       }
-      this.sellectedMemberIdx = NaN
+      this.selectedMember = null
       this.dialogMode = 'join'
       this.dialogVisible = true
     },
     editMe() {
-      this.sellectedMemberIdx = this.meMemberIdx
+      this.selectedMember = this.meMember
       this.dialogMode = 'editMe'
       this.dialogVisible = true
     },
     addMember() {
-      this.sellectedMemberIdx = NaN
+      this.selectedMember = null
       this.dialogMode = 'add'
       this.dialogVisible = true
     },
@@ -289,15 +289,28 @@ export default {
           return () => {}
       }
     },
-    meMemberIdx() {
-      const idx = this.data.findIndex((e) => e.user === this.currentUserStore.username)
-      return idx > -1 ? idx : NaN
+    meMember() {
+      const me = this.data.find((e) => e.user === this.currentUserStore.username)
+      return me ? me : null
     },
     tableHeaders() {
       if (!this.canEdit) {
         return this.headers.slice(0, -1)
       }
       return this.headers
+    }
+  },
+  watch: {
+    sortBy() {
+      this.sortBy.splice(
+        this.sortBy.findIndex((e) => e.key == 'role'),
+        1
+      )
+      this.sortBy.splice(
+        this.sortBy.findIndex((e) => e.key == 'user'),
+        1
+      )
+      this.sortBy.push(...this.defaultSort)
     }
   },
   mounted() {
