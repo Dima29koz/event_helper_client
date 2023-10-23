@@ -21,8 +21,13 @@
 
 <script>
 import { confirm_email } from '@/utils/api_user_account'
+import { useCurrentUserStore } from '../stores/currentUserStore'
 
 export default {
+  setup() {
+    const currentUserStore = useCurrentUserStore()
+    return { currentUserStore }
+  },
   data() {
     return {
       token: '',
@@ -48,7 +53,11 @@ export default {
   },
   mounted() {
     this.token = this.$route.query.token
-    this.confirmEmail()
+    if (!this.currentUserStore.is_email_verified) {
+      this.confirmEmail()
+    } else {
+      this.confirmationResult = true
+    }
   }
 }
 </script>

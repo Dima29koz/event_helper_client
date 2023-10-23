@@ -21,7 +21,7 @@ export default {
     if (this.$cookies.keys().includes('csrf_access_token')) {
       await currentUserStore.fetch_user()
     }
-    this.$router.beforeEach(async (to, from, next) => {
+    this.$router.beforeEach((to, from, next) => {
       if (to.matched.some((record) => record.meta.requiresAuth)) {
         if (!currentUserStore.isAuth) {
           next({
@@ -33,6 +33,14 @@ export default {
         }
       } else {
         next()
+      }
+    })
+
+    this.$router.afterEach((to) => {
+      if (to.matched.some((record) => record.meta.requiresAuth === false)) {
+        if (currentUserStore.isAuth) {
+          this.$router.push({ name: 'profile_settings' })
+        }
       }
     })
   }

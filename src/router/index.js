@@ -12,12 +12,14 @@ const router = createRouter({
     {
       path: '/login',
       name: 'login',
-      component: () => import('../views/LoginView.vue')
+      component: () => import('../views/LoginView.vue'),
+      meta: { requiresAuth: false }
     },
     {
       path: '/registration',
       name: 'registration',
-      component: () => import('../views/RegistrationView.vue')
+      component: () => import('../views/RegistrationView.vue'),
+      meta: { requiresAuth: false }
     },
     {
       path: '/profile_settings',
@@ -55,7 +57,8 @@ const router = createRouter({
     {
       path: '/reset_password',
       name: 'reset_password',
-      component: () => import('../views/ResetPasswordView.vue')
+      component: () => import('../views/ResetPasswordView.vue'),
+      meta: { requiresAuth: false }
     }
   ]
 })
