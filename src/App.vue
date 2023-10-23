@@ -16,12 +16,12 @@ export default {
     Navbar
   },
 
-  mounted() {
+  async mounted() {
     const currentUserStore = useCurrentUserStore()
+    if (this.$cookies.keys().includes('csrf_access_token')) {
+      await currentUserStore.fetch_user()
+    }
     this.$router.beforeEach(async (to, from, next) => {
-      if (this.$cookies.keys().includes('csrf_access_token')) {
-        await currentUserStore.fetch_user()
-      }
       if (to.matched.some((record) => record.meta.requiresAuth)) {
         if (!currentUserStore.isAuth) {
           next({

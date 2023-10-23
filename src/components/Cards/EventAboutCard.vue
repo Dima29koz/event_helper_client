@@ -1,5 +1,5 @@
 <template>
-  <v-card class="flex-fill">
+  <v-card>
     <v-card-title>
       <div v-if="canEdit" class="d-flex justify-space-between align-center">
         <div></div>
