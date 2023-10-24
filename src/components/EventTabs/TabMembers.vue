@@ -84,7 +84,7 @@
       <template v-slot:bottom></template>
     </v-data-table>
 
-    <v-dialog v-model="dialogVisible" width="1000">
+    <v-dialog v-model="dialogVisible" width="1000" :fullscreen="$vuetify.display.mobile">
       <v-card>
         <v-card-title>
           <span class="text-h5">{{ dialogTitle }}</span>

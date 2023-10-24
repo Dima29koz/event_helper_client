@@ -20,17 +20,17 @@
       label="Статус"
     ></v-select>
 
-    <v-row>
-      <v-col>
+    <div class="d-sm-flex">
+      <div class="d-flex">
         <v-text-field
           v-model.number="product.amount"
           :rules="[(v) => validateField(v, schema.amount)]"
           :min="0"
           label="Количество"
           type="number"
+          class="me-4"
         ></v-text-field>
-      </v-col>
-      <v-col>
+
         <v-text-field
           v-model.number="product.price_final"
           :rules="[(v) => validateField(v, schema.price_final)]"
@@ -38,19 +38,19 @@
           :min="0"
           label="Цена"
           type="number"
+          class="me-sm-4"
         ></v-text-field>
-      </v-col>
-      <v-col>
-        <v-text-field
-          :modelValue="getNumberFormat(product.amount * product.price_final)"
-          label="Сумма"
-          variant="solo"
-          flat
-          type="text"
-          readonly
-        ></v-text-field>
-      </v-col>
-    </v-row>
+      </div>
+
+      <v-text-field
+        :modelValue="getNumberFormat(product.amount * product.price_final)"
+        label="Сумма"
+        variant="solo"
+        flat
+        type="text"
+        readonly
+      ></v-text-field>
+    </div>
     <v-textarea v-model="product.description" label="Описание" auto-grow rows="2"></v-textarea>
     <v-text-field v-model="product.market" label="Магазин"></v-text-field>
   </v-form>

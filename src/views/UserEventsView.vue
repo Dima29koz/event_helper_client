@@ -1,6 +1,12 @@
 <template>
   <v-container>
-    <v-data-table :headers="headers" :items="events" :items-per-page="-1" hover>
+    <v-data-table
+      :headers="headers"
+      :items="events"
+      :items-per-page="-1"
+      hover
+      class="pa-2 rounded"
+    >
       <template v-slot:top>
         <div class="d-flex justify-space-between">
           <h1>События</h1>
@@ -10,9 +16,8 @@
                 <v-btn v-bind="props" variant="text" icon="mdi-dots-vertical"></v-btn>
               </template>
               <v-list>
-                <v-list-item title="Присоединиться" @click="joinDialogVisible = true"></v-list-item>
-                <v-list-item title="Создать" class="text-success" @click="onCreateEvent">
-                </v-list-item>
+                <v-list-item title="Присоединиться" @click="joinDialogVisible = true" />
+                <v-list-item title="Создать" @click="onCreateEvent" class="text-success" />
               </v-list>
             </v-menu>
           </div>
@@ -38,7 +43,7 @@
       <template v-slot:bottom></template>
     </v-data-table>
 
-    <v-dialog v-model="joinDialogVisible">
+    <v-dialog v-model="joinDialogVisible" width="600">
       <v-card>
         <v-card-title>
           <span class="text-h5">Присоединиться</span>
@@ -51,28 +56,28 @@
           <v-btn @click="joinDialogVisible = false" color="blue-darken-1" variant="text">
             Закрыть
           </v-btn>
-          <v-btn type="submit" form="eventJoinForm" color="blue-darken-1" variant="text"
-            >Присоединиться
+          <v-btn type="submit" form="eventJoinForm" color="blue-darken-1" variant="text">
+            Присоединиться
           </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
 
-    <v-dialog v-model="dialogVisible">
+    <v-dialog v-model="dialogVisible" width="1000" :fullscreen="$vuetify.display.mobile">
       <v-card>
         <v-card-title>
           <span class="text-h5">Создание события</span>
         </v-card-title>
         <v-card-text>
-          <event-creation-form id="eventForm" :onSubmit="addEvent"></event-creation-form>
+          <event-form id="eventForm" :onSubmit="addEvent"></event-form>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn @click="dialogVisible = false" color="blue-darken-1" variant="text">
             Закрыть
           </v-btn>
-          <v-btn type="submit" form="eventForm" color="blue-darken-1" variant="text"
-            >Создать
+          <v-btn type="submit" form="eventForm" color="blue-darken-1" variant="text">
+            Создать
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -81,12 +86,13 @@
 </template>
 
 <script>
-import EventCreationForm from '@/components/Forms/EventCreationForm.vue'
+import EventForm from '@/components/Forms/EventForm.vue'
 import EventJoinForm from '@/components/Forms/EventJoinForm.vue'
 import { get_events, create_event } from '@/utils/api_event_management'
 import { formatDateTime } from '@/utils/formatters'
 
 export default {
+  components: { EventForm, EventJoinForm },
   setup() {
     return { formatDateTime }
   },
@@ -94,7 +100,7 @@ export default {
     return {
       dialogVisible: false,
       joinDialogVisible: false,
-      selectedEventIdx: NaN,
+
       events_creator: [],
       events_member: [],
       headers: [
@@ -112,21 +118,8 @@ export default {
     }
   },
 
-  components: {
-    EventCreationForm,
-    EventJoinForm
-  },
-
   methods: {
-    eventByIdx() {
-      if (isNaN(this.selectedEventIdx)) {
-        return {}
-      }
-      return this.events[this.selectedEventIdx]
-    },
-
     onCreateEvent() {
-      this.selectedEventIdx = NaN
       this.dialogVisible = true
     },
 

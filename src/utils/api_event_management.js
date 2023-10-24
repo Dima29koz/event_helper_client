@@ -17,7 +17,7 @@ export const create_event = requestHandler(async function (event) {
       date_end: event.date_end.toISOString(),
       timezone: event.timezone,
       cost_reduction_factor: event.cost_reduction_factor,
-      location_id: event.location_id
+      location: event.location
     },
     authHeaders()
   )

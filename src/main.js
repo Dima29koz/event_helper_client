@@ -26,7 +26,14 @@ directives.forEach((directive) => {
 })
 
 app.use(createPinia())
-app.use(createVuetify({ components: { VDataTable } }))
+app.use(
+  createVuetify({
+    components: { VDataTable },
+    display: {
+      mobileBreakpoint: 'sm'
+    }
+  })
+)
 app.use(router)
 app.use(VueCookies)
 

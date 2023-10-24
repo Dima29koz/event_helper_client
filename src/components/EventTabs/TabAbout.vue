@@ -6,17 +6,13 @@
       @editEvent="dialogVisible = true"
     ></event-about-card>
 
-    <v-dialog v-model="dialogVisible" width="1000">
+    <v-dialog v-model="dialogVisible" width="1000" :fullscreen="$vuetify.display.mobile">
       <v-card>
         <v-card-title>
           <span class="text-h5">Изменение события</span>
         </v-card-title>
         <v-card-text>
-          <event-edit-form
-            id="eventForm"
-            :event_data="data"
-            :onSubmit="onEditEvent"
-          ></event-edit-form>
+          <event-form id="eventForm" :event_data="data" :onSubmit="onEditEvent"></event-form>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -34,12 +30,12 @@
 
 <script>
 import EventAboutCard from '@/components/Cards/EventAboutCard.vue'
-import EventEditForm from '@/components/Forms/EventEditForm.vue'
+import EventForm from '@/components/Forms/EventForm.vue'
 import { useEventMemberStore } from '@/stores/eventMemberStore'
 
 export default {
   name: 'tab-about',
-  components: { EventAboutCard, EventEditForm },
+  components: { EventAboutCard, EventForm },
   setup() {
     const eventMemberStore = useEventMemberStore()
     return { eventMemberStore }

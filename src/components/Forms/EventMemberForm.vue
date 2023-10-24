@@ -7,46 +7,44 @@
       type="text"
     ></v-text-field>
 
-    <v-row>
-      <v-col>
-        <datetime-picker
-          v-model:model="member.date_from"
-          :rules="[
-            (v) => validateField(v, schema.date),
-            (v) => validateField(v, schema.date_from(v, member.date_to))
-          ]"
-          :label="'Приеду (дата)'"
-          :name="'date_from'"
-          :minDate="eventMemberStore.getEventInfo.date_start"
-          :maxDate="eventMemberStore.getEventInfo.date_end"
-        ></datetime-picker>
-      </v-col>
-      <v-col>
-        <datetime-picker
-          v-model:model="member.date_to"
-          :rules="[
-            (v) => validateField(v, schema.date),
-            (v) => validateField(v, schema.date_to(v, member.date_from))
-          ]"
-          :label="'Уеду (дата)'"
-          :name="'date_to'"
-          :minDate="eventMemberStore.getEventInfo.date_start"
-          :maxDate="eventMemberStore.getEventInfo.date_end"
-        ></datetime-picker>
-      </v-col>
-      <v-col>
-        <v-text-field
-          v-model="member.days_amount"
-          label="Количество дней"
-          variant="solo"
-          flat
-          type="number"
-          readonly
-        ></v-text-field>
-      </v-col>
-    </v-row>
-    <v-checkbox v-model="member.is_drinker" label="Пьющий"></v-checkbox>
-    <v-checkbox v-model="member.is_involved" label="Приеду"></v-checkbox>
+    <div class="d-sm-flex">
+      <datetime-picker
+        v-model:model="member.date_from"
+        :rules="[
+          (v) => validateField(v, schema.date),
+          (v) => validateField(v, schema.date_from(v, member.date_to))
+        ]"
+        :label="'Приеду (дата)'"
+        :name="'date_from'"
+        :minDate="eventMemberStore.getEventInfo.date_start"
+        :maxDate="eventMemberStore.getEventInfo.date_end"
+        class="me-sm-4"
+      ></datetime-picker>
+
+      <datetime-picker
+        v-model:model="member.date_to"
+        :rules="[
+          (v) => validateField(v, schema.date),
+          (v) => validateField(v, schema.date_to(v, member.date_from))
+        ]"
+        :label="'Уеду (дата)'"
+        :name="'date_to'"
+        :minDate="eventMemberStore.getEventInfo.date_start"
+        :maxDate="eventMemberStore.getEventInfo.date_end"
+        class="me-sm-4"
+      ></datetime-picker>
+
+      <v-text-field
+        v-model="member.days_amount"
+        label="Количество дней"
+        variant="solo"
+        flat
+        type="number"
+        readonly
+      ></v-text-field>
+    </div>
+    <v-checkbox v-model="member.is_drinker" label="Пьющий" hide-details></v-checkbox>
+    <v-checkbox v-model="member.is_involved" label="Приеду" hide-details></v-checkbox>
     <v-select
       v-if="eventMemberStore.hasOneOfRoles(['organizer', 'creator'])"
       v-model="member.role"

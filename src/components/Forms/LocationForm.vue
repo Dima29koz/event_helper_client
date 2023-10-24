@@ -84,6 +84,14 @@ export default {
       if ((await this.$refs.form.validate()).valid) {
         this.onSubmit(this.local_location)
       }
+    },
+    async validate() {
+      return (await this.$refs.form.validate()).valid
+    }
+  },
+  watch: {
+    location() {
+      this.local_location = { ...this.location }
     }
   }
 }
