@@ -2,7 +2,7 @@
   <v-container>
     <v-data-table
       :headers="tableHeaders"
-      :items="data"
+      :items="eventStore.members"
       :items-per-page="-1"
       :search="search"
       v-model:sort-by="sortBy"
@@ -30,7 +30,7 @@
                   append-icon="mdi-plus"
                 ></v-list-item>
                 <v-list-item
-                  v-if="meMember === null"
+                  v-if="eventStore.getMemberMe === null"
                   title="Присоединиться"
                   @click="joinEvent"
                   append-icon="mdi-login"
@@ -44,7 +44,7 @@
                   <v-divider></v-divider>
                   <v-list-item
                     title="Покинуть событие"
-                    @click="this.$emit('delMe')"
+                    @click="delMe"
                     class="text-red"
                     append-icon="mdi-logout"
                   ></v-list-item>
@@ -148,6 +148,7 @@ import EventMemberMoneyForm from '@/components/Forms/EventMemberMoneyForm.vue'
 import UserContactsCard from '@/components/Cards/UserContactsCard.vue'
 import { useCurrentUserStore } from '@/stores/currentUserStore'
 import { useEventMemberStore } from '@/stores/eventMemberStore'
+import { useEventStore } from '../../stores/eventStore'
 
 export default {
   name: 'tab-members',
@@ -155,7 +156,12 @@ export default {
   setup() {
     const currentUserStore = useCurrentUserStore()
     const eventMemberStore = useEventMemberStore()
-    return { currentUserStore, eventMemberStore }
+    const eventStore = useEventStore()
+    const defaultSort = [
+      { key: 'role', order: 'desc' },
+      { key: 'user', order: 'desc' }
+    ]
+    return { currentUserStore, eventMemberStore, eventStore, defaultSort }
   },
   data() {
     return {
@@ -164,14 +170,7 @@ export default {
       moneyDialogVisible: false,
       selectedMember: null,
       search: '',
-      sortBy: [
-        { key: 'role', order: 'desc' },
-        { key: 'user', order: 'desc' }
-      ],
-      defaultSort: [
-        { key: 'role', order: 'desc' },
-        { key: 'user', order: 'desc' }
-      ],
+      sortBy: [...this.defaultSort],
       headers: [
         { title: '#', key: '', sortable: false },
         { title: 'Ник', key: 'nickname' },
@@ -182,30 +181,33 @@ export default {
       ]
     }
   },
-  props: {
-    data: {
-      type: Array,
-      default: () => []
-    }
-  },
   methods: {
-    getMember(member) {
-      return this.data.find((e) => e.id === member.id)
-    },
     editMember(member, index, event) {
       if (event.target.id == 'btn-delete-member') {
         this.delMember(member)
         return
       }
       if (event.target.id == 'btn-money-member') {
-        this.selectedMember = this.getMember(member)
+        this.selectedMember = this.eventStore.getMember(member.id)
         this.moneyDialogVisible = true
         return
       }
-      this.selectedMember = this.getMember(member)
+      this.selectedMember = this.eventStore.getMember(member.id)
       this.dialogMode = 'editMember'
       this.dialogVisible = true
     },
+
+    async delMe() {
+      if (
+        await this.$refs.confirm.open(
+          'Подтвердите выход из события',
+          'Вы уверены что хотите покинуть событие?'
+        )
+      ) {
+        this.$emit('delMe')
+      }
+    },
+
     async delMember(member) {
       if (
         await this.$refs.confirm.open(
@@ -226,7 +228,7 @@ export default {
       this.dialogVisible = true
     },
     editMe() {
-      this.selectedMember = this.meMember
+      this.selectedMember = this.eventStore.getMemberMe
       this.dialogMode = 'editMe'
       this.dialogVisible = true
     },
@@ -289,10 +291,6 @@ export default {
           return () => {}
       }
     },
-    meMember() {
-      const me = this.data.find((e) => e.user === this.currentUserStore.username)
-      return me ? me : null
-    },
     tableHeaders() {
       if (!this.canEdit) {
         return this.headers.slice(0, -1)
@@ -301,16 +299,16 @@ export default {
     }
   },
   watch: {
-    sortBy() {
-      this.sortBy.splice(
-        this.sortBy.findIndex((e) => e.key == 'role'),
-        1
-      )
-      this.sortBy.splice(
-        this.sortBy.findIndex((e) => e.key == 'user'),
-        1
-      )
-      this.sortBy.push(...this.defaultSort)
+    sortBy: {
+      handler(newVal, oldVal) {
+        if (JSON.stringify(newVal) === JSON.stringify(oldVal)) {
+          return
+        }
+
+        this.sortBy = this.sortBy.filter((e) => e.key !== 'role' && e.key !== 'user')
+        this.sortBy.push(...this.defaultSort)
+      },
+      deep: true
     }
   },
   mounted() {

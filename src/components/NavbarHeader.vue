@@ -1,14 +1,4 @@
 <template>
-  <v-navigation-drawer v-model="sidebar" temporary>
-    <v-list :lines="false" nav>
-      <v-list-item to="/">Главная</v-list-item>
-      <template v-if="currentUser.isAuth">
-        <v-list-item to="/events">События</v-list-item>
-      </template>
-      <v-list-item to="/about">FAQ</v-list-item>
-    </v-list>
-  </v-navigation-drawer>
-
   <v-app-bar flat>
     <template v-slot:prepend>
       <div>
@@ -69,6 +59,16 @@
       <color-mode-toggler></color-mode-toggler>
     </template>
   </v-app-bar>
+
+  <v-navigation-drawer v-model="sidebar" temporary>
+    <v-list :lines="false" nav>
+      <v-list-item to="/">Главная</v-list-item>
+      <template v-if="currentUser.isAuth">
+        <v-list-item to="/events">События</v-list-item>
+      </template>
+      <v-list-item to="/about">FAQ</v-list-item>
+    </v-list>
+  </v-navigation-drawer>
 </template>
 
 <script>

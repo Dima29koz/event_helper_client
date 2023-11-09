@@ -1,24 +1,33 @@
 <template>
   <v-form ref="form" @submit.prevent="submit" :disabled="!is_editable">
-    <div class="d-flex">
-      <v-select
-        v-model="product.base_product"
-        :items="base_products"
-        :rules="[(v) => validateField(v, schema.base_product)]"
-        item-title="name"
-        return-object
-        label="Продукт"
-      ></v-select>
-      <v-btn color="success" icon="mdi-plus"></v-btn>
-    </div>
-
     <v-select
-      v-model="product.state"
-      :items="states"
-      item-value="key"
-      :rules="[(v) => validateField(v, schema.state)]"
-      label="Статус"
+      v-model="product.base_product"
+      :items="base_products"
+      :rules="[(v) => validateField(v, schema.base_product)]"
+      item-title="name"
+      return-object
+      label="Продукт"
     ></v-select>
+
+    <div class="d-sm-flex">
+      <v-select
+        v-model="product.state"
+        :items="states"
+        item-value="key"
+        :rules="[(v) => validateField(v, schema.state)]"
+        label="Статус"
+      ></v-select>
+
+      <v-select
+        :readonly="product.state !== 'bought'"
+        v-model="product.buyer_id"
+        :items="eventStore.members"
+        item-title="nickname"
+        item-value="id"
+        label="Кем куплен"
+        class="ms-sm-4"
+      ></v-select>
+    </div>
 
     <div class="d-sm-flex">
       <div class="d-flex">
@@ -60,6 +69,7 @@
 import * as yup from 'yup'
 import { validateField } from '../../utils/validate_field'
 import { useEventMemberStore } from '@/stores/eventMemberStore'
+import { useEventStore } from '@/stores/eventStore'
 import { get_base_products } from '@/utils/api_event_management'
 import { getNumberFormat } from '@/utils/formatters'
 
@@ -84,7 +94,8 @@ export default {
         .typeError('Цена не указана')
     }
     const eventMemberStore = useEventMemberStore()
-    return { schema, eventMemberStore, validateField, getNumberFormat }
+    const eventStore = useEventStore()
+    return { schema, eventMemberStore, validateField, getNumberFormat, eventStore }
   },
   data() {
     return {
@@ -96,7 +107,8 @@ export default {
             amount: 0,
             price_final: NaN,
             description: '',
-            market: ''
+            market: '',
+            buyer_id: ''
           },
       base_products: []
     }
@@ -120,6 +132,15 @@ export default {
     async submit() {
       if ((await this.$refs.form.validate()).valid) {
         this.onSubmit(this.product)
+      }
+    }
+  },
+  watch: {
+    'product.state'(newVal) {
+      if (newVal !== 'bought') {
+        this.product.buyer_id = null
+      } else {
+        this.product.buyer_id = this.eventStore.selected_buyer?.id
       }
     }
   },

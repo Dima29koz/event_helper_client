@@ -20,6 +20,7 @@
             <v-btn @click="dialogCart = true" variant="tonal" color="success" class="h-100">
               <v-icon size="x-large">mdi-cart-variant</v-icon>
             </v-btn>
+            <products-options-card></products-options-card>
           </template>
         </v-text-field>
       </template>
@@ -28,15 +29,18 @@
         <tr>
           <td :colspan="columns.length" class="pa-0">
             <v-btn
-              @click="toggleGroup(item)"
+              v-if="item.depth === 0"
+              @click="toggleSubGroups(toggleGroup, item)"
               block
               rounded="0"
               variant="text"
-              class="justify-start h-100 text-none font-weight-medium text-subtitle-1"
+              class="justify-start h-100 text-none font-weight-medium text-h6"
               :prepend-icon="isGroupOpen(item) ? '$expand' : '$next'"
             >
               {{ item.value }}
             </v-btn>
+
+            <div v-else class="text-left ps-4 text-subtitle-1">{{ item.value }}</div>
           </td>
         </tr>
       </template>
@@ -47,7 +51,7 @@
           :states="states"
           :can_edit="canEdit"
           :can_delete="canDelete"
-          @editRow="(product_data) => this.$emit('editEventProduct', product_data)"
+          @editRow="(product_data, old_data) => editEventProduct(product_data, old_data)"
           @onModalEdit="modalEdit(item)"
           @onDelete="this.$emit('deleteEventProduct', item.id)"
         ></product-table-row>
@@ -59,7 +63,7 @@
     <v-dialog v-model="dialogVisible" width="1000" :fullscreen="$vuetify.display.mobile">
       <v-card>
         <v-card-title>
-          <span class="text-h5">{{ dialogTitle }}</span>
+          <span class="text-h5">Изменение продукта</span>
         </v-card-title>
         <v-card-text>
           <event-product-form
@@ -67,7 +71,7 @@
             :product_data="sellectedProduct"
             :states="states"
             :is_editable="canEdit"
-            :onSubmit="dialogOnSubmit"
+            :onSubmit="onEditEventProduct"
           ></event-product-form>
         </v-card-text>
         <v-card-actions>
@@ -111,14 +115,17 @@
 import EventProductForm from '@/components/Forms/EventProductForm.vue'
 import ProductTableRow from '@/components/EventTabs/ProductTableRow.vue'
 import CartProducts from '@/components/EventTabs/CartProducts.vue'
+import ProductsOptionsCard from '@/components/Cards/ProductsOptionsCard.vue'
 import { useEventMemberStore } from '@/stores/eventMemberStore'
+import { useEventStore } from '../../stores/eventStore'
 
 export default {
   name: 'tab-products',
-  components: { EventProductForm, ProductTableRow, CartProducts },
+  components: { EventProductForm, ProductTableRow, CartProducts, ProductsOptionsCard },
   setup() {
     const eventMemberStore = useEventMemberStore()
-    return { eventMemberStore }
+    const eventStore = useEventStore()
+    return { eventMemberStore, eventStore }
   },
   data() {
     return {
@@ -126,7 +133,10 @@ export default {
       dialogCart: false,
       sellectedProduct: null,
       search: '',
-      groupBy: [{ key: 'base_product.category', order: 'asc' }],
+      groupBy: [
+        { key: 'base_product.category', order: 'asc' },
+        { key: 'base_product.type', order: 'asc' }
+      ],
       headers: [
         [
           { title: 'Название', key: 'base_product.name', rowspan: 2 },
@@ -159,21 +169,37 @@ export default {
     }
   },
   methods: {
-    onAddEventProduct(product_data) {
-      this.dialogVisible = false
-      product_data['product_id'] = product_data.base_product.id
-      delete product_data['base_product']
-      this.$emit('addEventProduct', product_data)
-    },
     onEditEventProduct(product_data) {
       this.dialogVisible = false
       const product = { ...product_data, product_id: product_data.base_product.id }
       delete product.base_product
-      this.$emit('editEventProduct', product)
+      this.editEventProduct(product, this.sellectedProduct)
     },
+
+    editEventProduct(product_data, old_product_data) {
+      if (product_data.state !== undefined && product_data?.state !== old_product_data.state) {
+        if (product_data?.state === 'bought') {
+          product_data.buyer_id =
+            product_data.buyer_id !== undefined
+              ? product_data.buyer_id
+              : this.eventStore.selected_buyer?.id
+        } else {
+          product_data.buyer_id = null
+        }
+      }
+
+      this.$emit('editEventProduct', product_data)
+    },
+
     modalEdit(product) {
       this.sellectedProduct = product
       this.dialogVisible = true
+    },
+    toggleSubGroups(toggleGroupFn, item) {
+      toggleGroupFn(item)
+      item.items.forEach((subGroup) => {
+        toggleGroupFn(subGroup)
+      })
     }
   },
   computed: {
@@ -188,22 +214,11 @@ export default {
         return [this.headers[0].slice(0, -1), this.headers[1]]
       }
       return this.headers
-    },
-    dialogTitle() {
-      if (this.sellectedProduct === null) {
-        return 'Добавление продукта'
-      }
-      return 'Изменение продукта'
-    },
-    dialogOnSubmit() {
-      if (this.sellectedProduct === null) {
-        return this.onAddEventProduct
-      }
-      return this.onEditEventProduct
     }
   },
   mounted() {
     this.$emit('getEventProducts')
+    this.$emit('getMembers')
   }
 }
 </script>

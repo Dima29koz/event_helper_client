@@ -23,7 +23,6 @@
         @editMe="edit_me"
         @delMe="del_me"
         @delMember="del_member"
-        @addEventProduct="add_event_product"
         @addEventProducts="add_event_products"
         @editEventProduct="edit_event_product"
         @deleteEventProduct="delete_event_product"
@@ -41,19 +40,20 @@ import TabProducts from '@/components/EventTabs/TabProducts.vue'
 import TabResults from '@/components/EventTabs/TabResults.vue'
 import { useCurrentUserStore } from '@/stores/currentUserStore'
 import { useEventMemberStore } from '@/stores/eventMemberStore'
+import { useEventStore } from '../stores/eventStore'
 
 export default {
   setup() {
     const currentUserStore = useCurrentUserStore()
     const eventMemberStore = useEventMemberStore()
-    return { eventMemberStore, currentUserStore }
+    const eventStore = useEventStore()
+    return { eventMemberStore, currentUserStore, eventStore }
   },
   data() {
     return {
       socket: null,
       currentTab: 'about',
       event_data: {},
-      event_members: [],
       event_products: []
     }
   },
@@ -160,14 +160,6 @@ export default {
         member_id: member.id
       })
     },
-    add_event_product(product) {
-      this.socket.emit('add_product', {
-        auth: {
-          csrf_access_token: this.$cookies.get('csrf_access_token')
-        },
-        product: product
-      })
-    },
     add_event_products(products) {
       let fixed_products = products.map((product) => {
         return { ...product, product_id: product.id }
@@ -216,17 +208,13 @@ export default {
       if (this.currentTab === 'about') {
         return this.event_data
       }
-      if (this.currentTab === 'members') {
-        return this.event_members
-      }
       if (this.currentTab === 'products') {
         return this.event_products
       }
       if (this.currentTab === 'results') {
         return {
           event_data: this.event_data,
-          event_products: this.event_products,
-          event_members: this.event_members
+          event_products: this.event_products
         }
       }
       return null
@@ -247,6 +235,7 @@ export default {
       }
     }
     this.socket = setupIO(event_key)
+    this.eventStore.reset()
     this.get_data()
     this.get_location()
 
@@ -280,15 +269,7 @@ export default {
     })
 
     this.socket.on('get_event_members', (event_members) => {
-      event_members.forEach((member) => {
-        if (member.date_from) {
-          member.date_from = new Date(member.date_from)
-        }
-        if (member.date_to) {
-          member.date_to = new Date(member.date_to)
-        }
-      })
-      this.event_members = event_members
+      this.eventStore.setMembers(event_members)
     })
 
     this.socket.on('get_event_products', (event_products) => {
@@ -308,42 +289,33 @@ export default {
     })
 
     this.socket.on('update_event_member', (member_data) => {
-      let member_idx = this.event_members.findIndex((element) => element.id == member_data.id)
-      const me_idx = this.event_members.findIndex((e) => e.user === this.currentUserStore.username)
-      if (member_idx == me_idx && me_idx > -1) {
+      if (member_data.user === this.currentUserStore.username) {
         this.eventMemberStore.fetchMemberInfo(event_key)
       }
-
-      if (member_data.date_from) {
-        member_data.date_from = new Date(member_data.date_from)
-      }
-      if (member_data.date_to) {
-        member_data.date_to = new Date(member_data.date_to)
-      }
-      this.event_members[member_idx] = member_data
+      this.eventStore.updateMember(member_data)
     })
+
     this.socket.on('delete_event', (event_data) => {
       console.log(event_data)
       this.$router.push({ name: 'events' })
     })
+
     this.socket.on('add_member', (member_data) => {
-      if (member_data.date_from) {
-        member_data.date_from = new Date(member_data.date_from)
-      }
-      if (member_data.date_to) {
-        member_data.date_to = new Date(member_data.date_to)
-      }
-      this.event_members.push(member_data)
+      this.eventStore.addMember(member_data)
     })
+
     this.socket.on('delete_member', (response) => {
-      this.event_members = this.event_members.filter((member) => member.id !== response.member_id)
+      this.eventStore.deleteMember(response.member_id)
     })
+
     this.socket.on('add_products', (products) => {
       products.forEach((product) => this.event_products.push(product))
     })
+
     this.socket.on('add_product', (product) => {
       this.event_products.push(product)
     })
+
     this.socket.on('update_event_products', (products) => {
       products.forEach((product) => {
         let index = this.event_products.findIndex((p) => p.id === product.id)
@@ -352,12 +324,14 @@ export default {
         }
       })
     })
+
     this.socket.on('update_event_product', (product) => {
       let index = this.event_products.findIndex((p) => p.id === product.id)
       if (index !== -1) {
         this.event_products[index] = product
       }
     })
+
     this.socket.on('delete_event_product', (response) => {
       this.event_products = this.event_products.filter((p) => p.id !== response.product_id)
     })

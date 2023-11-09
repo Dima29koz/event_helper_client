@@ -33,7 +33,7 @@
     </v-row>
     <v-row>
       <v-col cols="4" class="font-weight-bold">Общее количество людей</v-col>
-      <v-col class="text-center">{{ membersAmount }}</v-col>
+      <v-col class="text-center">{{ eventStore.getMembersAmount }}</v-col>
     </v-row>
 
     <v-row>
@@ -58,10 +58,13 @@
 
 <script>
 import { getNumberFormat, getDaysAmount } from '@/utils/formatters'
+import { useEventStore } from '../../stores/eventStore'
+
 export default {
   name: 'tab-results',
   setup() {
-    return { getNumberFormat }
+    const eventStore = useEventStore()
+    return { getNumberFormat, eventStore }
   },
   data() {
     return {}
@@ -70,7 +73,7 @@ export default {
     data: {
       type: Object,
       default: function () {
-        return { event_data: {}, event_products: [], event_members: [] }
+        return { event_data: {}, event_products: [] }
       }
     }
   },
@@ -78,9 +81,6 @@ export default {
   computed: {
     eventDaysAmount() {
       return getDaysAmount(this.data.event_data.date_start, this.data.event_data.date_end)
-    },
-    membersAmount() {
-      return this.data.event_members.length
     },
     baseCoef() {
       return 1 - this.data.event_data.cost_reduction_factor / 100
@@ -121,7 +121,7 @@ export default {
         members_alco_coefficient: 0
       }
 
-      this.data.event_members.forEach((member) => {
+      this.eventStore.members.forEach((member) => {
         if (!members_info.by_days[member.days_amount]) {
           members_info.by_days[member.days_amount] = { drinkers: 0, not_drinkers: 0 }
         }
@@ -165,7 +165,7 @@ export default {
     },
     actualSum() {
       let sum = 0
-      this.data.event_members.forEach((member) => {
+      this.eventStore.members.forEach((member) => {
         sum += member.money_impact
       })
 

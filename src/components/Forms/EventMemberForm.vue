@@ -2,7 +2,7 @@
   <v-form ref="form" @submit.prevent="submit" :disabled="!is_editable">
     <v-text-field
       v-model="member.nickname"
-      :rules="[(v) => validateField(v, schema.role)]"
+      :rules="[(v) => validateField(v, schema.nickname)]"
       label="Как к вам обращаться?"
       type="text"
     ></v-text-field>

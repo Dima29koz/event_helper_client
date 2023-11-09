@@ -1,5 +1,5 @@
 <template>
-  <v-sheet class="pa-4 text-center mx-auto my-16 form-register rounded" :elevation="8">
+  <v-sheet class="pa-4 text-center mx-auto my-sm-16 form-register rounded" :elevation="8">
     <h1 class="h3 mb-3 fw-normal">Регистрация</h1>
     <v-form ref="form" @submit.prevent="registrateUser">
       <v-text-field
@@ -34,6 +34,7 @@
         type="password"
         name="password"
         label="Пароль"
+        autocomplete="new-password"
       ></v-text-field>
 
       <v-text-field
@@ -48,8 +49,6 @@
     </v-form>
   </v-sheet>
 </template>
-
-<script setup></script>
 
 <script>
 import * as yup from 'yup'
@@ -97,7 +96,5 @@ export default {
 .form-register {
   width: 100%;
   max-width: 600px;
-  padding: 15px;
-  margin: auto;
 }
 </style>

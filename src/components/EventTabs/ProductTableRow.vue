@@ -152,7 +152,8 @@ export default {
             id: this.product_data.id
           },
           updated
-        )
+        ),
+        this.product_data
       )
     },
     getStateTitle() {
