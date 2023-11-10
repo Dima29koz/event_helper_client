@@ -15,6 +15,8 @@
         <v-text-field
           v-model="searchValue"
           :rules="[(v) => validateField(v, schema.searchValue)]"
+          :counter="max_len"
+          persistent-counter
           label="Добавляемое значение"
           type="text"
           readonly
@@ -30,14 +32,15 @@
 
 <script>
 import * as yup from 'yup'
-import { validateField } from '@/utils/validate_field'
+import { validateField } from '@/utils/validators'
 
 export default {
   name: 'v-editable-autocomplete',
-  setup() {
+  setup(props) {
     const schema = {
       searchValue: yup
         .string()
+        .max(props.max_len, 'Превышена максимальная длина')
         .required('Значение не указано')
         .matches(/^[^\d].*$/, 'Значение не может начинаться с числа')
     }
@@ -56,6 +59,7 @@ export default {
       default: ''
     },
     rules: null,
+    max_len: { type: Number, default: 50 },
     onAdd: {
       type: Function
     }

@@ -3,10 +3,13 @@
     <v-text-field
       v-model="event.title"
       :rules="[(v) => validateField(v, schema.title)]"
+      counter="50"
       label="Название"
     ></v-text-field>
+
     <div class="d-sm-flex">
       <datetime-picker
+        ref="date_start"
         id="date_start"
         v-model:model="event.date_start"
         :rules="[(v) => validateField(v, schema.date_start(event.date_end))]"
@@ -14,13 +17,16 @@
         class="me-sm-4"
       ></datetime-picker>
       <datetime-picker
+        ref="date_end"
         id="date_end"
         v-model:model="event.date_end"
         :rules="[(v) => validateField(v, schema.date_end(event.date_start))]"
         label="Дата окончания"
       ></datetime-picker>
     </div>
+
     <v-textarea v-model="event.description" label="Описание" auto-grow rows="2"></v-textarea>
+
     <v-text-field
       v-model.number="event.cost_reduction_factor"
       :rules="[(v) => validateField(v, schema.cost_reduction_factor)]"
@@ -29,28 +35,25 @@
       type="number"
     >
       <template v-slot:append-inner>
-        <v-tooltip location="bottom" v-model="showTooltip">
-          <template v-slot:activator="{ props }">
-            <v-icon
-              v-bind="props"
-              @click="showTooltip = !showTooltip"
-              icon="mdi-help-circle-outline"
-            ></v-icon>
-          </template>
+        <v-switchable-tooltip>
           <p>Данное значение влияет на расчет взноса участника.</p>
           <p>Взнос уменьшается на указанный процент за каждый день отсутсвия.</p>
-        </v-tooltip>
+        </v-switchable-tooltip>
       </template>
     </v-text-field>
-    <h5>Адрес</h5>
-    <v-select
+
+    <h5 class="pb-2">Адрес</h5>
+    <v-autocomplete
       v-model="event.location_id"
-      @update:modelValue="setLocationData"
+      v-model:search="searchLocation"
       :items="locations"
       item-title="name"
       item-value="id"
+      no-data-text="Адрес не найден"
+      auto-select-first
       label="Адрес"
-    ></v-select>
+    ></v-autocomplete>
+
     <location-form
       ref="locationForm"
       :location="event.location"
@@ -61,7 +64,7 @@
 
 <script>
 import * as yup from 'yup'
-import { validateField } from '../../utils/validate_field'
+import { validateField } from '../../utils/validators'
 import LocationForm from '@/components/Forms/LocationForm.vue'
 import { get_locations, get_location } from '@/utils/api_user_account'
 import { MAX_DATE } from '@/utils/constants'
@@ -71,7 +74,7 @@ export default {
   components: { LocationForm },
   setup() {
     const schema = {
-      title: yup.string().required('Название не указано'),
+      title: yup.string().max(50, 'Превышена максимальная длина').required('Название не указано'),
       date_start: (date) =>
         yup
           .date()
@@ -101,7 +104,7 @@ export default {
             location: {}
           },
       locations: [],
-      showTooltip: false
+      searchLocation: ''
     }
   },
   props: {
@@ -129,6 +132,22 @@ export default {
     submitForms(location_data) {
       this.event.location = location_data
       this.onSubmit(this.event)
+    }
+  },
+
+  watch: {
+    'event.location_id'() {
+      if (this.event.location_id !== null) {
+        this.setLocationData()
+      } else {
+        this.searchLocation = ''
+      }
+    },
+    'event.date_start'() {
+      this.$refs.date_end.validate()
+    },
+    'event.date_end'() {
+      this.$refs.date_start.validate()
     }
   },
 

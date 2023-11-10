@@ -1,5 +1,6 @@
 <template>
   <v-text-field
+    ref="field"
     v-model="date"
     :rules="rules"
     :label="label"
@@ -20,6 +21,11 @@ export default {
     model: { type: Date, default: null }
   },
   methods: {
+    validate() {
+      if (this.model !== null) {
+        this.$refs.field.validate()
+      }
+    },
     toLocaleISOString(date) {
       let tmp_date = date ? new Date(date) : null
       if (tmp_date) {

@@ -1,6 +1,6 @@
 <template>
   <v-sheet class="pa-4 text-center mx-auto my-16 form-signin rounded" :elevation="8">
-    <h1 class="h3 mb-3 fw-normal">Авторизация</h1>
+    <h1 class="h3 mb-4 fw-normal">Авторизация</h1>
     <v-alert
       v-if="alertMsg"
       border="start"
@@ -24,13 +24,15 @@
         label="Пароль"
         type="password"
       ></v-text-field>
-      <v-checkbox v-model="user.remember_me" label="Запомнить меня"></v-checkbox>
+
+      <v-checkbox v-model="user.remember_me" label="Запомнить меня" hide-details></v-checkbox>
 
       <v-btn type="submit" color="success" size="large" block>Войти</v-btn>
-      <v-list-item @click="dialogResetPassword = true" variant="plain" class="mt-2">
-        Забыли пароль?
-      </v-list-item>
     </v-form>
+
+    <v-list-item @click="dialogResetPassword = true" variant="plain" class="mt-2">
+      Забыли пароль?
+    </v-list-item>
 
     <v-dialog v-model="dialogResetPassword" width="400">
       <v-card>
@@ -56,7 +58,7 @@
 
 <script>
 import * as yup from 'yup'
-import { validateField } from '../../utils/validate_field'
+import { validateField } from '../../utils/validators'
 import ResetPasswordForm from '@/components/forms/ResetPasswordForm.vue'
 import { reset_password_request } from '@/utils/api_user_account'
 

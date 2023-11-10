@@ -2,6 +2,7 @@
   <v-form ref="form" @submit.prevent="submit" :disabled="!is_editable">
     <v-text-field
       v-model.trim="base_product.name"
+      counter="50"
       :rules="[(v) => validateField(v, schema.name)]"
       label="Название"
       type="text"
@@ -11,6 +12,7 @@
       v-model:model="base_product.category"
       :items="categories"
       :rules="[(v) => validateField(v, schema.category)]"
+      :max_len="50"
       :label="'Категория'"
       :onAdd="addNewCategory"
     ></v-editable-autocomplete>
@@ -19,6 +21,7 @@
       v-model:model="base_product.type"
       :items="types"
       :rules="[(v) => validateField(v, schema.type)]"
+      :max_len="50"
       :label="'Тип'"
       :onAdd="addNewType"
     ></v-editable-autocomplete>
@@ -27,6 +30,7 @@
       v-model:model="base_product.unit"
       :items="units"
       :rules="[(v) => validateField(v, schema.unit)]"
+      :max_len="50"
       :label="'Единица измерения'"
       :onAdd="addNewUnit"
     ></v-editable-autocomplete>
@@ -42,7 +46,7 @@
 
 <script>
 import * as yup from 'yup'
-import { validateField } from '../../utils/validate_field'
+import { validateField, validateMonetary } from '../../utils/validators'
 import { useEventMemberStore } from '@/stores/eventMemberStore'
 import {
   get_product_categories,
@@ -59,12 +63,13 @@ export default {
     const schema = {
       name: yup
         .string()
+        .max(50, 'Превышена максимальная длина')
         .required('Название не указано')
         .matches(/^[^\d].*$/, 'Название не может начинаться с числа'),
       category: yup.object().required('Категория не выбрана'),
       type: yup.object().required('Тип не выбран'),
       unit: yup.object().required('Единица измерения не выбрана'),
-      price_supposed: yup.number().moreThan(0, 'Значение должно быть больше 0')
+      price_supposed: validateMonetary
     }
     const eventMemberStore = useEventMemberStore()
     return { schema, eventMemberStore, validateField }

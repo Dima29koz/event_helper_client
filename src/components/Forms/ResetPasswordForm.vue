@@ -10,7 +10,7 @@
 
 <script>
 import * as yup from 'yup'
-import { validateField } from '../../utils/validate_field'
+import { validateField } from '../../utils/validators'
 
 export default {
   name: 'reset-password-form',

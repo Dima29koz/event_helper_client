@@ -1,13 +1,16 @@
 <template>
   <v-form ref="form" @submit.prevent="submit" :disabled="!is_editable">
-    <v-select
+    <v-autocomplete
       v-model="product.base_product"
+      v-model:search="searchProduct"
       :items="base_products"
       :rules="[(v) => validateField(v, schema.base_product)]"
       item-title="name"
       return-object
+      no-data-text="Продукт не найден"
+      auto-select-first
       label="Продукт"
-    ></v-select>
+    ></v-autocomplete>
 
     <div class="d-sm-flex">
       <v-select
@@ -19,8 +22,8 @@
       ></v-select>
 
       <v-select
-        :readonly="product.state !== 'bought'"
         v-model="product.buyer_id"
+        :readonly="product.state !== 'bought'"
         :items="eventStore.members"
         item-title="nickname"
         item-value="id"
@@ -60,14 +63,21 @@
         readonly
       ></v-text-field>
     </div>
+
     <v-textarea v-model="product.description" label="Описание" auto-grow rows="2"></v-textarea>
-    <v-text-field v-model="product.market" label="Магазин"></v-text-field>
+
+    <v-text-field
+      v-model="product.market"
+      :rules="[(v) => validateField(v, schema.market)]"
+      counter="50"
+      label="Магазин"
+    ></v-text-field>
   </v-form>
 </template>
 
 <script>
 import * as yup from 'yup'
-import { validateField } from '../../utils/validate_field'
+import { validateField } from '../../utils/validators'
 import { useEventMemberStore } from '@/stores/eventMemberStore'
 import { useEventStore } from '@/stores/eventStore'
 import { get_base_products } from '@/utils/api_event_management'
@@ -91,7 +101,8 @@ export default {
         .test('two-decimals', 'Цена должна иметь не более двух десятичных знаков', (value) =>
           /^\d+(\.\d{1,2})?$/.test(value)
         )
-        .typeError('Цена не указана')
+        .typeError('Цена не указана'),
+      market: yup.string().max(50, 'Превышена максимальная длина')
     }
     const eventMemberStore = useEventMemberStore()
     const eventStore = useEventStore()
@@ -110,7 +121,8 @@ export default {
             market: '',
             buyer_id: ''
           },
-      base_products: []
+      base_products: [],
+      searchProduct: ''
     }
   },
   props: {
@@ -136,6 +148,11 @@ export default {
     }
   },
   watch: {
+    'product.base_product'() {
+      if (this.product.base_product === null) {
+        this.searchProduct = ''
+      }
+    },
     'product.state'(newVal) {
       if (newVal !== 'bought') {
         this.product.buyer_id = null

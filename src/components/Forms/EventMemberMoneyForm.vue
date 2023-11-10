@@ -1,15 +1,24 @@
 <template>
   <v-form ref="form" @submit.prevent="submit">
-    <v-text-field v-model.number="member.money_impact" label="Взнос" type="number"></v-text-field>
+    <v-text-field
+      v-model.number="member.money_impact"
+      :rules="[(v) => validateField(v, schema.money_impact)]"
+      label="Взнос"
+      type="number"
+    ></v-text-field>
   </v-form>
 </template>
 
 <script>
+import { validateField, validateMonetary } from '../../utils/validators'
+
 export default {
   name: 'event-member-money-form',
   setup() {
-    const shema = {}
-    return { shema }
+    const schema = {
+      money_impact: validateMonetary
+    }
+    return { schema, validateField }
   },
   data() {
     return {
