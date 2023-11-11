@@ -1,3 +1,5 @@
+import { parsePhoneNumber } from 'libphonenumber-js'
+
 export function formatDateTime(date_str, tz) {
   let date = fixDate(date_str, tz)
   let res = date.toLocaleString('ru', {
@@ -27,13 +29,17 @@ export function getNumberFormat(value) {
 }
 
 export function formatPhoneNumber(phoneNumberString) {
-  let cleaned = ('' + phoneNumberString).replace(/\D/g, '')
-  let match = cleaned.match(/^(\d{1})(\d{3})(\d{3})(\d{4})$/)
-  if (match) {
-    let code = match[1] === '8' ? '8' : '+' + match[1]
-    return code + ' (' + match[2] + ') ' + match[3] + '-' + match[4]
+  if (!phoneNumberString) {
+    return ''
   }
-  return null
+  return parsePhoneNumber(phoneNumberString).formatNational()
+}
+
+export function formatPhoneNumberInternational(phoneNumberString) {
+  if (!phoneNumberString) {
+    return ''
+  }
+  return parsePhoneNumber(phoneNumberString).formatInternational()
 }
 
 export function getDaysAmount(date_start, date_end) {

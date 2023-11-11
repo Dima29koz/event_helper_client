@@ -43,7 +43,10 @@
         <v-divider></v-divider>
 
         <v-list>
-          <v-list-item prepend-icon="mdi-phone">
+          <v-list-item
+            prepend-icon="mdi-phone"
+            :href="'tel:' + formatPhoneNumberInternational(user.phone)"
+          >
             {{ formatPhoneNumber(user.phone) }}
           </v-list-item>
           <v-list-item prepend-icon="mdi-card-account-mail">
@@ -73,14 +76,14 @@
 <script>
 import { profileInfo } from '@/utils/api_user_account'
 import { useEventMemberStore } from '@/stores/eventMemberStore'
-import { formatPhoneNumber } from '@/utils/formatters'
+import { formatPhoneNumber, formatPhoneNumberInternational } from '@/utils/formatters'
 
 export default {
   name: 'user-contacts-card',
   setup() {
     const eventMemberStore = useEventMemberStore()
 
-    return { eventMemberStore, formatPhoneNumber }
+    return { eventMemberStore, formatPhoneNumber, formatPhoneNumberInternational }
   },
   data() {
     return {

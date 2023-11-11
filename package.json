@@ -12,6 +12,7 @@
   "dependencies": {
     "@vuepic/vue-datepicker": "^7.2.0",
     "axios": "^1.5.0",
+    "libphonenumber-js": "^1.10.49",
     "pinia": "^2.1.6",
     "socket.io-client": "^4.7.2",
     "vee-validate": "^4.11.6",

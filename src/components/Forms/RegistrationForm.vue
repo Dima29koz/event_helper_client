@@ -27,13 +27,11 @@
         label="email"
       ></v-text-field>
 
-      <v-text-field
+      <v-phone-number-input
         v-model="new_user.phone"
-        :rules="[(v) => validateField(v, schema.phone)]"
-        counter="12"
-        name="tel"
-        label="Телефон"
-      ></v-text-field>
+        :rules="[() => validateField(new_user.phone, schema.phone)]"
+        show-code-on-list
+      />
 
       <v-text-field
         v-model="new_user.contacts"
@@ -80,7 +78,7 @@ export default {
         .max(50, 'Превышена максимальная длина')
         .required('Поле не заполнено')
         .email('Некорректный ардес'),
-      phone: yup.string().max(12, 'Превышена максимальная длина'),
+      phone: yup.string().max(20, 'Превышена максимальная длина'),
       contacts: yup.string().max(100, 'Превышена максимальная длина'),
       password: yup.string().required('Поле не заполнено'),
       password_repeat: (password) => yup.string().oneOf([password, null], 'Пароли не совпадают')
@@ -102,7 +100,8 @@ export default {
         contacts: '',
         password: '',
         password_repeat: ''
-      }
+      },
+      phoneNumber: ''
     }
   },
   methods: {
@@ -110,6 +109,9 @@ export default {
       if ((await this.$refs.form.validate()).valid) {
         this.$emit('register', this.new_user)
       }
+    },
+    setPhone(results) {
+      this.new_user.phone = results.e164
     }
   }
 }
