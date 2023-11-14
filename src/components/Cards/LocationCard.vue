@@ -20,7 +20,7 @@
       </v-expansion-panel-title>
       <v-expansion-panel-text>
         <p>{{ location.address }}</p>
-        <div v-html="location.description"></div>
+        <div v-html="location.description" class="tiptap"></div>
         <p>{{ location.geo }}</p>
       </v-expansion-panel-text>
     </v-expansion-panel>

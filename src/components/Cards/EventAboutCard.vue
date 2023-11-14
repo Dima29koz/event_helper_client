@@ -26,7 +26,7 @@
       {{ formatDateTime(event.date_start, '') }} - {{ formatDateTime(event.date_end, '') }}
     </v-card-subtitle>
     <v-card-text>
-      <div v-html="event.description" class="mt-2"></div>
+      <div v-html="event.description" class="mt-2 tiptap"></div>
     </v-card-text>
     <location-card :location="event.location"></location-card>
 

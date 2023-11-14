@@ -25,7 +25,7 @@
       ></datetime-picker>
     </div>
 
-    <v-textarea v-model="event.description" label="Описание" auto-grow rows="2"></v-textarea>
+    <tiptap-editor v-model="event.description" />
 
     <v-text-field
       v-model.number="event.cost_reduction_factor"

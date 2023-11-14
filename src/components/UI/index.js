@@ -5,6 +5,7 @@ import VEditableField from '@/components/UI/VEditableField.vue'
 import VPhoneNumberInput from '@/components/UI/VPhoneNumberInput.vue'
 import VConfirmDialog from '@/components/UI/VConfirmDialog.vue'
 import VSwitchableTooltip from '@/components/UI/VSwitchableTooltip.vue'
+import TiptapEditor from '@/components/UI/Tiptap/TiptapEditor.vue'
 
 export default [
   DatePicker,
@@ -13,5 +14,6 @@ export default [
   VPhoneNumberInput,
   VConfirmDialog,
   DateTimePicker,
-  VSwitchableTooltip
+  VSwitchableTooltip,
+  TiptapEditor
 ]

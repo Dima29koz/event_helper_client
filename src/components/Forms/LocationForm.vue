@@ -7,12 +7,7 @@
       label="Название"
     ></v-text-field>
 
-    <v-textarea
-      v-model="local_location.description"
-      label="Описание"
-      auto-grow
-      rows="2"
-    ></v-textarea>
+    <tiptap-editor v-model="local_location.description" />
 
     <v-textarea
       v-model="local_location.address"
