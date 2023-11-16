@@ -19,8 +19,9 @@
 
     <v-editable-autocomplete
       v-model:model="base_product.type"
-      :items="types"
+      :items="filteredTypes"
       :rules="[(v) => validateField(v, schema.type)]"
+      :newItemRules="[() => schema.new_type(base_product.category)]"
       :max_len="50"
       :label="'Тип'"
       :onAdd="addNewType"
@@ -68,6 +69,7 @@ export default {
         .matches(/^[^\d].*$/, 'Название не может начинаться с числа'),
       category: yup.object().required('Категория не выбрана'),
       type: yup.object().required('Тип не выбран'),
+      new_type: (category) => (category !== null ? true : 'Категория не выбрана'),
       unit: yup.object().required('Единица измерения не выбрана'),
       price_supposed: validateMonetary
     }
@@ -118,7 +120,8 @@ export default {
       this.categories.push(res)
     },
     async addNewType(name) {
-      let res = await add_product_type(name)
+      const category_id = this.base_product.category.id
+      let res = await add_product_type(name, category_id)
       this.types.push(res)
     },
     async addNewUnit(name) {
@@ -126,6 +129,30 @@ export default {
       this.units.push(res)
     }
   },
+
+  watch: {
+    'base_product.category'() {
+      this.base_product.type = null
+    },
+
+    'base_product.type'(newVal) {
+      if (newVal) {
+        this.base_product.category = this.categories.find(
+          (category) => category.id === newVal.category
+        )
+      }
+    }
+  },
+
+  computed: {
+    filteredTypes() {
+      if (!this.base_product.category) {
+        return this.types
+      }
+      return this.types.filter((type) => type.category === this.base_product.category.id)
+    }
+  },
+
   mounted() {
     this.getBaseProductOptions()
   }

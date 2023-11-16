@@ -70,11 +70,12 @@ export const get_product_types = requestHandler(async function () {
   return response.data
 })
 
-export const add_product_type = requestHandler(async function (value) {
+export const add_product_type = requestHandler(async function (name, category_id) {
   const response = await axios.post(
     '/api/event_management/product/type',
     {
-      name: value
+      name: name,
+      category_id: category_id
     },
     authHeaders()
   )

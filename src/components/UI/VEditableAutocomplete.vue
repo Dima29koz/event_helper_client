@@ -14,7 +14,7 @@
       <v-form @submit.prevent ref="form">
         <v-text-field
           v-model="searchValue"
-          :rules="[(v) => validateField(v, schema.searchValue)]"
+          :rules="[(v) => validateField(v, schema.searchValue)].concat(newItemRules)"
           :counter="max_len"
           persistent-counter
           label="Добавляемое значение"
@@ -22,7 +22,16 @@
           readonly
         >
           <template v-slot:append>
-            <v-btn @click="onBeforeAdd" icon="mdi-plus" color="success"></v-btn>
+            <v-btn
+              @click="onBeforeAdd"
+              variant="flat"
+              density="compact"
+              color="success"
+              title="Добавить"
+              class="h-100 me-2"
+            >
+              <v-icon size="x-large">mdi-plus</v-icon>
+            </v-btn>
           </template>
         </v-text-field>
       </v-form>
@@ -59,6 +68,7 @@ export default {
       default: ''
     },
     rules: null,
+    newItemRules: { type: Array, default: () => [] },
     max_len: { type: Number, default: 50 },
     onAdd: {
       type: Function
