@@ -1,7 +1,7 @@
 <template>
   <v-card>
     <v-card-title>
-      <div v-if="canEdit" class="d-flex justify-space-between align-center">
+      <div class="d-flex justify-space-between align-center">
         <div></div>
         <div class="text-h6 text-md-h5 text-lg-h4 font-weight-bold">{{ event.title }}</div>
 
@@ -10,16 +10,29 @@
             <v-btn v-bind="props" variant="text" icon="mdi-dots-vertical"></v-btn>
           </template>
           <v-list>
-            <v-list-item title="Изменить" @click="this.$emit('editEvent')"></v-list-item>
+            <v-list-item
+              title="Скопировать ссылку на событие"
+              @click="copyLocation"
+              append-icon="mdi-content-copy"
+            ></v-list-item>
+            <v-list-item
+              v-if="canEdit"
+              title="Изменить"
+              @click="this.$emit('editEvent')"
+              append-icon="mdi-pencil"
+            ></v-list-item>
             <template v-if="canDelete">
               <v-divider></v-divider>
-              <v-list-item title="Удалить" class="text-red" @click="deleteEvent"> </v-list-item>
+              <v-list-item
+                title="Удалить"
+                class="text-red"
+                @click="deleteEvent"
+                append-icon="mdi-trash-can-outline"
+              >
+              </v-list-item>
             </template>
           </v-list>
         </v-menu>
-      </div>
-      <div v-else class="text-center">
-        <h2>{{ event.title }}</h2>
       </div>
     </v-card-title>
     <v-card-subtitle class="text-center text-md-subtitle-2 text-lg-subtitle-1 font-weight-medium">
@@ -38,11 +51,13 @@
 import LocationCard from '@/components/Cards/LocationCard.vue'
 import { formatDateTime } from '@/utils/formatters'
 import { useEventMemberStore } from '@/stores/eventMemberStore'
+import { useNotificationsStore } from '@/stores/notificationsStore'
 
 export default {
   setup() {
     const eventMemberStore = useEventMemberStore()
-    return { formatDateTime, eventMemberStore }
+    const notificationsStore = useNotificationsStore()
+    return { formatDateTime, eventMemberStore, notificationsStore }
   },
   name: 'event-about-card',
   components: { LocationCard },
@@ -71,6 +86,14 @@ export default {
         )
       ) {
         this.$emit('delEvent')
+      }
+    },
+    async copyLocation() {
+      try {
+        await navigator.clipboard.writeText(window.location.href)
+        this.notificationsStore.addNotification('Ссылка скопирована', 'info')
+      } catch (err) {
+        console.error('Failed to copy: ', err)
       }
     }
   },

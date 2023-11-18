@@ -2,11 +2,12 @@
   <div class="pa-4">
     <v-data-table
       :headers="tableHeaders"
-      :items="data"
+      :items="filteredProducts"
       :items-per-page="-1"
       :group-by="groupBy"
       :search="search"
       hover
+      class="pa-2"
     >
       <template v-slot:top>
         <v-text-field
@@ -23,6 +24,35 @@
             <products-options-card></products-options-card>
           </template>
         </v-text-field>
+        <div class="mt-2">
+          <v-select
+            v-model="productFilter.state"
+            :items="states"
+            item-title="title"
+            item-value="key"
+            label="Статус"
+            multiple
+            class="w-25"
+          >
+            <template v-slot:prepend-item>
+              <v-list-item title="Выбрать все" @click="selectAllStates">
+                <template v-slot:prepend>
+                  <v-checkbox-btn :model-value="isSelectedAllStates"></v-checkbox-btn>
+                </template>
+              </v-list-item>
+
+              <v-divider class="mt-2"></v-divider>
+            </template>
+            <template v-slot:selection="{ item, index }">
+              <v-chip v-if="index < 2">
+                <span>{{ item.title }}</span>
+              </v-chip>
+              <span v-if="index === 2" class="text-grey text-caption align-self-center">
+                (+{{ productFilter.state.length - 2 }})
+              </span>
+            </template>
+          </v-select>
+        </div>
       </template>
 
       <template v-slot:group-header="{ item, columns, toggleGroup, isGroupOpen }">
@@ -133,6 +163,9 @@ export default {
       dialogCart: false,
       sellectedProduct: null,
       search: '',
+      productFilter: {
+        state: []
+      },
       groupBy: [
         { key: 'base_product.category', order: 'asc' },
         { key: 'base_product.type', order: 'asc' }
@@ -200,6 +233,13 @@ export default {
       item.items.forEach((subGroup) => {
         toggleGroupFn(subGroup)
       })
+    },
+    selectAllStates() {
+      if (this.isSelectedAllStates) {
+        this.productFilter.state = []
+      } else {
+        this.productFilter.state = this.states.slice().map((state) => state.key)
+      }
     }
   },
   computed: {
@@ -214,6 +254,18 @@ export default {
         return [this.headers[0].slice(0, -1), this.headers[1]]
       }
       return this.headers
+    },
+
+    isSelectedAllStates() {
+      return this.productFilter.state.length === this.states.length
+    },
+    filteredProducts() {
+      return this.data.filter((product) => {
+        if (!this.productFilter.state.length) {
+          return true
+        }
+        return this.productFilter.state.includes(product.state)
+      })
     }
   },
   mounted() {

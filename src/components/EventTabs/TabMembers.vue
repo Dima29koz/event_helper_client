@@ -8,6 +8,7 @@
       v-model:sort-by="sortBy"
       multi-sort
       hover
+      class="pa-2"
     >
       <template v-slot:top>
         <v-text-field

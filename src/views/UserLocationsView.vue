@@ -22,7 +22,7 @@
           :key="location.id"
           @click="locationInfo(location, index, $event)"
         >
-          <th scope="row">{{ index + 1 }}</th>
+          <td>{{ index + 1 }}</td>
           <td class="text-left">{{ location.name }}</td>
           <td class="text-center">
             <v-btn density="compact" name="delete-location" icon>

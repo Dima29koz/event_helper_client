@@ -28,7 +28,8 @@
         <tr>
           <td :colspan="columns.length" class="pa-0">
             <v-btn
-              @click="toggleGroup(item)"
+              v-if="item.depth === 0"
+              @click="toggleSubGroups(toggleGroup, item)"
               block
               rounded="0"
               variant="text"
@@ -37,6 +38,7 @@
             >
               {{ item.value }}
             </v-btn>
+            <div v-else class="text-left ps-4 text-subtitle-1">{{ item.value }}</div>
           </td>
         </tr>
       </template>
@@ -70,7 +72,6 @@
             </div>
           </td>
           <td>{{ item.name }}</td>
-          <td>{{ item.type }}</td>
           <td class="text-end">{{ getNumberFormat(item.price_supposed) }}</td>
           <td class="text-end">
             {{ getNumberFormat((item.amount + item.bought_amount) * item.price_supposed) }}
@@ -132,7 +133,10 @@ export default {
       base_products: [],
       dialogVisible: false,
       search: '',
-      groupBy: [{ key: 'category', order: 'asc' }],
+      groupBy: [
+        { key: 'category', order: 'asc' },
+        { key: 'type', order: 'asc' }
+      ],
       headers: [
         { title: 'Количество', key: 'amount', align: 'center' },
         { title: 'Название', key: 'name' },
@@ -206,6 +210,12 @@ export default {
       } else {
         item.amount += 1
       }
+    },
+    toggleSubGroups(toggleGroupFn, item) {
+      toggleGroupFn(item)
+      item.items.forEach((subGroup) => {
+        toggleGroupFn(subGroup)
+      })
     }
   },
   computed: {

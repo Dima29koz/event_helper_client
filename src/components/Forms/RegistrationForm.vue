@@ -39,6 +39,7 @@
         counter="100"
         name="contacts"
         label="Контакты"
+        placeholder="Другие способы связаться с вами (tg / vk и т.п.)"
       ></v-text-field>
 
       <v-text-field
