@@ -92,11 +92,18 @@ export const reset_password_request = requestHandler(async function (username) {
 })
 
 export const reset_password = requestHandler(async function (token, pwd, pwd_repeat) {
-  const response = await axios.post('/api/user_account/reset_password/' + token, {
-    pwd: pwd,
-    pwd_repeat: pwd_repeat
-  })
-  return response.data
+  try {
+    const response = await axios.post('/api/user_account/reset_password/' + token, {
+      pwd: pwd,
+      pwd_repeat: pwd_repeat
+    })
+    return response.data
+  } catch (e) {
+    if (e.response.status == 400 && e.response.data?.msg === 'Wrong token') {
+      return e.response.data
+    }
+    throw e
+  }
 })
 
 export const registration = requestHandler(

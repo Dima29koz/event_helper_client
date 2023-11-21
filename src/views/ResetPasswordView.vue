@@ -5,25 +5,16 @@
     :elevation="8"
   >
     <h1 class="h3 mb-3 fw-normal">Сброс пароля</h1>
-    <v-form @submit.prevent="submit" ref="form">
-      <v-text-field
-        v-model="user.password"
-        :rules="[(v) => validateField(v, schema.password)]"
-        type="password"
-        name="password"
-        label="Пароль"
-      ></v-text-field>
-
-      <v-text-field
-        v-model="user.password_repeat"
-        :rules="[(v) => validateField(v, schema.password_repeat(user.password))]"
-        type="password"
-        name="passwordRepeat"
-        label="Повторите пароль"
-      ></v-text-field>
-
-      <v-btn type="submit" color="success" size="large" block>Подтвердить</v-btn>
-    </v-form>
+    <v-alert
+      v-if="alertMsg"
+      border="start"
+      :color="alertType"
+      closable
+      :title="alertTitle"
+      :text="alertText"
+      class="mb-4 text-start"
+    ></v-alert>
+    <reset-password-form @resetPassword="resetPassword"></reset-password-form>
   </v-sheet>
   <v-sheet
     v-else
@@ -42,43 +33,48 @@
 </template>
 
 <script>
-import * as yup from 'yup'
-import { validateField } from '@/utils/validators'
-
+import ResetPasswordForm from '@/components/Forms/ResetPasswordForm.vue'
 import { reset_password } from '@/utils/api_user_account'
 
 export default {
-  setup() {
-    const schema = {
-      password: yup.string().required('Поле не заполнено'),
-      password_repeat: (password) => yup.string().oneOf([password, null], 'Пароли не совпадают')
-    }
-    return { schema, validateField }
-  },
+  components: { ResetPasswordForm },
+
   data() {
     return {
-      user: {
-        password: '',
-        password_repeat: ''
-      },
       token: '',
-      isConfirmed: false
+      isConfirmed: false,
+      alertMsg: null
     }
   },
+
   methods: {
-    async submit() {
-      if ((await this.$refs.form.validate()).valid) {
-        await reset_password(this.token, this.user.password, this.user.password_repeat)
+    async resetPassword(password, password_repeat) {
+      const res = await reset_password(this.token, password, password_repeat)
+      if (res?.msg === 'Wrong token') {
+        this.alertMsg = 'error_token'
+        this.isConfirmed = false
+      } else {
+        this.alertMsg = null
         this.isConfirmed = true
       }
     }
   },
+
   computed: {
-    hintText() {
-      if (this.confirmationMsg == 'Wrong token') return 'Ошибка в токене'
-      return this.confirmationMsg
+    alertTitle() {
+      if (this.alertMsg == 'error_token') return 'Ошибка в токене'
+      return '<alert title>'
+    },
+    alertText() {
+      if (this.alertMsg == 'error_token')
+        return 'Возможно время действия токена истекло. Отправьте повторный запрос на сброс пароля.'
+      return '<alert text>'
+    },
+    alertType() {
+      return this.alertMsg.split('_')[0]
     }
   },
+
   mounted() {
     this.token = this.$route.query.token
   }
