@@ -1,11 +1,9 @@
 <template>
   <v-tooltip location="bottom" v-model="showTooltip">
     <template v-slot:activator="{ props }">
-      <v-icon
-        v-bind="props"
-        @click="showTooltip = !showTooltip"
-        icon="mdi-help-circle-outline"
-      ></v-icon>
+      <div v-bind="props" @click="showTooltip = !showTooltip">
+        <slot name="activator"><v-icon :icon="icon"></v-icon></slot>
+      </div>
     </template>
     <slot></slot>
   </v-tooltip>
@@ -18,6 +16,9 @@ export default {
     return {
       showTooltip: false
     }
+  },
+  props: {
+    icon: { type: String, default: 'mdi-help-circle-outline' }
   }
 }
 </script>

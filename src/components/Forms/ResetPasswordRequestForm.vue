@@ -13,7 +13,7 @@ import * as yup from 'yup'
 import { validateField } from '../../utils/validators'
 
 export default {
-  name: 'reset-password-form',
+  name: 'reset-password-request-form',
   setup() {
     const schema = {
       username: yup.string().required('Поле не заполнено')
@@ -28,7 +28,7 @@ export default {
   methods: {
     async submit() {
       if ((await this.$refs.form.validate()).valid) {
-        this.$emit('resetPassword', this.username)
+        this.$emit('resetPasswordRequest', this.username)
       }
     }
   }
