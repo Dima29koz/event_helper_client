@@ -37,23 +37,20 @@
       <v-text-field
         ref="PhoneNumberInput"
         :model-value="inputValue"
-        :rules="rules"
+        :rules="[() => (hasError ? 'некорректный номер' : true)].concat(rules)"
         name="tel"
         label="Номер телефона"
         :placeholder="inputPlaceholder"
         :disabled="disabled"
-        :error="error || (!noValidationError ? !!inputValue && !results?.isValid : false)"
-        :error-messages="
-          (!noValidationError ? !!inputValue && !results?.isValid : false)
-            ? 'некорректный номер'
-            : undefined
-        "
+        :error="error || hasError"
         type="tel"
         clearable
         @focus="inputFocused = true"
         @blur="inputFocused = false"
         @update:modelValue="onInputValueChanged($event)"
-      ></v-text-field>
+      >
+        <template v-slot:append><slot name="append"></slot></template>
+      </v-text-field>
     </v-col>
   </v-row>
 </template>
@@ -224,6 +221,10 @@ const countryCode = computed({
     emits('update:country-code', value)
     internalCountryCode.value = value
   }
+})
+
+const hasError = computed(() => {
+  return !props.noValidationError ? !!inputValue.value && !results?.value?.isValid : false
 })
 
 const internalValue = ref(model.value)

@@ -178,3 +178,35 @@ export const confirm_email = requestHandler(async function (token) {
   const response = await axios.get('/api/user_account/confirm_email/' + token)
   return response.data.msg
 })
+
+export const edit_profile = requestHandler(async function (user_data) {
+  const response = await axios.post('/api/user_account/edit_profile', user_data, authHeaders())
+  return response.data
+})
+
+export const edit_email = requestHandler(async function (new_email) {
+  const response = await axios.post(
+    '/api/user_account/edit_profile/email',
+    { email: new_email },
+    authHeaders()
+  )
+  return response.data
+})
+
+export const edit_password = requestHandler(
+  async function (current_password, new_password, new_password_repeat) {
+    try {
+      const response = await axios.post(
+        '/api/user_account/edit_profile/password',
+        { current_pwd: current_password, pwd: new_password, pwd_repeat: new_password_repeat },
+        authHeaders()
+      )
+      return response.data
+    } catch (e) {
+      if (e.response.status == 401 && e.response.data?.msg == 'Wrong username or password') {
+        return e.response.data
+      }
+      throw e
+    }
+  }
+)
