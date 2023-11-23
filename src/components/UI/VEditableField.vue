@@ -10,6 +10,7 @@
       :type="type"
       variant="outlined"
       single-line
+      hide-spin-buttons
       :hide-details="true"
       density="compact"
       :autofocus="true"

@@ -11,7 +11,6 @@ import VueCookies from 'vue-cookies'
 import 'vuetify/styles'
 import '@mdi/font/css/materialdesignicons.css'
 import { createVuetify } from 'vuetify'
-import { VDataTable } from 'vuetify/labs/VDataTable'
 
 import '@vuepic/vue-datepicker/dist/main.css'
 
@@ -28,7 +27,6 @@ directives.forEach((directive) => {
 app.use(createPinia())
 app.use(
   createVuetify({
-    components: { VDataTable },
     display: {
       mobileBreakpoint: 'sm'
     }

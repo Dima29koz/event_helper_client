@@ -175,9 +175,9 @@ export default {
       headers: [
         { title: '#', key: '', sortable: false },
         { title: 'Ник', key: 'nickname' },
-        { title: 'число дней', key: 'days_amount' },
-        { title: 'пьет', key: 'is_drinker' },
-        { title: 'приедет', key: 'is_involved' },
+        { title: 'Число дней', key: 'days_amount' },
+        { title: 'Пьет', key: 'is_drinker' },
+        { title: 'Приедет', key: 'is_involved' },
         { title: 'Действия', key: 'actions', sortable: false }
       ]
     }

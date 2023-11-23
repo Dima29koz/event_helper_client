@@ -6,6 +6,7 @@
       :items-per-page="-1"
       :group-by="groupBy"
       :search="search"
+      no-data-text="Продукты не найдены"
       hover
     >
       <template v-slot:top>
@@ -29,7 +30,7 @@
           <td :colspan="columns.length" class="pa-0">
             <v-btn
               v-if="item.depth === 0"
-              @click="toggleSubGroups(toggleGroup, item)"
+              @click="toggleGroup(item)"
               block
               rounded="0"
               variant="text"
@@ -38,7 +39,9 @@
             >
               {{ item.value }}
             </v-btn>
-            <div v-else class="text-left ps-4 text-subtitle-1">{{ item.value }}</div>
+            <div v-else class="text-left ps-4 text-subtitle-1">
+              {{ getSubGroup(toggleGroup, isGroupOpen, item) }}
+            </div>
           </td>
         </tr>
       </template>
@@ -138,6 +141,7 @@ export default {
         { key: 'type', order: 'asc' }
       ],
       headers: [
+        { title: 'Добавлен', key: 'data-table-group', value: 'data-table-group', sortable: false },
         { title: 'Количество', key: 'amount', align: 'center' },
         { title: 'Название', key: 'name' },
         { title: 'Тип', key: 'type' },
@@ -211,11 +215,11 @@ export default {
         item.amount += 1
       }
     },
-    toggleSubGroups(toggleGroupFn, item) {
-      toggleGroupFn(item)
-      item.items.forEach((subGroup) => {
-        toggleGroupFn(subGroup)
-      })
+    getSubGroup(toggleGroupFn, isGroupOpenFn, item) {
+      if (!isGroupOpenFn(item)) {
+        toggleGroupFn(item)
+      }
+      return item.value
     }
   },
   computed: {

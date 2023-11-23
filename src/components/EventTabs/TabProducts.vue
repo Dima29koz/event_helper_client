@@ -6,6 +6,7 @@
       :items-per-page="-1"
       :group-by="groupBy"
       :search="search"
+      no-data-text="Продукты не найдены"
       hover
       class="pa-2"
     >
@@ -60,7 +61,7 @@
           <td :colspan="columns.length" class="pa-0">
             <v-btn
               v-if="item.depth === 0"
-              @click="toggleSubGroups(toggleGroup, item)"
+              @click="toggleGroup(item)"
               block
               rounded="0"
               variant="text"
@@ -70,7 +71,9 @@
               {{ item.value }}
             </v-btn>
 
-            <div v-else class="text-left ps-4 text-subtitle-1">{{ item.value }}</div>
+            <div v-else class="text-left ps-4 text-subtitle-1">
+              {{ getSubGroup(toggleGroup, isGroupOpen, item) }}
+            </div>
           </td>
         </tr>
       </template>
@@ -171,21 +174,32 @@ export default {
         { key: 'base_product.type', order: 'asc' }
       ],
       headers: [
-        [
-          { title: 'Название', key: 'base_product.name', rowspan: 2 },
-          { title: 'Количество', key: 'amount', align: 'center', rowspan: 2 },
-          { title: 'Цена', key: 'price', colspan: 2, align: 'center', sortable: false },
-          { title: 'Сумма', key: 'sum', colspan: 2, align: 'center', sortable: false },
-          { title: 'Магазин', key: 'market', rowspan: 2 },
-          { title: 'Описание', key: 'description', rowspan: 2 },
-          { title: 'Действия', key: 'actions', rowspan: 2 }
-        ],
-        [
-          { title: 'Ожидаемая', key: 'base_product.price_supposed' },
-          { title: 'Итоговая', key: 'price_final' },
-          { title: 'Ожидаемая', key: 'sum_supposed' },
-          { title: 'Итоговая', key: 'sum_final' }
-        ]
+        { title: 'Статус', key: 'data-table-group', value: 'data-table-group', sortable: false },
+        { title: 'Название', key: 'base_product.name' },
+        { title: 'Количество', key: 'amount', align: 'center' },
+        {
+          title: 'Цена',
+          key: 'price',
+          align: 'center',
+          sortable: false,
+          children: [
+            { title: 'Ожидаемая', key: 'base_product.price_supposed' },
+            { title: 'Итоговая', key: 'price_final' }
+          ]
+        },
+        {
+          title: 'Сумма',
+          key: 'sum',
+          align: 'center',
+          sortable: false,
+          children: [
+            { title: 'Ожидаемая', key: 'sum_supposed' },
+            { title: 'Итоговая', key: 'sum_final' }
+          ]
+        },
+        { title: 'Магазин', key: 'market' },
+        { title: 'Описание', key: 'description' },
+        { title: 'Действия', key: 'actions' }
       ],
       states: [
         { title: 'Не добавлен', key: 'not_added' },
@@ -228,11 +242,11 @@ export default {
       this.sellectedProduct = product
       this.dialogVisible = true
     },
-    toggleSubGroups(toggleGroupFn, item) {
-      toggleGroupFn(item)
-      item.items.forEach((subGroup) => {
-        toggleGroupFn(subGroup)
-      })
+    getSubGroup(toggleGroupFn, isGroupOpenFn, item) {
+      if (!isGroupOpenFn(item)) {
+        toggleGroupFn(item)
+      }
+      return item.value
     },
     selectAllStates() {
       if (this.isSelectedAllStates) {
@@ -251,7 +265,7 @@ export default {
     },
     tableHeaders() {
       if (!this.canEdit && !this.canDelete) {
-        return [this.headers[0].slice(0, -1), this.headers[1]]
+        return this.headers.slice(0, -1)
       }
       return this.headers
     },
