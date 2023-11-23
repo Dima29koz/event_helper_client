@@ -100,7 +100,7 @@ export default {
         let sum_final = product.price_final * product.amount
         let sum_supposed = product.base_product.price_supposed * product.amount
 
-        if (category === 'Алкогольные напитки') {
+        if (category.name === 'Алкогольные напитки') {
           total.sum_alco_final += sum_final
           total.sum_alco_supposed += sum_supposed
         } else {

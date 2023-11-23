@@ -102,7 +102,7 @@ export default {
           /^\d+(\.\d{1,2})?$/.test(value)
         )
         .typeError('Цена не указана'),
-      market: yup.string().max(50, 'Превышена максимальная длина')
+      market: yup.string().nullable().max(50, 'Превышена максимальная длина')
     }
     const eventMemberStore = useEventMemberStore()
     const eventStore = useEventStore()

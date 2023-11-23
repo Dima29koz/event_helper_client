@@ -170,8 +170,8 @@ export default {
         state: []
       },
       groupBy: [
-        { key: 'base_product.category', order: 'asc' },
-        { key: 'base_product.type', order: 'asc' }
+        { key: 'base_product.category.name', order: 'asc' },
+        { key: 'base_product.type.name', order: 'asc' }
       ],
       headers: [
         { title: 'Статус', key: 'data-table-group', value: 'data-table-group', sortable: false },

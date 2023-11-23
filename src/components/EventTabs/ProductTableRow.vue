@@ -59,7 +59,7 @@
           </v-btn>
 
           <div class="mx-3" style="white-space: nowrap !important">
-            {{ product_data.amount }} {{ product_data.base_product.unit }}
+            {{ product_data.amount }} {{ product_data.base_product.unit.name }}
           </div>
           <v-btn @click="increaseAmount()" density="compact" variant="text" icon>
             <v-icon color="red"> mdi-plus </v-icon>
@@ -67,7 +67,7 @@
         </div>
       </template>
       <span v-else style="white-space: nowrap !important">
-        {{ product_data.amount }} {{ product_data.base_product.unit }}
+        {{ product_data.amount }} {{ product_data.base_product.unit.name }}
       </span>
     </td>
     <td class="text-end">{{ getNumberFormat(product_data.base_product.price_supposed) }}</td>

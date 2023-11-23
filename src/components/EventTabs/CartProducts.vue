@@ -67,7 +67,8 @@
               </v-btn>
 
               <div class="mx-3" style="white-space: nowrap !important">
-                {{ item.amount + item.bought_amount }} / {{ item.bought_amount }} {{ item.unit }}
+                {{ item.amount + item.bought_amount }} / {{ item.bought_amount }}
+                {{ item.unit.name }}
               </div>
               <v-btn @click="increaseAmount(item)" density="compact" variant="text" icon>
                 <v-icon color="red"> mdi-plus </v-icon>
@@ -137,14 +138,13 @@ export default {
       dialogVisible: false,
       search: '',
       groupBy: [
-        { key: 'category', order: 'asc' },
-        { key: 'type', order: 'asc' }
+        { key: 'category.name', order: 'asc' },
+        { key: 'type.name', order: 'asc' }
       ],
       headers: [
         { title: 'Добавлен', key: 'data-table-group', value: 'data-table-group', sortable: false },
         { title: 'Количество', key: 'amount', align: 'center' },
         { title: 'Название', key: 'name' },
-        { title: 'Тип', key: 'type' },
         { title: 'Цена', key: 'price_supposed' },
         { title: 'Сумма', key: 'sum_supposed' }
       ]
