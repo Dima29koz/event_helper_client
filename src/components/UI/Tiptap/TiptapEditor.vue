@@ -1,11 +1,13 @@
 <template>
-  <v-label>{{ label }}</v-label>
-  <v-sheet elevation="2" class="rounded-t">
-    <div class="editor" v-if="editor">
-      <menu-bar :editor="editor" />
-      <editor-content class="editor__content" :editor="editor" />
-    </div>
-  </v-sheet>
+  <v-input v-if="editor" class="mb-4" hide-details>
+    <v-field :focused="focused">
+      <div class="d-flex flex-column flex-fill editor">
+        <span class="v-label overflow-visible text-caption mx-4 my-1">{{ label }}</span>
+        <menu-bar :editor="editor" />
+        <editor-content class="editor__content mx-4 h-100" :editor="editor" />
+      </div>
+    </v-field>
+  </v-input>
 </template>
 
 <script>
@@ -41,7 +43,8 @@ export default {
 
   data() {
     return {
-      editor: null
+      editor: null,
+      focused: false
     }
   },
 
@@ -73,6 +76,12 @@ export default {
       content: this.modelValue,
       onUpdate: () => {
         this.$emit('update:modelValue', this.editor.getHTML())
+      },
+      onFocus: () => {
+        this.focused = true
+      },
+      onBlur: () => {
+        this.focused = false
       }
     })
   },
@@ -85,17 +94,24 @@ export default {
 
 <style lang="scss">
 .editor {
-  display: flex;
-  flex-direction: column;
   max-height: 20rem;
+  max-width: 100%;
+  position: relative;
+}
 
-  &__content {
-    flex: 1 1 auto;
-    overflow-x: hidden;
-    overflow-y: auto;
-    padding: 1.25rem 1rem;
-    -webkit-overflow-scrolling: touch;
-  }
+.editor__content {
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 0.25rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.ProseMirror {
+  max-height: max-content;
+}
+
+.ProseMirror:focus {
+  outline: none;
 }
 
 /* Basic editor styles */
@@ -106,7 +122,7 @@ export default {
 
   ul,
   ol {
-    padding: 0 1rem;
+    padding: 0 2rem;
   }
 
   h1,
