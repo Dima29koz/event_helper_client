@@ -107,6 +107,7 @@
               v-model="phone"
               :rules="[() => validateField(phone, schema.phone)]"
               show-code-on-list
+              appended
             >
               <template v-slot:append>
                 <v-btn type="submit" icon="mdi-check"> </v-btn>

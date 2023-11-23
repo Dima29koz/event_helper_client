@@ -36,7 +36,7 @@
       <div class="d-flex">
         <v-text-field
           v-model.number="product.amount"
-          :rules="[(v) => validateField(v, schema.amount)]"
+          :rules="[(v) => validateField(v, schema.amount(product.base_product.unit.name))]"
           :min="0"
           label="Количество"
           type="number"
@@ -89,12 +89,21 @@ export default {
     const schema = {
       base_product: yup.object().required('Продукт не указан'),
       state: yup.string().required('Состояние не выбрано'),
-      amount: yup
-        .number()
-        .integer('Доступны только целые значения')
-        .moreThan(0, 'Количество должно быть больше 0')
-        .required('Количество не указано')
-        .typeError('Количество не указано'),
+      amount: (unit_name) => {
+        const baseValidation = yup
+          .number()
+          .moreThan(0, 'Количество должно быть больше 0')
+          .required('Количество не указано')
+          .typeError('Количество не указано')
+
+        return unit_name === 'кг.'
+          ? baseValidation.test(
+              'three-decimals',
+              'Значение задается с точностью до 3х знаков',
+              (value) => /^\d+(\.\d{1,3})?$/.test(value)
+            )
+          : baseValidation.integer('Доступны только целые значения')
+      },
       price_final: yup
         .number()
         .min(0, 'Цена должна быть больше или равна 0')

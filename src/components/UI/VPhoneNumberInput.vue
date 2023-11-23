@@ -49,7 +49,7 @@
         @blur="inputFocused = false"
         @update:modelValue="onInputValueChanged($event)"
       >
-        <template v-slot:append><slot name="append"></slot></template>
+        <template v-slot:append v-if="appended"><slot name="append"></slot></template>
       </v-text-field>
     </v-col>
   </v-row>
@@ -136,7 +136,8 @@ const props = defineProps({
   /** Disable validation error UI */
   noValidationError: { type: Boolean, default: false },
   /** Add error UI */
-  error: { type: Boolean, default: false }
+  error: { type: Boolean, default: false },
+  appended: { type: Boolean, default: false }
 })
 
 function countryCodeToUnicodeFlag(locale) {
