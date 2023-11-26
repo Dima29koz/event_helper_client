@@ -12,57 +12,81 @@
       label="Продукт"
     ></v-autocomplete>
 
-    <div class="d-sm-flex">
-      <v-select
-        v-model="product.state"
-        :items="states"
-        item-value="key"
-        :rules="[(v) => validateField(v, schema.state)]"
-        label="Статус"
-      ></v-select>
+    <v-row no-gutters class="flex-column flex-sm-row">
+      <v-col class="me-sm-4">
+        <v-select
+          v-model="product.state"
+          :items="states"
+          item-value="key"
+          :rules="[(v) => validateField(v, schema.state)]"
+          label="Статус"
+        ></v-select>
+      </v-col>
 
-      <v-select
-        v-model="product.buyer_id"
-        :readonly="product.state !== 'bought'"
-        :items="eventStore.members"
-        item-title="nickname"
-        item-value="id"
-        label="Кем куплен"
-        class="ms-sm-4"
-      ></v-select>
-    </div>
+      <v-col>
+        <v-select
+          v-model="product.buyer_id"
+          :readonly="product.state !== 'bought'"
+          :items="eventStore.members"
+          item-title="nickname"
+          item-value="id"
+          label="Кем куплен"
+        ></v-select>
+      </v-col>
+    </v-row>
 
-    <div class="d-sm-flex">
-      <div class="d-flex">
-        <v-text-field
-          v-model.number="product.amount"
-          :rules="[(v) => validateField(v, schema.amount(product.base_product.unit.name))]"
-          :min="0"
-          label="Количество"
-          type="number"
-          class="me-4"
-        ></v-text-field>
+    <v-row no-gutters class="flex-column flex-md-row">
+      <v-col class="me-md-4">
+        <v-row no-gutters>
+          <v-col class="me-4">
+            <v-text-field
+              v-model.number="product.amount"
+              :rules="[(v) => validateField(v, schema.amount(product.base_product.unit.name))]"
+              :min="0"
+              label="Количество"
+              type="number"
+            ></v-text-field>
+          </v-col>
+          <v-col>
+            <v-text-field
+              v-model.number="product.price_supposed"
+              :rules="[(v) => validateField(v, schema.price_supposed)]"
+              @blur="product.price_supposed = Number(product.price_supposed.toFixed(2))"
+              :min="0"
+              label="Предполагаемая цена"
+              type="number"
+              class="text-truncate"
+            >
+            </v-text-field>
+          </v-col>
+        </v-row>
+      </v-col>
 
-        <v-text-field
-          v-model.number="product.price_final"
-          :rules="[(v) => validateField(v, schema.price_final)]"
-          @blur="product.price_final = Number(product.price_final.toFixed(2))"
-          :min="0"
-          label="Цена"
-          type="number"
-          class="me-sm-4"
-        ></v-text-field>
-      </div>
-
-      <v-text-field
-        :modelValue="getNumberFormat(product.amount * product.price_final)"
-        label="Сумма"
-        variant="solo"
-        flat
-        type="text"
-        readonly
-      ></v-text-field>
-    </div>
+      <v-col>
+        <v-row no-gutters>
+          <v-col class="me-4">
+            <v-text-field
+              v-model.number="product.price_final"
+              :rules="[(v) => validateField(v, schema.price_final)]"
+              @blur="product.price_final = Number(product.price_final.toFixed(2))"
+              :min="0"
+              label="Цена"
+              type="number"
+            ></v-text-field>
+          </v-col>
+          <v-col>
+            <v-text-field
+              :modelValue="getNumberFormat(product.amount * product.price_final)"
+              label="Сумма"
+              variant="solo"
+              flat
+              type="text"
+              readonly
+            ></v-text-field>
+          </v-col>
+        </v-row>
+      </v-col>
+    </v-row>
 
     <v-textarea v-model="product.description" label="Описание" auto-grow rows="2"></v-textarea>
 
@@ -105,6 +129,13 @@ export default {
           : baseValidation.integer('Доступны только целые значения')
       },
       price_final: yup
+        .number()
+        .min(0, 'Цена должна быть больше или равна 0')
+        .test('two-decimals', 'Цена должна иметь не более двух десятичных знаков', (value) =>
+          /^\d+(\.\d{1,2})?$/.test(value)
+        )
+        .typeError('Цена не указана'),
+      price_supposed: yup
         .number()
         .min(0, 'Цена должна быть больше или равна 0')
         .test('two-decimals', 'Цена должна иметь не более двух десятичных знаков', (value) =>

@@ -98,7 +98,7 @@ export default {
       this.data.event_products.forEach((product) => {
         const category = product.base_product.category
         let sum_final = product.price_final * product.amount
-        let sum_supposed = product.base_product.price_supposed * product.amount
+        let sum_supposed = product.price_supposed * product.amount
 
         if (category.name === 'Алкогольные напитки') {
           total.sum_alco_final += sum_final
@@ -125,9 +125,8 @@ export default {
         if (!members_info.by_days[member.days_amount]) {
           members_info.by_days[member.days_amount] = { drinkers: 0, not_drinkers: 0 }
         }
-        members_info.by_days[member.days_amount][
-          member.is_drinker ? 'drinkers' : 'not_drinkers'
-        ] += 1
+        members_info.by_days[member.days_amount][member.is_drinker ? 'drinkers' : 'not_drinkers'] +=
+          1
 
         const coef = this.baseCoef ** (this.eventDaysAmount - member.days_amount)
         members_info.members_coefficient += coef

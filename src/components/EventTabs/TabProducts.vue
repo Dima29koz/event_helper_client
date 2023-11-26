@@ -183,7 +183,7 @@ export default {
           align: 'center',
           sortable: false,
           children: [
-            { title: 'Ожидаемая', key: 'base_product.price_supposed' },
+            { title: 'Ожидаемая', key: 'price_supposed' },
             { title: 'Итоговая', key: 'price_final' }
           ]
         },

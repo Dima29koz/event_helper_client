@@ -70,7 +70,7 @@
         {{ product_data.amount }} {{ product_data.base_product.unit.name }}
       </span>
     </td>
-    <td class="text-end">{{ getNumberFormat(product_data.base_product.price_supposed) }}</td>
+    <td class="text-end">{{ getNumberFormat(product_data.price_supposed) }}</td>
     <td class="text-end">
       <v-editable-field
         v-if="can_edit"
@@ -82,7 +82,7 @@
       <span v-else>{{ getNumberFormat(product_data.price_final) }}</span>
     </td>
     <td class="text-end">
-      {{ getNumberFormat(product_data.base_product.price_supposed * product_data.amount) }}
+      {{ getNumberFormat(product_data.price_supposed * product_data.amount) }}
     </td>
     <td class="text-end">
       {{ getNumberFormat(product_data.price_final * product_data.amount) }}
