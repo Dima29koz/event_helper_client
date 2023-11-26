@@ -73,16 +73,14 @@
 
 <script>
 import { useCurrentUserStore } from '../stores/currentUserStore'
-import ColorModeToggler from '@/components/ColorModeToggler.vue'
+import ColorModeToggler from '@/components/UI/ColorModeToggler.vue'
 import { logout } from '@/utils/api_user_account'
-import { ref } from 'vue'
 
 export default {
   name: 'navbar-header',
   setup() {
     const currentUserStore = useCurrentUserStore()
-    const avatarSrc = ref('/src/assets/default_avatar.jpg')
-
+    const avatarSrc = new URL('@/assets/default_avatar.jpg', import.meta.url).href
     return { currentUserStore, avatarSrc }
   },
   data() {
