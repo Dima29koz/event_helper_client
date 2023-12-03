@@ -41,13 +41,15 @@ import TabResults from '@/components/EventTabs/TabResults.vue'
 import { useCurrentUserStore } from '@/stores/currentUserStore'
 import { useEventMemberStore } from '@/stores/eventMemberStore'
 import { useEventStore } from '../stores/eventStore'
+import { useNotificationsStore } from '../stores/notificationsStore'
 
 export default {
   setup() {
     const currentUserStore = useCurrentUserStore()
     const eventMemberStore = useEventMemberStore()
     const eventStore = useEventStore()
-    return { eventMemberStore, currentUserStore, eventStore }
+    const notificationsStore = useNotificationsStore()
+    return { eventMemberStore, currentUserStore, eventStore, notificationsStore }
   },
   data() {
     return {
@@ -231,7 +233,8 @@ export default {
         'msg' in e.response.data &&
         e.response.data.msg == 'Wrong event key'
       ) {
-        this.$router.push({ name: 'events', query: { err: 'Wrong event key' } })
+        this.$router.push({ name: 'events' })
+        this.notificationsStore.addNotification('Событие не найдено', 'error')
       }
     }
     this.socket = setupIO(event_key)

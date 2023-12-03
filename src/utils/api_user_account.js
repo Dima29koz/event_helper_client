@@ -20,8 +20,8 @@ export function requestHandler(fn) {
         router.push({ path: '/login' })
       } else if (
         e.response.status == 401 &&
-        'msg' in e.response.data &&
-        e.response.data.msg == 'Token has expired'
+        (e.response.data?.msg == 'Token has expired' ||
+          e.response.data?.msg.startsWith('Missing JWT in headers or cookies') == true)
       ) {
         await refresh()
         return await requestHandler(fn)(...args)
@@ -33,11 +33,12 @@ export function requestHandler(fn) {
   }
 }
 
-export const login = requestHandler(async function (username, pwd) {
+export const login = requestHandler(async function (username, pwd, remember) {
   try {
     const response = await axios.post('/api/user_account/login', {
       username: username,
-      pwd: pwd
+      pwd: pwd,
+      remember: remember
     })
     return response.data
   } catch (e) {

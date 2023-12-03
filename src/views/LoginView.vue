@@ -65,7 +65,7 @@ export default {
   },
   methods: {
     async loginUser(user) {
-      const res = await login(user.username, user.password)
+      const res = await login(user.username, user.password, user.remember_me)
       if (res?.msg === 'Wrong username or password') {
         this.error = 'Неверный логин или пароль'
         return
