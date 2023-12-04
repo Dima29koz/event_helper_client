@@ -71,8 +71,7 @@ export default {
         return
       }
 
-      this.currentUserStore.authenticate()
-      this.getUserData()
+      await this.getUserData()
       if (this.$route.query.redirect) {
         this.$router.push({ path: this.$route.query.redirect })
       } else {

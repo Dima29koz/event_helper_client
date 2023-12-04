@@ -64,142 +64,79 @@ export default {
     connect() {
       this.socket.connect()
     },
+
     disconnect() {
       this.socket.disconnect()
     },
+
     get_data() {
-      this.socket.emit('get_data', {
-        entity: 'event'
-      })
+      this.socket.emit('get_data', { entity: 'event' })
     },
+
     get_location() {
-      this.socket.emit('get_data', {
-        entity: 'location'
-      })
+      this.socket.emit('get_data', { entity: 'location' })
     },
+
     get_members() {
-      this.socket.emit('get_data', {
-        entity: 'members'
-      })
+      this.socket.emit('get_data', { entity: 'members' })
     },
+
     get_event_products() {
       if (this.event_products.length === 0) {
-        this.socket.emit('get_data', {
-          entity: 'products'
-        })
+        this.socket.emit('get_data', { entity: 'products' })
       }
     },
+
     del_event() {
-      this.socket.emit('delete_event', {
-        auth: {
-          csrf_access_token: this.$cookies.get('csrf_access_token')
-        }
-      })
+      this.socket.emit('delete_event', {})
     },
+
     edit_event(event_data) {
-      this.socket.emit('update_data', {
-        auth: {
-          csrf_access_token: this.$cookies.get('csrf_access_token')
-        },
-        entity: 'event',
-        data: event_data
-      })
+      this.socket.emit('update_data', { entity: 'event', data: event_data })
     },
+
     edit_location(location_data) {
-      this.socket.emit('update_data', {
-        auth: {
-          csrf_access_token: this.$cookies.get('csrf_access_token')
-        },
-        entity: 'location',
-        data: location_data
-      })
+      this.socket.emit('update_data', { entity: 'location', data: location_data })
     },
+
     add_member(member_data) {
-      this.socket.emit('add_member', {
-        auth: {
-          csrf_access_token: this.$cookies.get('csrf_access_token')
-        },
-        member: member_data
-      })
+      this.socket.emit('add_member', { member: member_data })
     },
+
     join_event(member_data) {
-      this.socket.emit('join_event', {
-        auth: {
-          csrf_access_token: this.$cookies.get('csrf_access_token')
-        },
-        member: member_data
-      })
+      this.socket.emit('join_event', { member: member_data })
     },
+
     edit_member(member_data) {
-      this.socket.emit('update_data', {
-        auth: {
-          csrf_access_token: this.$cookies.get('csrf_access_token')
-        },
-        entity: 'member',
-        data: member_data
-      })
+      this.socket.emit('update_data', { entity: 'member', data: member_data })
     },
+
     edit_me(member_data) {
-      this.socket.emit('update_me', {
-        auth: {
-          csrf_access_token: this.$cookies.get('csrf_access_token')
-        },
-        data: member_data
-      })
+      this.socket.emit('update_me', { data: member_data })
     },
+
     del_me() {
-      this.socket.emit('delete_me', {
-        auth: {
-          csrf_access_token: this.$cookies.get('csrf_access_token')
-        }
-      })
+      this.socket.emit('delete_me', {})
     },
+
     del_member(member) {
-      this.socket.emit('delete_member', {
-        auth: {
-          csrf_access_token: this.$cookies.get('csrf_access_token')
-        },
-        member_id: member.id
-      })
+      this.socket.emit('delete_member', { member_id: member.id })
     },
+
     add_event_products(products) {
-      let fixed_products = products.map((product) => {
-        return { ...product, product_id: product.id }
-      })
-      fixed_products.forEach((product) => {
-        delete product.id
-      })
-      this.socket.emit('add_products', {
-        auth: {
-          csrf_access_token: this.$cookies.get('csrf_access_token')
-        },
-        products: fixed_products
-      })
+      this.socket.emit('add_products', { products: products })
     },
+
     edit_event_product(product) {
-      this.socket.emit('update_data', {
-        auth: {
-          csrf_access_token: this.$cookies.get('csrf_access_token')
-        },
-        entity: 'product',
-        data: product
-      })
+      this.socket.emit('update_data', { entity: 'product', data: product })
     },
+
     delete_event_product(product_id) {
-      this.socket.emit('delete_event_product', {
-        auth: {
-          csrf_access_token: this.$cookies.get('csrf_access_token')
-        },
-        product_id: product_id
-      })
+      this.socket.emit('delete_event_product', { product_id: product_id })
     },
+
     set_member_money(member_data) {
-      this.socket.emit('set_member_money', {
-        auth: {
-          csrf_access_token: this.$cookies.get('csrf_access_token')
-        },
-        data: member_data
-      })
+      this.socket.emit('set_member_money', { data: member_data })
     }
   },
   computed: {
@@ -221,6 +158,10 @@ export default {
       }
       return null
     }
+  },
+
+  unmounted() {
+    this.disconnect()
   },
 
   async mounted() {
@@ -245,8 +186,8 @@ export default {
     this.socket.on('connect', () => {
       setTimeout(
         () => {
-          this.socket.disconnect()
-          this.socket.connect()
+          this.disconnect()
+          this.connect()
         },
         1000 * 60 * 30
       )

@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import $cookies from 'vue-cookies'
 import { profileSettings } from '@/utils/api_user_account'
 
 export const useCurrentUserStore = defineStore('currentUser', {
@@ -32,6 +33,8 @@ export const useCurrentUserStore = defineStore('currentUser', {
       this.is_email_verified = data.is_email_verified
     },
     logout() {
+      $cookies.remove('csrf_access_token')
+      $cookies.remove('csrf_refresh_token')
       this.$reset()
     },
     async fetch_user() {

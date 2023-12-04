@@ -6,25 +6,35 @@ export const authHeaders = () => {
   return { headers: { 'X-CSRF-TOKEN': $cookies.get('csrf_access_token') } }
 }
 
+export const refreshHeaders = () => {
+  return { headers: { 'X-CSRF-TOKEN': $cookies.get('csrf_refresh_token') } }
+}
+
 export function requestHandler(fn) {
   return async function (...args) {
     try {
+      if (!$cookies.isKey('csrf_access_token') && $cookies.isKey('csrf_refresh_token')) {
+        await refresh()
+      }
       return await fn(...args)
     } catch (e) {
-      if (
-        e.response.status == 422 &&
-        'msg' in e.response.data &&
-        e.response.data.msg == 'Signature verification failed'
-      ) {
+      const msg = e.response.data?.msg ?? ''
+      if (e.response.status == 422) {
         $cookies.remove('csrf_access_token')
+        $cookies.remove('csrf_refresh_token')
         router.push({ path: '/login' })
       } else if (
         e.response.status == 401 &&
-        (e.response.data?.msg == 'Token has expired' ||
-          e.response.data?.msg.startsWith('Missing JWT in headers or cookies') == true)
+        (msg === 'Token has expired' || msg === 'Missing cookie "access_token_cookie"')
       ) {
-        await refresh()
-        return await requestHandler(fn)(...args)
+        try {
+          await refresh()
+          return await requestHandler(fn)(...args)
+        } catch (ex) {
+          $cookies.remove('csrf_access_token')
+          $cookies.remove('csrf_refresh_token')
+          router.push({ path: '/login' })
+        }
       } else {
         console.log(e)
         throw e
@@ -54,16 +64,8 @@ export const login = requestHandler(async function (username, pwd, remember) {
 })
 
 export async function refresh() {
-  try {
-    const response = await axios.post(
-      '/api/user_account/refresh',
-      {},
-      { headers: { 'X-CSRF-TOKEN': $cookies.get('csrf_refresh_token') } }
-    )
-    return response.data
-  } catch (e) {
-    console.log(e)
-  }
+  const response = await axios.post('/api/user_account/refresh', {}, refreshHeaders())
+  return response.data
 }
 
 export const profileSettings = requestHandler(async function () {

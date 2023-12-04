@@ -173,7 +173,12 @@ export default {
       this.resetSelection(true)
     },
     addProducts() {
-      this.$emit('addEventProducts', this.selected)
+      const fixed_products = this.selected.map((product) => {
+        const { id, ...rest } = product
+        return { ...rest, product_id: id }
+      })
+
+      this.$emit('addEventProducts', fixed_products)
     },
     resetSelection(resetAmount = false) {
       this.base_products.forEach((product) => {

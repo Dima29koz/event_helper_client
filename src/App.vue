@@ -37,19 +37,23 @@ export default {
 
   async mounted() {
     const currentUserStore = useCurrentUserStore()
-    if (this.$cookies.keys().includes('csrf_access_token')) {
+
+    if (
+      this.$cookies.keys().includes('csrf_access_token') ||
+      this.$cookies.keys().includes('csrf_refresh_token')
+    ) {
       await currentUserStore.fetch_user()
     }
+
     this.$router.beforeEach((to, from, next) => {
-      if (to.matched.some((record) => record.meta.requiresAuth)) {
-        if (!currentUserStore.isAuth) {
-          next({
-            path: '/login',
-            query: { redirect: to.fullPath }
-          })
-        } else {
-          next()
-        }
+      if (currentUserStore.isAuth && !this.$cookies.keys().includes('csrf_refresh_token')) {
+        currentUserStore.logout()
+      }
+      if (to.matched.some((record) => record.meta.requiresAuth) && !currentUserStore.isAuth) {
+        next({
+          path: '/login',
+          query: { redirect: to.fullPath }
+        })
       } else {
         next()
       }
